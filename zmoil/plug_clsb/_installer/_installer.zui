@@ -1,0 +1,105 @@
+
+:ExampleStyleSectionHeader = ZUI {
+	parent = styleGlobal
+	font = header
+	textColor = 0x000000FF
+	layout_cellAlign = c
+}
+
+:ExampleStyleTwiddler = ZUI {
+	parent = styleGlobal
+	panelColor = 0
+
+	varPanelColorEditMode = 0x505050FF
+	varPanelFrameEditMode = 2
+	varTextColorEditMode = 0xFFFF66FF
+	varTextColor = 0xFFFF33FF
+
+}
+
+
+:Tutorial = ZUIPanel {
+	style = styleDialog
+	hidden = 0
+	layoutManual = 1
+	layoutManual_x = W w - 2 /
+	layoutManual_y = H h - 2 /
+	layoutManual_w = 500
+	layoutManual_h = 400
+	parent = root
+	layout_indentL = 5
+	layout_indentT = 5
+	layout_indentR = 5
+	layout_indentB = 5
+	pack_fillLast = 1
+	pack_side = t
+
+	: = ZUIPanel {
+		style = styleGroupL
+		layout_cellFill = wh
+
+		: = ZUIText {
+			style = styleDialogTitle
+			text = "Welcome to the MOIL installation program."
+		}
+	}
+
+	: = ZUILine {
+		lineEmbossed = 1
+	}
+	
+	: = ZUIText {
+		wordWrap = 1
+		!multilineIgnoreWhitespace text
+			This program will install MOIL to your computer.
+			\n
+			\n
+			Please select a location for installation by typing in the box provided or clicking 'Browse'
+			to choose a location interactively.
+			\n
+			\n
+			MOIL contains a main 'moil' folder, which will be placed at the location you specify.  Based
+			on your current selection, moil will be installed here:
+		!endmultiline
+	}
+
+	: = ZUIText {
+		textColor = 0xFFFF00FF
+		text = "C:\\moil"
+	}
+
+
+	: = ZUILine {
+		lineEmbossed = 1
+	}
+
+	: = ZUIPanel {
+		: = ZUITextEditor {
+			layout_forceW = 200
+			text = "C:\\"
+		}
+
+		: = ZUIButton {
+			text = "Browse"
+			sendMsg = "type=ZUIHide toZUI=$parent; type=TutorialOK"
+			layout_forceW = 50
+		}
+	}
+
+	: = ZUIPanel {
+		: = ZUIButton {
+			text = "Contuinue"
+		}
+
+		: = ZUIButton {
+			text = "Exit"
+			sendMsg = "type=ZLAB_Shutdown"
+		}
+	}
+}
+
+
+
+
+
+

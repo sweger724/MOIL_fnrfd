@@ -1,0 +1,33 @@
+c	for avedS_dyna and the subroutines called by it
+c	stores average values
+
+	double precision e0_total,p
+      	double precision psq,ujk(3,maxnpts),ujksq(3,maxnpts)
+      	double precision pujk(3,maxnpts), ujkp(3,maxnpts)
+      	double precision diagparts21(3,maxnpts), diagparts22(3,maxnpts)
+      	double precision diagparts23(3,maxnpts), diagparts24(3,maxnpts)
+      	double precision dpot_total(3,maxnpts), diagparts31(3,maxnpts)
+      
+      	double precision diag11(3,maxnpts),diag12(3,maxnpts)
+
+	double precision e0_sum(LGRID),p_sum(LGRID), psq_sum(LGRID)
+      	double precision ujk_sum(3,maxnpts,LGRID)
+	double precision ujksq_sum(3,maxnpts,LGRID)
+      	double precision pujk_sum(3,maxnpts,LGRID)
+	double precision ujkp_sum(3,maxnpts,LGRID)
+      	double precision diagprts11_sum(3,maxnpts,LGRID) 
+      	double precision diagprts12_sum(3,maxnpts,LGRID) 
+      	double precision diagprts22_sum(3,maxnpts,LGRID)
+      	double precision diagprts21_sum(3,maxnpts,LGRID)
+      	double precision diagprts23_sum(3,maxnpts,LGRID)
+      	double precision diagprts24_sum(3,maxnpts,LGRID)
+      	double precision diagprts31_sum(3,maxnpts,LGRID)
+
+	common /AVE/ e0_total,p,psq,ujk,ujksq,pujk, ujkp,
+     1	      	diagparts21, diagparts22,diagparts23, diagparts24,
+     2	 	dpot_total, diagparts31,diag11,diag12, e0_sum,p_sum, 
+     3		psq_sum,ujk_sum,ujksq_sum,pujk_sum,ujkp_sum,
+     4		diagprts11_sum,diagprts12_sum,diagprts22_sum,
+     5		diagprts21_sum,diagprts23_sum,diagprts24_sum,
+     6	 	diagprts31_sum
+

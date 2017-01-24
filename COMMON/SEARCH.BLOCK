@@ -1,0 +1,38 @@
+        
+        integer Stotal
+
+        double precision centers(3,maxNodes*maxpt)
+        double precision ReducedCoor(max_reducedCoor,maxNodes)
+        double precision myReduced(max_reducedCoor)
+        integer          torsions(max_reducedCoor,4), Nreduced
+        double precision myDReduced(3,4,max_reducedCoor)
+        double precision structures(3,maxStru*maxpt),
+     &                   weight,allmass,mmm(maxpt)
+        
+        double precision P(maxNodes,maxNeighbors),cutoff,fA(maxNodes),
+     &                   searchLimit,gA(maxNodes),hA(maxNodes),dx,
+     &    dx_umbrella,dx_approximate,umbrella_K1,umbrella_K2,
+     &    Wvelo(3,maxpt),Wcoor(3,maxpt),www(10000),conform(maxNodes),
+     $    tor_weight(max_reducedCoor), tor_weight2(max_reducedCoor)
+     
+        integer node(maxNodes,maxNeighbors), neighbors(maxNodes),
+     &          ord(maxNodes), doneB, cell(maxNodes), Ncells, myCell
+     &          ,myCell2,nStart,nsave, 
+     &           total,is_in, nodeType(maxNodes), nEnd
+
+
+        logical langevin, verbose
+
+        common /SEARCH_integer/ node,neighbors,Stotal,ord,cell,Ncells,
+     &                     myCell,myCell2,nStart,doneB,
+     &                     nsave, total,is_in,nodeType,
+     &                     nEnd,torsions,Nreduced
+        
+        common /SEARCH_double/ P,cutoff,centers,structures,fA,gA,hA,
+     &                         searchLimit,conform,mmm,dx,dx_umbrella,
+     &                         weight,allmass,Wvelo,Wcoor,www,
+     &                         myReduced,ReducedCoor,myDReduced,
+     &                         tor_weight,tor_weight2, dx_approximate,
+     &                         umbrella_K1,umbrella_K2
+        
+        common /SEARCH_logical/ langevin, verbose

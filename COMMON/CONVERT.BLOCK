@@ -1,0 +1,18 @@
+c Parameters for converting between units
+c kofdie - in electrostatic calculations: Eelec = kofdie *q1*q2/r
+c 	converting from angstrom, electron charge units to kcal/mol
+c pi     - value of pi as set up by the machine
+c pi180  - converting from degrees to radians (and vice versa)
+c tconv  - converting from picoseconds to internal moil units (divide time
+c		in ps to get the time in moil units)
+c one_bar - atmospheric units
+c
+	double precision pi180,kofdie,tconv,kboltzmann,one_bar
+	double precision atmosp
+c	parameter (pi180 = 180.d0/(4.d0*datan(1.d0)))
+	parameter (kofdie=332.0716d0)
+	parameter (tconv=.04888821290839616117d0)
+	parameter (kboltzmann=1.987d-3)
+	parameter (one_bar=.00001439263d0)
+	parameter (atmosp=0.024861661d0)
+	common /CONVERT/pi180

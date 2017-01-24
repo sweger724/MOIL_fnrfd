@@ -1,0 +1,8 @@
+c THE second derivative matrix (the NxN representation)
+c not always required and therefore separated from SCNDRV.BLOCK
+c that contains the second derivatibe matrix in a compressed from.
+c it is store in a linear form such that conversion to a square
+c matrix can be done in a more general way, i.e. d2v(npt3,*)
+c where npt3 is the CURRENT number of particles.
+	double precision d2vec(9*maxpt2d*maxpt2d)
+	common /scndrv2/d2vec

@@ -1,0 +1,13 @@
+c a common block for using communication libraries
+c
+c inum    -number of the process (-1) in the order of starting the PVM 
+c          processes.
+c comm_first_call- flag to know if it is necessary to enroll the process
+c
+        logical comm_first_call
+        integer inum1,dest_left,dest_right
+c
+        common /COMM0/comm_first_call
+        common /COMM1/inum1,dest_left,dest_right
+
+

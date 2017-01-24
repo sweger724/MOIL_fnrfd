@@ -1,0 +1,142 @@
+c e_total - (double) total energy
+c e_bond - (double) bond energy
+c e_theta - (double) angle energy
+c e_tors - (double) proper torsion energy
+c e_imp  - (double) improper torsion energy
+c e_vdw  - (double) vdw 6-12 energy
+c e_el   - (double) electrostatic energy
+c e_el14 - (double) 1-4 electrostatic interaction
+c e_vdw14- (double) 1-4 van der Waals energy
+c e_cnst - (double) constraints energy
+c e_vsym - (double) van der Waals energy resulting from symmetry related particles
+c e_lsym - (double) electrostatic energy resulting from symmetry related particles
+c e_cent - (double) constraint energy on center of mass of selected atoms
+c e_hyd  - (double) hydrophobic energy
+c e_morseb  - energy contributed by morse potential
+c e_repuls  - repulsion energy
+c e_tether  - local harmonic force to keep selected particles around
+c e_wall    - Wall energy (exponential replusion along the Y axis
+c e_lctd    - Metal electrode energy associate with external electric potential gradient
+c e_lmet    - Metal image charge energy
+c e_gbsa    - Generalized Born Model energy
+c e_gbnonpol - non-polar solvation energy
+c e_ball     - Ball containing water molecules
+c e_enm       - energy for network model.
+c e_external - customized external potential
+c e_ctors    - torsion constraint energy
+c e_Kumb     - umbrella constraint energy for a given interface
+c            - if two cells in multimensional milestoning               
+c            - lastViolated ...the last constrained that was not satisfied is not OK
+c e_alabar   - alanine barrier energy
+c 
+c dpot   - (double) forces on atom i
+c logical flags if true corresponding energy is calculated
+c ebyes (bond) ; ethyes (angle) ; etoyes (torsion) ; eimyes (improper)
+c evdyes (van der Waals) ; eelyes (electrostatic) ; ecnyes (constrain)
+c esymyes (symmetry related energy) ; eballyes (constraining water to a sphere)
+c eCGyes (CG energy terms)
+c replusyes (exponential replusion term)
+c nocut  - if true, do not employ additional cut in enonb
+c logical ctrue - if true, cdie is used, otherwise, distance
+c dependedt dielectric is employed.
+c eps - guess
+c e0fin  - pre-exponent factor for finite van der Waals
+c emyes     - in true morse present
+c repulsyes - if true repulsion present
+c eteth_yes - logical variable, if yes e_teth is used
+c efyes     - logical variable if yes "finite" nonbonded interaction
+c		at zero distance is used
+c ehyes     - logical if true hydrophobic energy is on.
+c eenmyes   - logical if true e_enm is on.
+c e_Kumbyes - logical if true e_Kumb is on.    
+c metalyes  - logical if true metal walls are present (along Y)
+c
+c hvdw0     - if true vdw rad of hydrogen is zero
+c test_d    - if true test distances any call to eforce
+
+c ufast - energy of the intercations involving fast parts
+        double precision e_total,e_bond,e_theta,e_tors,e_imp
+c abarpsi - psi angle of aladip barrier. -TF
+c kphi / kpsi / keq / ctstr - these are parameters for ctors, which
+c       imposes a harmonic penalty force (energy scaled by ctstr)
+c       ensuring "kphi*phi + kpsi*psi = keq".
+c rgcst - logical indicating radgyr constraint (fp/rgyrconst.f)
+c sPhase - type of umbrela potential for sampling interface between two cells
+        integer npts, sPhase
+
+c npts - number of slow degrees of freedom for OM
+
+c virvdw1,virvdw2     - virial terms for real and PBC water vdw interactions 
+c virvdw3,virvdw4     - virial terms for real and PBC protein vdw interactions 
+c virvdw5             - virial terms for 1-4 vdw --Luca
+c vircent             - virial term for cent potential
+c pconv               - convert press in internal units to bar
+c pdebug              - flag for printing virial terms
+
+
+
+	double precision e_vdw,e_el,e_cnst,e_vsym,e_lsym,e_cent
+	double precision e_tether,e_hyd,e_morseb(maxmorsb)
+	double precision e_repuls(maxmorsb),tote_morsb,tote_repuls
+	double precision e_el14,e_vdw14,e_ball
+	double precision e_wall,e_lctd,e_lmet,e_external
+	double precision e_enm, e_CG, e_Kumb
+	double precision dpot(3,maxpt)
+	double precision eps,e0fin,ufast,e_gbsa,e_gbnonpol
+	double precision e_alabar,e_rgyr,e_steer
+
+c        double precision e,fthird,plrc,elrc,virlrc !--Luca
+c        double precision virvdw1,virvdw2 !--Luca
+c        double precision virvdw3,virvdw4,virvdw5 !--Luca
+c        double precision vircent,virstr,enkin !--Luca
+c	Luca additions
+        double precision eninth,fthird,plrc,elrc,virlrc
+        double precision virvdw1,virvdw2
+        double precision virvdw3,virvdw4,virvdw5
+        double precision vircent,virstr,enkin
+        double precision pconv
+
+c Urey-Bradley
+        integer urey1(maxangl),urey2(maxangl),urey3(maxangl),nurey
+        double precision angleq_urey(maxangl),kangl_urey(maxangl)
+
+	logical pdebug, lastViolated
+	logical ctrue,shift,lcent
+	logical ebyes,ethyes,etoyes,eimyes,evdyes,eelyes,ecnyes
+	logical repyes(maxmorsb),repyes0
+	logical esymyes,emyes0,emyes(maxmorsb),eteth_yes,nocut
+	double precision kphi,kpsi,keq,ctstr,abarpsi,e_ctors
+	logical efyes,ehyes,eenmyes,eCGyes,e_Kumbyes
+	logical metalyes
+	logical e14el_yes,e14v_yes
+	logical eballyes
+        logical esteeryes
+	logical hvdw0
+	logical test_d
+	logical dpot_ave_yes
+	logical torscstr,alabar,rgcst
+
+	common /ENERGY/e_total,e_bond,e_theta,e_tors,e_imp,e_vdw,e_el
+     *  ,e_cnst,e_vsym,e_lsym,e_morseb,e_cent,e_repuls,e_el14,e_vdw14
+     *  ,e_tether,e_hyd,tote_morsb,tote_repuls,eps,e0fin,e_wall,e_lctd
+     *  ,e_enm, e_CG, e_Kumb
+     *  ,e_lmet,ufast,e_external,e_gbsa, e_gbnonpol
+     *  ,kphi,kpsi,keq,ctstr,abarpsi,e_ctors
+     *  ,e_alabar,e_rgyr,e_ball,
+c     *  plrc,elrc,eninth,virlrc,fthird,virvdw1, ! --Luca
+c     *  virvdw2,virvdw3,virvdw4,virvdw5 ! --Luca
+c     *  ,vircent,enkin,pconv !  --Luca
+     *  plrc,elrc,eninth,virlrc,fthird,virvdw1,
+     *  virvdw2,virvdw3,virvdw4,virvdw5
+     *  ,vircent,enkin,pconv
+     *  ,kangl_urey,angleq_urey,e_steer
+
+	common /DERIVATIVES/dpot
+	common /LENER/ctrue,ebyes,ethyes,etoyes,eimyes,evdyes,eelyes
+     *  ,ecnyes,esymyes,emyes,eteth_yes,lcent,nocut,shift,repyes
+     *  ,efyes,ehyes,repyes0,emyes0,metalyes,e14el_yes,e14v_yes
+     *  ,eenmyes,eCGyes,e_Kumbyes,esteeryes, lastViolated
+     *  ,hvdw0,test_d,dpot_ave_yes,rgcst,torscstr,alabar,eballyes
+     *  ,pdebug
+	common /IENER/npts,sPhase
+     *  ,urey1,urey2,urey3,nurey	

@@ -1,0 +1,53 @@
+ Volume in drive C has no label.
+ Volume Serial Number is 24A4-B346
+
+ Directory of C:\elber\moil\moil.source\cmoil
+
+09/07/2007  08:56 AM             2,522 cmoil.h
+08/21/2007  09:52 AM             1,241 cmoil_aminoacids.h
+08/21/2007  09:52 AM            10,975 cmoil_atom.h
+08/21/2007  09:52 AM             1,714 cmoil_bspline.h
+08/21/2007  09:52 AM             1,928 cmoil_camera.h
+09/24/2007  08:23 AM             6,857 cmoil_const.h
+08/21/2007  09:52 AM             2,241 cmoil_crd.h
+08/21/2007  09:52 AM             1,210 cmoil_dib.h
+08/21/2007  09:52 AM             9,221 cmoil_drawshape.h
+10/04/2007  01:17 PM             1,360 cmoil_globals.h
+08/21/2007  09:52 AM             4,618 cmoil_menu.h
+08/21/2007  09:52 AM             1,953 cmoil_movieprint.h
+10/04/2007  01:15 PM             1,218 cmoil_msgboard.h
+08/21/2007  09:52 AM             4,853 cmoil_parm.h
+09/07/2007  08:56 AM             2,046 cmoil_pick.h
+08/21/2007  09:52 AM             3,325 cmoil_rms.h
+08/21/2007  09:52 AM             1,849 gifmerge.h
+08/21/2007  09:52 AM             3,391 trackball.h
+              18 File(s)         62,522 bytes
+               0 Dir(s)  12,539,379,712 bytes free
+ Volume in drive C has no label.
+ Volume Serial Number is 24A4-B346
+
+ Directory of C:\elber\moil\moil.source\cmoil
+
+10/12/2007  09:14 AM            34,585 cmoil.cpp
+08/21/2007  09:52 AM             3,370 cmoil_aminoacids.cpp
+10/04/2007  01:40 PM           101,046 cmoil_atom.cpp
+08/21/2007  09:52 AM             6,476 cmoil_bspline.cpp
+08/21/2007  09:52 AM            11,683 cmoil_ce.cpp
+09/25/2007  10:05 AM             3,729 cmoil_dib.cpp
+08/21/2007  09:52 AM            33,743 cmoil_drawshape.cpp
+08/21/2007  09:52 AM               972 cmoil_keysim.cpp
+08/21/2007  09:52 AM             1,487 cmoil_magick.cpp
+10/04/2007  01:30 PM            30,026 cmoil_menu.cpp
+09/07/2007  08:56 AM             5,819 cmoil_movieprint.cpp
+10/04/2007  01:27 PM             2,482 cmoil_msgboard.cpp
+09/07/2007  08:56 AM            12,682 cmoil_parm.cpp
+09/07/2007  08:56 AM            11,832 cmoil_pick.cpp
+08/21/2007  09:52 AM            17,517 cmoil_rms.cpp
+08/21/2007  09:52 AM               367 cmoil_test.cpp
+09/07/2007  08:56 AM            10,658 cmoil_util.cpp
+08/21/2007  09:52 AM            14,736 gifmerge.cpp
+08/21/2007  09:52 AM             1,205 swap4.cpp
+08/21/2007  09:52 AM             1,681 swap8p.cpp
+08/21/2007  09:52 AM             9,197 trackball.cpp
+              21 File(s)        315,293 bytes
+               0 Dir(s)  12,539,379,712 bytes free

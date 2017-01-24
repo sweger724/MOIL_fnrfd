@@ -1,0 +1,52 @@
+      SUBROUTINE INITP3(DIAGB,EMAT,N,LRESET,YKSK,YRSR,BSK,
+     *     SK,YK,SR,YR,MODET,UPD1)
+c      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      INTEGER N,MODET
+      DOUBLE PRECISION DIAGB(N),EMAT(N),YKSK,YRSR,BSK(N),SK(N),
+     *     YK(N),COND,SR(N),YR(N),DDOT,SDS,SRDS,YRSK,TD,D1,DN
+      INTEGER I
+      LOGICAL LRESET,UPD1
+      IF (UPD1) GO TO 90
+      IF (LRESET) GO TO 60
+      DO 10 I = 1,N
+         BSK(I) = DIAGB(I)*SR(I)
+10    CONTINUE
+      SDS = DDOT(N,SR,1,BSK,1)
+      SRDS = DDOT(N,SK,1,BSK,1)
+      YRSK = DDOT(N,YR,1,SK,1)
+      DO 20 I = 1,N
+         TD = DIAGB(I)
+         BSK(I) = TD*SK(I) - BSK(I)*SRDS/SDS+YR(I)*YRSK/YRSR
+         EMAT(I) = TD-TD*TD*SR(I)*SR(I)/SDS+YR(I)*YR(I)/YRSR
+20    CONTINUE
+      SDS = DDOT(N,SK,1,BSK,1)
+      DO 30 I = 1,N
+         EMAT(I) = EMAT(I) - BSK(I)*BSK(I)/SDS+YK(I)*YK(I)/YKSK
+30    CONTINUE
+      GO TO 110
+60    CONTINUE
+      DO 70 I = 1,N
+         BSK(I) = DIAGB(I)*SK(I)
+70    CONTINUE
+      SDS = DDOT(N,SK,1,BSK,1)
+      DO 80 I = 1,N
+         TD = DIAGB(I)
+         EMAT(I) = TD - TD*TD*SK(I)*SK(I)/SDS + YK(I)*YK(I)/YKSK
+80    CONTINUE
+      GO TO 110
+90    CONTINUE
+      CALL DCOPY(N,DIAGB,1,EMAT,1)
+110   CONTINUE
+      IF (MODET .LT. 1) RETURN
+      D1 = EMAT(1)
+      DN = EMAT(1)
+      DO 120 I = 1,N
+         IF (EMAT(I) .LT. D1) D1 = EMAT(I)
+         IF (EMAT(I) .GT. DN) DN = EMAT(I)
+120   CONTINUE
+      COND = DN/D1
+      WRITE(*,800) D1,DN,COND
+800   FORMAT(' ',//8X,'DMIN =',1PD12.4,'  DMAX =',1PD12.4,
+     *     ' COND =',1PD12.4,/)
+      RETURN
+      END

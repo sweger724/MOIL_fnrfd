@@ -1,0 +1,14 @@
+BEGIN {
+radius["H"] = "1.00";
+radius["N"] = "1.75"; 
+radius["C"] = "1.85"; 
+radius["O"] = "1.60"; 
+radius["S"] = "2.00"; 
+count = 0;
+   }
+   { 
+ print count, radius[substr($3,0,1)],$6, $7, $8;
+count++;
+}
+END {
+}

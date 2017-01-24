@@ -1,0 +1,30 @@
+Recursive Dijkstra, Edge-list Bisection and Edge Elimination Algorithms to find Global Maximum Weight Paths in Kinetic Networks
+
+All algorithms described in Viswanath, Kreuzer, Cardenas and Elber, 'Analyzing Milestoning Networks for Kinetic Data: Definitions, Algorithms and Examples', 2013. 
+
+Note that the code here does not deal with different graph representations, and only deals with the straightforward case of state-space graphs. To get paths from flux-space representations, the user is responsible for determining and supplying the correct input graph as mentioned in the paper. Note also that the output paths will correspond to the nodes in the same space as the input graph, and if the input graph is in flux-space, the output path will also be in flux-space. The user is responsible for converting the paths to state-space later on. 
+
+Compile the codes like this:
+
+g++ recursiveDijkstra.cpp -o recursiveDijkstra.exe
+g++ edgeElimination.cpp -o edgeElimination.exe
+g++ edgeListBisection.cpp -o edgeListBisection.exe
+
+Run the code with the following arguments:
+1. Weight matrix, NXN in anchor space or milestone space
+2. Number of nodes in the network, N
+3. Start state, s 
+4. End state,t 
+
+Note that nodes are indexed from 1, not 0.
+
+Example
+The example in the example directory can be run like this to get the output files rd.pajek.net and ee.pajek.net:
+
+ ../recursiveDijkstra.exe weightMat.dat 195 8 14 > rd.pajek.net
+ ../edgeElimination.exe weightMat.dat 195 8 14 > ee.pajek.net 
+ ../edgeListBisection.exe weightMat.dat 195 8 14 > eb.pajek.net 
+
+Output files are in pajek format. 
+
+Note that the path returned by all algorithms is same.

@@ -1,0 +1,43 @@
+c
+c parameter required for Elastic Network Calculation
+c g[x]list1(i) - a pointer to the last neighbour of atomi i
+c g[x]list2( g[x]list1(i) ) - the last neighbour of atom i
+c req1 - the equilibrium distances of network 1
+c req2 - the equilibrium distances of network 2
+c  plastic network models
+c	alpha - relative well depths
+c	beta  - coupling parameter in the EVB model
+c	gamma - force constant
+c	cutoff - distance for edge on/off
+c
+c	Env_temperature - physical temperature of the system
+c
+
+	integer g1list1(0:maxpt),g1list2(maxCGcontacts)
+	integer g2list1(0:maxpt),g2list2(maxCGcontacts)
+	integer gmlist1(0:maxpt),gmlist2(maxCGcontacts)
+	double precision req1(maxCGcontacts) 
+        double precision req2(maxCGcontacts)
+	double precision reqm(maxCGcontacts)
+	double precision enm_alpha, enm_beta, enm_gamma, enm_cutoff
+	double precision Env_temperature
+
+c Potential energies and its derivatives
+        double precision U1,U2, gradU1(3,maxpt), gradU2(3,maxpt)
+	double precision Um,gradUm(3,maxpt), maxU, limU
+	parameter (maxU=1.d10)
+
+
+c 2nd derivative variables
+
+        double precision dG_dU1,dG_dU2,d2G_d2U1,d2G_d2U2,d2G_dU1dU2
+        double precision diag(6*maxpt2d)
+        double precision offdiag(6*maxCGcontacts)
+
+        
+	common /enm_integer/g1list1,g1list2,g2list1,g2list2,gmlist1
+     1          ,gmlist2
+	common /enm_double/req1,req2,enm_alpha,enm_beta,enm_gamma 
+     1         ,enm_cutoff,dG_dU1,dG_dU2,d2G_d2U1,d2G_d2U2,d2G_dU1dU2
+     2         ,diag,offdiag,Env_temperature,limU
+     3         ,U1,U2,Um,gradU1,gradU2,gradUm,reqm

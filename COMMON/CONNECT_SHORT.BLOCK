@@ -1,0 +1,78 @@
+C DEFINITION OF THE MOLECULE TOPOLOGY AND POTENTIAL ENERGY TERMS 
+c
+c maxmono - maximal number of monomers types.
+c maxpt   - maximal number of particles in the system.
+c maxbond - maximal total number of bonds.
+c maxex   - maximal total number of exclusions.
+c maxspec - maximum number of special (1-4) interactions.
+c MAXBULK - maximum number of molecular systems (BULK)
+c
+c-----------------------------------------------------------------------
+c *** vectors of length npt, number of particles in the system
+c     (npt < maxpt)
+c poimon  - integer vector with monomer pointer
+c		(poimon(ipt) = the # of the monomer of the ipt particle)
+c ptid    - integer vector with id of particle types
+c ptnm    - (char*4)name of the particle (ipt)
+c ptms    - (double)mass of the particle (ipt)
+c ptchg   - (double)charge of particle   (ipt)
+c epsgm6  - (double)square root of van der Waals energy times sigma^6
+c epsgm12 - (double)square root of van der Waals energy times sigma^12
+c flagchr - is a flag charge. It is set to true of the particle is 
+c             charged
+c 
+	integer poimon(maxpt),ptid(maxpt)
+        logical flagchr(maxpt)
+	character*4 ptnm(maxpt)
+	double precision ptms(maxpt),ptchg(maxpt)
+	double precision epsgm6(maxpt),epsgm12(maxpt)
+c-----------------------------------------------------------------------
+c BULK - character vector with the name of BULK (molecular systems)
+c assembled
+c pbulk - pointer to the last particle of the i-th BULK
+c
+        character*4 BULK(MAXBULK)
+        integer pbulk(MAXBULK)
+c-----------------------------------------------------------------------
+c *** vector of length totmono (number of monomers in the molecule)
+c               totmono< maxmono
+c moname  - character*4 vector with the name of monomers type
+c poipt   - From monomers to particles poipt(i) is the last particle
+c               of monomer i
+c
+      character*4 moname(maxmono)
+      integer poipt(0:maxmono)
+c-----------------------------------------------------------------------
+c *** vectors of length nb (number of bonds) nb < maxbond
+c ib1 ib2   - pointers to particles that are bonded
+c             ib1(i) is the pointer to particle k.
+c
+	integer ib1(maxbond),ib2(maxbond)
+c----------------------------------------------------------------------
+c Exclusion lists between 1-2 1-3 and  aspecial list for 1-4.
+c exc1 is a pointer to exc2, i.e. exc2(exc1(i)) is the last
+c particles to be excluded from interaction with i
+c Similarly spec1 is a pointer to spec2
+c
+	integer exc1(0:maxpt),exc2(maxex)
+	integer spec1(maxspec),spec2(maxspec)
+c----------------------------------------------------------------------
+c *** integers define actual size of molecule, initially are set to 0
+c totmon  - total number of monomers
+c npt     - total number of particles
+c nb      - total number of bonds
+c totex   - number of exclusions of particle interactions
+c totspe  - number of special (1-4) interactions
+c nbulk   - number of "bulk" (molecular systems)
+c
+	integer totmon,npt,nb,totex,totspe,nbulk
+c  
+c-----------------------------------------------------------------------
+c Now gather everything into common blocks
+c
+	common /CONNLOG/flagchr
+	common /CONNINT/poimon,ptid,pbulk,poipt,ib1,ib2,
+     2		exc1,exc2,spec1,spec2,
+     5		totmon,npt,nb,totex,totspe,nbulk
+	common /CONNDBL/ptms,ptchg,epsgm6,epsgm12
+	common /CONNCHR/ptnm,moname,BULK

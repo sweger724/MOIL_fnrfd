@@ -1,0 +1,61 @@
+c a common block for SPW calculations. Parallel or not.
+c grid - number of grid points for the Onsager path
+c degfmax - maximum number of degrees of freedom (for the whole
+c 	discrete representation of the path). Including fix points
+c degfmin  - number of degrees of freedom for the path excluding
+c	fix points
+c maxpt3- maximum number of particles (for a single copy of the
+c 	system) multiply by 3
+c pseg  - number of structures in a path segment (assigned to one
+c		process.
+c npt2 and npt3 - npt is the ACTUAL number of particles in a single 
+c	copy of the system, npt2 and npt2 are 2 times and 3 times
+c	the same number.
+c ndgef - actual number of degrees of freedom to be optimized in
+c	a given process. I.e. 3*npt*(grid-2)/proc
+c nstep - number of optimization steps
+c npri  - number of steps between writing reports
+c nwcrd - number of steps between writing coordinates
+c level - if 1 you are in a big trouble (program stop), if 0 you are
+c	in a small trouble (program issues a warning)
+c nlist - number of steps between update of non-bonded lists and
+c 	recall to pwl_sto
+c lap   - if "lap" overlap structures along the path.
+c tolg  - convergence crierion, if gradient norm less than tolg, stop.
+c estred- estimated reduction in function in the first step
+c spw     - current value of the Self Penalty Walk action
+c dt      - time step along the path
+c gamma   - friction constant
+c twodt   - twice the time step
+c r       - vector with all the coordinates of the path segment
+c	in the present process
+c dspw - vector with the derivatives of the SPW action in
+c	the present process
+c
+c
+        integer pseg,maxpt3,degfmin
+        parameter (maxpt3=3*maxpt)
+	parameter (pseg=(grid-2)/proc)
+	parameter (degfmin=pseg*maxpt3)
+
+	integer npt2,npt3
+	integer nstep,npri,nwcrd
+	integer level,nlist,ndegf
+	character*4 crdstyl
+	logical first,last,fixend,lap
+
+	double precision spw
+	double precision tolg,estred
+	double precision gamma,rho,lambda
+	double precision gam2,rhol,rho2
+	double precision e0(pseg)
+
+
+	double precision r(degfmax),dspw(degfmax)
+
+	common /spwlog/first,last,fixend,lap
+	common /spwint/npt2,npt3,nstep,npri,nwcrd,
+     1		level,nlist,ndegf
+	common /spwdbl/spw,tolg,estred,gamma,rho,lambda,gam2,
+     1		rhol,rho2,e0,r,dspw
+	common /spwchr/crdstyl

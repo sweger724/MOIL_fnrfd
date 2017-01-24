@@ -1,0 +1,110 @@
+c common block for the sake of shake
+c ishak1 & ishak2 - pointers to bonds to be shaked
+c		    ishak1/2(i) is the first/second particle
+c		    of the i-th constrained bond.
+c nshak           - number of constraints
+c xref,yref,zref  - reference coordinate system used to define the
+c		    bond direction
+c itershak - maximum number of allowed shake iterations
+c dissq		  - vector with ideal bond lengths
+c
+	integer ishak1(maxshak),ishak2(maxshak),nshak
+	integer itershak
+	double precision epshak,epshakv
+	double precision cooref(3,maxshak)
+	double precision dissq(maxshak)
+
+c chen  
+c For (standard) parallelization:
+c
+c ex_shared	  - velocity components of shared particles, that should be 
+c		    exchanged between PEs.
+c		    the (x,y,z) volocity components of a kth particle shared by 
+c		    two PEs i and j. are stored in: 
+c		    ex_shared(1,i * mx_shk_shr_tot + j * mx_shk_shr + k),
+c		    ex_shared(2,i * mx_shk_shr_tot + j * mx_shk_shr + k) and 
+c		    ex_shared(3,i * mx_shk_shr_tot + j * mx_shk_shr + k).
+c		    and in 
+c		    ex_shared(1,j * mx_shk_shr_tot + i * mx_shk_shr + k),
+c		    ex_shared(2,j * mx_shk_shr_tot + i * mx_shk_shr + k) and 
+c		    ex_shared(3,j * mx_shk_shr_tot + i * mx_shk_shr + k).
+c		    This is a global array shared by all PEs.
+c shared_list 	  - a (PE) local  list of the shared particles.
+c		    shared_list(i,1) is the shared atom index in the global particle
+c		    list. shared_list(i,2) is the other PE. shared_list(i,3) 
+c		    is the particles number in the list of particles shared 
+c		    by me and the other PE.
+c n_shared(i)	  - number of shared particles with the ith PE.
+c n_shared_total  - number of shared particles.
+c shaked_prtcls   - a list of all the particles shaked by me.
+c n_shaked_prtcls - The number of all the particles shaked by me.		      
+c shak_velo	  - a copy of velo with zeros for atomes not shaked by me
+c everybody_happy - an array of integers, one for each PE. 
+c		  - each element is 1 if the shake converged on that PE,
+c		    and 0 otherwhise. 
+c		    of course shake continues as long as any PE is unhappy.
+c shak_diff 	  - an array of convergence criteria for shake.
+c shak_shr_epsi_fctr - reduced convergence criteria for particles shared by 
+c		       two PEs
+   
+c	integer shared_list(maxpe * mx_shk_shr,3)
+c	integer n_shared(maxpe),n_shared_total
+c	integer shaked_prtcls(max_shk_pe), n_shaked_prtcls
+c	double precision ex_shared(3,maxpe * maxpe * mx_shk_shr)
+	double precision shak_diff(maxshak)
+c	double precision shak_velo(3,maxpt)
+c	integer everybody_happy(maxpe)
+c	integer shak_shr_epsi_fctr
+
+c parallel shake - Yael
+
+c conjugate gradient matrix prallel shake
+c sk_start,sk_end - the first and last constrian for each processor.
+c pt_start,pt_end - the first and last particle for each processor.
+c shared_const - the constrains that shared by non neighbors processors.
+c total_shared - number of elements in the total_shared array
+c disp - displace for the particles partitions, disp(i), is the start
+c        of the particles list for the i'th processor.
+c nptsh - nptsh(i) is the number of particles for the i'th processor 
+c right_num,left_num - the number of shared constrains to send to
+c        the right/left processor
+c left_nbrs,right_nbrs - the list of shared constrains to send to the
+c        to the right/left processor.   
+c right_num_rcv,left_num_rcv - the number of shared constrains to
+c        recieve from the right/left 
+c left_nbrs_rcv,right_nbrs_rcv - the list of shared constrains 
+c        to get to the from the right/left processor. 
+
+	integer shared_const(maxpe*3),sk_start,sk_end,pt_start,pt_end
+	integer shake_bal(0:maxpe),shared_pt_num,disp(0:maxpe)
+	integer total_shared,nptsh(0:maxpe),right_num,left_num
+	integer left_nbrs(maxlink),right_nbrs(maxlink),right_num_rcv
+	integer left_nbrs_rcv(maxlink+2),right_nbrs_rcv(maxlink+2),
+     1		left_num_rcv
+	integer mxleft,mxright,updates_num,updates(30),
+     1  shared_pt(maxpe*3)
+	integer cg_shak_it,cg_shakv_it,disp1(0:maxpe),
+     1  shared_num(0:maxpe)
+	double precision sqri(maxshak)
+	logical matshak
+
+c	parameter(shak_shr_epsi_fctr = 1000)
+
+	common /shk1/ishak1,ishak2,nshak,itershak
+	common /shk2/cooref,dissq,epshak,epshakv
+c chen
+c	common /shk3/shared_list,n_shared,n_shared_total,shaked_prtcls, 
+c     *		     n_shaked_prtcls,everybody_happy
+c	common /shk4/ex_shared,shak_velo,shak_diff
+	common /shk4/shak_diff
+
+c yael	
+	common /msk1/matshak
+	common /msk2/shared_const,total_shared,
+     1    shake_bal,nptsh,disp,sk_start,sk_end,mxleft,mxright,
+     2    left_nbrs_rcv,right_nbrs_rcv,left_num_rcv,right_num_rcv,
+     3    updates_num,updates,pt_start,pt_end,shared_pt,shared_pt_num,
+     4    cg_shak_it,cg_shakv_it,shared_num,disp1
+	common /msk3/left_nbrs,right_nbrs,left_num,right_num
+	common /msk4/sqri
+

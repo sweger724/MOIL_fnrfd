@@ -1,0 +1,83 @@
+c e_total - (double) total energy
+c e_bond - (double) bond energy
+c e_theta - (double) angle energy
+c e_tors - (double) proper torsion energy
+c e_imp  - (double) improper torsion energy
+c e_vdw  - (double) vdw 6-12 energy
+c e_el   - (double) electrostatic energy
+c e_el14 - (double) 1-4 electrostatic interaction
+c e_vdw14- (double) 1-4 van der Waals energy
+c e_cnst - (double) constraints energy
+c e_vsym - (double) van der Waals energy resulting from symmetry related particles
+c e_lsym - (double) electrostatic energy resulting from symmetry related particles
+c e_cent - (double) constraint energy on center of mass of selected atoms
+c e_hyd  - (double) hydrophobic energy
+c e_morseb  - energy contributed by morse potential
+c e_repuls  - repulsion energy
+c e_tether  - local harmonic force to keep selected particles around
+c e_wall    - Wall energy (exponential replusion along the Y axis
+c e_lctd    - Metal electrode energy associate with external electric potential gradient
+c e_lmet    - Metal image charge energy
+c e_gbsa    - Generalized Born Model energy
+c e_gbnonpol - non-polar solvation energy
+c e_ball     - Ball containing water molecules
+c e_external - customized external potential
+c 
+c dpot   - (double) forces on atom i
+c logical flags if true corresponding energy is calculated
+c ebyes (bond) ; ethyes (angle) ; etoyes (torsion) ; eimyes (improper)
+c evdyes (van der Waals) ; eelyes (electrostatic) ; ecnyes (constrain)
+c esymyes (symmetry related energy) ; eballyes (constraining water to a sphere)
+c replusyes (exponential replusion term)
+c nocut  - if true, do not employ additional cut in enonb
+c logical ctrue - if true, cdie is used, otherwise, distance
+c dependedt dielectric is employed.
+c eps - guess
+c e0fin  - pre-exponent factor for finite van der Waals
+c emyes     - in true morse present
+c repulsyes - if true repulsion present
+c eteth_yes - logical variable, if yes e_teth is used
+c efyes     - logical variable if yes "finite" nonbonded interaction
+c		at zero distance is used
+c ehyes     - logical if true hydrophobic energy is on.
+c metalyes  - logical if true metal walls are present (along Y)
+c
+c hvdw0     - if true vdw rad of hydrogen is zero
+c test_d    - if true test distances any call to eforce
+
+c ufast - energy of the intercations involving fast parts
+        double precision e_total,e_bond,e_theta,e_tors,e_imp
+
+        integer npts
+
+c npts - number of slow degrees of freedom for OM
+
+
+	double precision e_vdw,e_el,e_cnst,e_vsym,e_lsym,e_cent
+	double precision e_tether,e_hyd,e_morseb(maxmorsb)
+	double precision e_repuls(maxmorsb),tote_morsb,tote_repuls
+	double precision e_el14,e_vdw14,e_ball
+	double precision e_wall,e_lctd,e_lmet,e_external
+	double precision dpot(3,maxpt),dpot_ave(3,maxpt)
+	double precision eps,e0fin,ufast,e_gbsa,e_gbnonpol
+	logical ctrue,shift,lcent
+	logical ebyes,ethyes,etoyes,eimyes,evdyes,eelyes,ecnyes
+	logical repyes(maxmorsb),repyes0
+	logical esymyes,emyes0,emyes(maxmorsb),eteth_yes,nocut
+	logical efyes,ehyes
+	logical metalyes
+	logical e14el_yes,e14v_yes
+	logical eballyes
+	logical hvdw0
+	logical test_d
+	logical dpot_ave_yes
+
+	common /ENERGY/e_total,e_bond,e_theta,e_tors,e_imp,e_vdw,e_el
+     *  ,e_cnst,e_vsym,e_lsym,e_morseb,e_cent,e_repuls,e_el14,e_vdw14
+     *  ,e_tether,e_hyd,tote_morsb,tote_repuls,eps,e0fin,e_wall,e_lctd
+     *  ,e_lmet,dpot,dpot_ave,ufast,e_external,e_gbsa, e_gbnonpol
+	common /LENER/ctrue,ebyes,ethyes,etoyes,eimyes,evdyes,eelyes
+     *  ,ecnyes,esymyes,emyes,eteth_yes,lcent,nocut,shift,repyes
+     *  ,efyes,ehyes,repyes0,emyes0,metalyes,e14el_yes,e14v_yes
+     *  ,hvdw0,test_d,dpot_ave_yes
+	common /IENER/npts	

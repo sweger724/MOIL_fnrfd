@@ -1,0 +1,27 @@
+c ---------------------------------------------------
+c MPI parameters for parallel tempering dyna runs
+c ---------------------------------------------------
+
+
+c ---------------------------------------------------
+c MPIerr - auxiliary variable for running of PMI ruttines
+c
+c procID - ID of currect process
+c numprocs - number of processes in the computation
+cc
+c-----------------------------------------------------
+
+	integer MPIerr,nswap,random_index
+        integer Nreplicas, replicaID,old_step
+        real sumswap1, sum_accept1,RANDOM_ARRAY(randomSize)
+        real sumswap2, sum_accept2
+        logical PT_run
+
+c
+c Put all variables to common block
+c
+        common /PT_i/ MPIerr,nswap,Nreplicas,
+     &                replicaID,random_index,old_step
+        common /PT_r/ sumswap1, sum_accept1,RANDOM_ARRAY,
+     &                sumswap2, sum_accept2
+        common /PT_l/ PT_run

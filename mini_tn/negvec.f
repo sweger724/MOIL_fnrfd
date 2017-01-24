@@ -1,0 +1,13 @@
+      SUBROUTINE NEGVEC(N,V)
+c      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      INTEGER N
+      DOUBLE PRECISION V(N)
+C
+C NEGATIVE OF THE VECTOR V
+C
+      INTEGER I
+      DO 10 I = 1,N
+         V(I) = -V(I)
+10    CONTINUE
+      RETURN
+      END

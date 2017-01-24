@@ -1,0 +1,23 @@
+C MLM
+C COMMON VARIABLES SET TO MUTATION AND THERMODYNAMIC
+C INTEGRATION
+C H=K+U0+(lambda)U1+(1-lambda)U2
+C dF(lambda)=<U1-U2>_(lambda)d(lambda)
+
+      integer poi_l(10000),cnt_l,i_lambda,n_lambda,baf,mutl(maxpt)
+     &        , i_ens, i_step, lambda_max, n_step_lambda,twait,udeb       
+      parameter (lambda_max=1000)     
+      double precision lambda, d_lambda, e_lambda, e_d_lambda
+     &                ,tmp_e_lambda, old_lambda, f_lambda
+     &                ,lambda_step, D_E_L(lambda_max)
+     &                ,in_lambda,D_E_L2(lambda_max)
+     &                ,sD_E_L(lambda_max),sD_E_L2(lambda_max)
+     &                ,edeb(10,lambda_max),edeb2(10,lambda_max)
+      logical lambda_flag,BandF,muta
+
+      common/lbd0/ lambda_flag
+      common/lbdi/ poi_l,cnt_l,udeb,n_step_lambda,twait,i_lambda,mutl
+      common/lbdr/ lambda,d_lambda,e_lambda,e_d_lambda,tmp_e_lambda
+     &                 ,f_lambda,lambda_step,in_lambda,D_E_L,D_E_L2
+     &                 ,edeb,edeb2
+      common/lbdl/ BandF,muta

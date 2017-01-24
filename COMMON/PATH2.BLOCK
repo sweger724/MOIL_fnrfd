@@ -1,0 +1,62 @@
+c a common block for one of the parallel segments of the length action
+c
+c maxpt3- maximum number of particles (for a single copy of the
+c         system) multiply by 3
+c proc  - number of processes to which the path is divided
+c pseg  - number of structures in a path segment (assigned to one
+c                process.
+c npt2 and npt3 - npt is the ACTUAL number of particles in a single
+c        copy of the system, npt2 and npt2 are 2 times and 3 times
+c        the same number.
+c nwcrd - number of steps between writing coordinates
+c smlp  - number of optimization steps before comunication between
+c       procesors
+c level - if 1 you are in a big trouble (program stop), if 0 you are
+c        in a small trouble (program issues a warning)
+c nliststo - number of steps between update of non-bonded lists and
+c         recall to pwl_sto
+c first, last - if "first" this is the first machine, if "last" this
+c        is the last machine
+c fixend- if "fixend" the end points are fixed. This is the
+c                only option supported now
+c
+c gamma - the "spring" force constant in the chain describing
+c               attraction between nearest neighbors
+c               units:  kcal/mol angstrom-2
+c pdqS  - value of original Action (we try to minimize derivative of this)
+c
+c dave  - average dl
+c
+
+
+        integer pseg,igrid,maxpt3,skpno
+        integer degfmin,MASSWEIGHT,cycleno
+c
+        parameter (maxpt3=3*maxpt)
+
+        integer npt2,npt3
+        integer nwcrd,smlp
+        integer level,nupd
+        character*4 crdstyl
+        logical first,last,paral,chmin, sepfast,Random_velocities
+
+
+        double precision gamma,e0(lgrid),pdqS,dave
+
+        double precision   dv_old(3,lgrid*maxpt)
+        double precision       dsall(3,lgrid*maxpt)
+        double precision velocity(3,lgrid*maxpt),U(lgrid)
+        double precision r_initial(3,MAXPT),r_final(3,MAXPT)
+
+        
+        
+        
+        common /actlog/first,last,paral,chmin,sepfast,
+     1   Random_velocities
+        common /actint/npt2,npt3,nwcrd,
+     1                level,igrid,MASSWEIGHT,skpno,
+     2                smlp,pseg,nupd,cycleno
+        common /actdou/ gamma,e0,dv_old,dsall,velocity,
+     1                r_initial,r_final,pdqS,dave,U
+        common /actchr/crdstyl
+

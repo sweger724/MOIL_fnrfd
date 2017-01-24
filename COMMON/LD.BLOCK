@@ -1,0 +1,3 @@
+        double precision sigmaR, sigmaV, crv, LDgamma, c0, c1, c2
+
+        common /LDdouble/ sigmaR, sigmaV, crv, c0,c1,c2,LDgamma

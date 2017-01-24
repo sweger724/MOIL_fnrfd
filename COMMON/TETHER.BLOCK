@@ -1,0 +1,14 @@
+c    ---------------------------------------------------
+c      GLOBAL VARIABLES AND CONSTANTS FOR TETHERING 
+c      PARTICALS TO THIER ORIGINAL COORDINATES
+c      DURING MD.
+c    ---------------------------------------------------
+c	n_tether - # of tethered patricals.
+c	tether - list of tethered particals.
+c	tether_force - force constant for tethering a partical to 
+c			it's original coordinates. 
+	integer n_tether,tether(maxpt)
+	double precision tf(maxpt)
+
+	common /TETHER/ n_tether,tether
+	common /TET_DP/ tf

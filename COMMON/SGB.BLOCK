@@ -1,0 +1,45 @@
+c       A common block for Generalized Born calculation
+
+	integer  chainno,setalpha,alphac(LGRID)
+	integer sgbupdate,sndbool,debugsgb
+	character*4  name_sgb
+	logical sgbbool,gbsabool
+	integer namel_sgb,sgba,gbsu
+	integer stepno,firstbool
+	double precision kappa,dielectric
+	double precision rborn(MAXPT),fs(MAXPT),reff(MAXPT)
+	common /SGBINT/chainno,setalpha,sgbupdate
+     1		,sndbool,debugsgb,namel_sgb,sgba,gbsu
+     2		,stepno,firstbool
+	common /SGBLOG/sgbbool,gbsabool
+	common /SGBDBL/kappa,dielectric,rborn,fs,reff
+	common /SGBCHR/name_sgb
+
+c  add by YS 
+
+
+	logical gbobcbool, gbnpbool
+	common /SGB2LOG/ gbobcbool,gbnpbool
+
+	double precision rgbmax, Fsmax,gbalpha,gbbeta,gbgamma,surften
+	double precision psi(MAXPT), sumdeijda(MAXPT)
+	parameter ( rgbmax = 999.0D0 )
+	common /SGB2DBL/ Fsmax,gbalpha,gbbeta,gbgamma
+	common /SGB2DBL2/ surften,psi,sumdeijda
+
+c YS for non-polar term, there are 22 particles types for surface area
+	double precision P0(22),P1(22),P2(22),P3(22),P4(22)
+	common /NONPOLAR/P0,P1,P2,P3,P4
+
+	integer ineighbor_ptrs(MAXPT+1),ineighbor(30*MAXPT)
+	common /SGB2INT/  ineighbor_ptrs, ineighbor 
+
+	integer overlappair_ptrs(MAXPT+1), overlappair(30*MAXPT)
+	common /GBSNDDRV1/ overlappair_ptrs, overlappair 
+
+
+	double precision egb_self_ene, egb_inter_ene
+	common /SGB3DBL/ egb_self_ene, egb_inter_ene
+
+ 
+

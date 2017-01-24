@@ -1,0 +1,64 @@
+C ***DYNAMICS COMMON BLOCK modified by Amena
+
+
+c ndynstep (was nstep)  - number of integration steps
+	integer ndynstep
+
+c neqstep - number of equilibration steps
+	integer neqstep
+
+c ndynlist (was nlist) - number of steps between recalculating 
+c			 the non-bonded list
+	integer ndynlist
+
+c tempi   - vector of intial temperatures
+	double precision tempi(1)
+
+c dt      - time step. Total time is therefore nstep*step
+c	Funny units are used internally (angstrom, kcal/mol, molar
+c	masses - AKM). External step is expected in picoseconds.
+	double precision dt
+
+c dt2     - square of the time step divided by two
+	double precision dt2
+
+c twodt   - half the time step
+	double precision twodt
+
+c shakm   - If true, shake is activated in matrix for for TIP3 only
+	logical shakm
+
+c shakl   - If true, shake is activated for particles m <= 1.1
+	logical shakl
+
+c shakb   - If true all bonds are shaked
+	logical shakb
+
+c freeze  - If true, there are frozn atoms
+	logical freeze
+
+c irand	  - integer to initialize the randomizer
+	integer irand
+
+c factor1 & factor2 - dble precision vectors in which some of the 
+c		constants for the integrator are computed and stored
+c		in advance
+	double precision factor1(maxpt),factor2(maxpt)
+
+c syma2,symb2,symc2 - the dimension of a new periodic box to be 
+c		approached from the initial size of the box
+	double precision syma2,symb2,symc2
+
+c dxtra,dytra,dztra - the step to be used in changing the dimension of the box
+	double precision dxtra,dytra,dztra
+
+c
+c Put all variables to common block
+c
+	common /dynint/ndynstep,neqstep,ndynlist,
+     1		irand
+	common /dynlog/shakm,shakl,shakb,freeze
+	common /dyndbl/tempi,dt,dt2,twodt,
+     1		factor1,factor2,
+     2		syma2,symb2,symc2,dxtra,dytra,dztra
+

@@ -1,0 +1,25 @@
+c Parallel computation.
+c
+c prll_on_off - if TRUE parallel computation is expected
+c nsynch - how often are coordinates and velocities vectors synchronized
+
+	integer num_pes,my_pe,npt_par,displs(maxpe),seg_size(maxpe)
+	integer prtc_pointer(maxpt),monp(0:maxpe),new_monp(0:maxpe)
+	integer nblists(4,0:maxpe),MY_COMM
+	integer monsym(isym,0:maxpe),new_monsym(isym,0:maxpe)
+	integer tip3_st,tip3_en, procID, numprocs
+        integer nsynch
+
+        parameter(nsynch=100)
+	
+        logical first_gather, energy_reduced,prll_on_off
+	
+        double precision par_buffer(3,2*maxpt)
+        
+	common /prll_i/num_pes,my_pe,npt_par,displs,seg_size,
+     1  prtc_pointer, procID, numprocs, MY_COMM,
+     2	monp,new_monp,nblists,monsym,new_monsym,tip3_st,tip3_en
+	common /prll_l/first_gather,energy_reduced,prll_on_off
+	common /prll_d/par_buffer
+
+

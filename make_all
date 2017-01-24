@@ -1,0 +1,72 @@
+#!/bin/bash
+
+if [ ! -f Makefile ]; then
+	echo '************************************************************************************************'
+	echo 'No Makefile is found.  ./copyTemplates will be executed, and default compiler will be used.'
+	echo 'See the README in this folder for information about editing Makefiles for your platform/compiler.'
+	echo '  Press ENTER to continue with default makefiles, or CTRL-C to abort...'
+	echo '************************************************************************************************'
+	read
+	./copyTemplates 
+fi
+
+
+#1
+echo '************************** make everything with LENGTH-CHMIN.BLOCK using Makefile.chmin'
+make clean
+cp COMMON/LENGTH-CHMIN.BLOCK COMMON/LENGTH.BLOCK
+make everything -f Makefile.chmin
+
+#2
+echo '************************** make exe/sdel exe/sdp with LENGTH-SDEL.BLOCK using Makefile.paral'
+make clean
+cp COMMON/LENGTH-SDEL.BLOCK COMMON/LENGTH.BLOCK
+make -f Makefile.paral exe/sdel exe/sdp 
+
+#3
+echo '************************** make exe/dynapt exe/coupledDyna and exe/dyna_prl with LENGTH_SAVE.BLOCK using Makefile.paral'
+make clean
+cp COMMON/LENGTH_SAVE.BLOCK COMMON/LENGTH.BLOCK
+make -f Makefile.paral exe/dynapt exe/dyna_prl exe/coupledDyna
+
+#4
+echo '************************** make with LENGTH-SECOND.BLOCK using Makefile.second'
+make clean
+cp COMMON/LENGTH-.BLOCK COMMON/LENGTH.BLOCK
+make -f Makefile.second
+
+#5
+echo '************************** make with LENGTH_SAVE.BLOCK using Makefile'
+make clean
+cp COMMON/LENGTH_SAVE.BLOCK COMMON/LENGTH.BLOCK
+make
+
+#6
+echo '************************** make sdelS with LENGTH-SDEL.BLOCK using Makefile'
+make clean
+cp COMMON/LENGTH-SDEL.BLOCK COMMON/LENGTH.BLOCK
+make exe/sdelS
+
+#7
+echo '************************** make exe/dynapress with LENGTH_SAVE_PRESS.BLOCK using Makefile'
+make clean
+cp  COMMON/LENGTH_SAVE_PRESS.BLOCK COMMON/LENGTH.BLOCK
+make exe/dynapress
+
+#8
+echo '************************** make Directional Milestoning executables with LENGTH-DIM.BLOCK using Makefile'
+make clean
+cp  COMMON/LENGTH-DIM.BLOCK COMMON/LENGTH.BLOCK
+make exe/dim_prepare exe/dim_run
+
+#8
+echo '************************** make Directional Milestoning parallel executables with LENGTH-DIM.BLOCK using Makefile.paral'
+make clean
+cp  COMMON/LENGTH-DIM.BLOCK COMMON/LENGTH.BLOCK
+make -f Makefile.paral exe/dim_sample
+
+#10
+echo '************************** cleanup'
+cp COMMON/LENGTH_SAVE.BLOCK COMMON/LENGTH.BLOCK
+make clean
+

@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cmoil", "cmoil.vcproj", "{91A70D7B-9F4C-40E2-B34B-401BD080239D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cmoil_magic", "cmoil_magic.vcproj", "{32B5BD69-12F5-4A7A-839C-8326B1A6A82A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91A70D7B-9F4C-40E2-B34B-401BD080239D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{91A70D7B-9F4C-40E2-B34B-401BD080239D}.Debug|Win32.Build.0 = Debug|Win32
+		{91A70D7B-9F4C-40E2-B34B-401BD080239D}.Release|Win32.ActiveCfg = Release|Win32
+		{91A70D7B-9F4C-40E2-B34B-401BD080239D}.Release|Win32.Build.0 = Release|Win32
+		{32B5BD69-12F5-4A7A-839C-8326B1A6A82A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{32B5BD69-12F5-4A7A-839C-8326B1A6A82A}.Release|Win32.ActiveCfg = Debug|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,20 @@
+ok
+*Vertices 14
+1"   c Blue
+2"   c Blue
+3"   c Blue
+4"   c Blue
+5"   c Blue
+6"   c Blue
+7"   c Blue
+8"   c Blue
+9"   c Blue
+10"   c Blue
+11"   c Blue
+12"   c Blue
+13"   c Blue
+14"   c Blue
+*Arcs
+8 6 6.0564e-05"  c Black
+6 13 0.000185533"  c Black
+13 14 0.000270626"  c Black

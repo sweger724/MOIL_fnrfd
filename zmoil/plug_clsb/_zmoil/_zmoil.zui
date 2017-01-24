@@ -1,0 +1,1679 @@
+//!palette key=cmoilHeader val=0x7080C0FF  //headers such as Display Editor
+//!palette key=cmoilSelected val=0x606570FF
+//!palette key=textAreaColor val=0x303040FF
+//!palette key=observablesTextAreaColor val=0x585C62FF
+//!palette key=graypanel val=0x888C90FF   // text panels and fit output
+//!palette key=unselectedExperimentColor val=0xB0B0B8FF
+//!palette key=selectedExperimentColor val=0xE8E8F0FF 
+//!palette key=dkGreen val=0x066516FF
+//!palette key=varedit val=0x5f5d5dff
+//!palette key=varedittext val=0xffffffff
+
+
+// OVERRIDE main.zui to make panels more opaque !palette key=panel val=0xA88979A0
+
+//!palette key=panel val=0x888C90FF  //open file and edit mech panels
+
+:styleCmoilSectionHeader = ZUI {
+	parent = styleGlobal
+	font = header
+	textColor = 0x000000FF
+	layout_cellAlign = c
+}
+
+:styleCmoilTwiddler = ZUI {
+	parent = styleGlobal
+	panelColor = 0
+
+	varPanelColorEditMode = 0x505050FF
+	varPanelFrameEditMode = 2
+	varTextColorEditMode = 0xFFFF66FF
+	varTextColor = 0xFFFF33FF
+
+}
+
+:cmoilRender = ZUIRenderCmoil {
+	parent = pluginPanel
+	panelColor = 0x00ff00FF
+	layoutManual = 1
+	layoutManual_x = 0
+	layoutManual_y = 26
+	layoutManual_w = W
+	layoutManual_h = H 26 -
+}
+
+:residuePanel = ZUIPanel {
+		parent = pluginPanel
+		layoutManual = 1
+		layoutManual_x = 0
+		layoutManual_y = 0
+		layoutManual_w = W
+		layoutManual_h = 26
+			// enough for two rows of text
+		
+	clipToBounds = 1
+	clipMessagesToBounds = 1
+
+	:residueText = ZUIResidueText {
+		panelColor = 0x202020FF
+		permitScrollX = 1
+		layout_forceH = 26
+		layout_forceW = 10000
+			// really ZUIResidueText should imple the layout requeset or 
+			// whatever and calc it's width based on text, then you won't be
+			// able to scroll further than you need to.
+
+		:= ZUIText {
+			text = ""
+		}
+	}
+}
+
+
+:cmoilZUI = ZUIPanel {
+
+	parent = root
+	panelColor = 0xc0c0c0ff
+
+	layoutManual = 1
+	layoutManual_x = 0
+	layoutManual_y = 0
+	layoutManual_w = 360
+	layoutManual_h = H
+
+	pack_side = t
+
+	+style = styleGlobal
+	+pack_fillOpposite = 1
+	+layout_cellFill = wh
+
+	clipToBounds = 1
+	clipMessagesToBounds = 1
+	
+	:cmoilZUIScrollable = ZUIPanel {
+		permitScrollY = 1
+		layout_forceW = 360
+
+		layout_padX = 10
+		layout_padY = 10
+		pack_side = t
+		pack_fillOpposite = 1
+		layout_cellFill = wh
+		panelColor = 0xc0c0c6ff
+
+
+		// Main
+		//-----------------------------------------------------------------
+		:mainEditContainerPanel = ZUIPanel {
+			style = styleIndent1
+			pack_side = t
+			layout_cellFill = w
+
+			*layout_padX = 2
+			*layout_padY = 2
+
+			:= ZUIPanel {
+				pack_fillLast = 1
+				panelColor = 0
+
+				:= ZUIButton {
+					text = '+'
+					selected = 1
+					toggle = 1
+					sendMsgOnSelect = "type=ZUIShow toZUI=mainEditPanel; type=ZUISet key=text val='-' toZUI=$this"
+					sendMsgOnUnselect = "type=ZUIHide toZUI=mainEditPanel; type=ZUISet key=text val='+' toZUI=$this"
+				}
+
+				:= ZUIText {
+					style = styleCmoilSectionHeader
+					text = "Main"
+				}
+
+				:= ZUIPanel {
+					pack_side = r
+					panelColor = 0
+					:hideUI = ZUIButton {
+						text = 'Hide UI (f8)'
+						sendMsg = 'type=Zmoil_ToggleUI'
+					}
+				}
+			}
+
+			:mainEditPanel = ZUIPanel {
+				style = styleGroupT
+
+				: = ZUILine {
+					lineEmbossed = 1
+				}
+
+				:mainPanel = ZUIPanel {
+					style = styleGroupL
+					:fileOpen = ZUIButton {
+						text = 'Open...'
+						sendMsg = "type=Zmoil_Open"
+					}
+					:setListClear = ZUIButton {
+						text = 'Close'
+						sendMsg = "type=Zmoil_SetListClear"
+						hidden = 1
+					}
+					:setListPrev = ZUIButton {
+						text = '<< Prev'
+						sendMsg = "type=Zmoil_SetListPrev"
+						hidden = 1
+					}
+					:setListNext = ZUIButton {
+						text = 'Next >>'
+						sendMsg = "type=Zmoil_SetListNext"
+						hidden = 1
+					}
+					:setListIndex = ZUIText {
+						text = 'Index of the SetList'
+						hidden = 1
+					}
+				}
+
+				:= ZUILine {
+					lineEmbossed = 1
+				}
+
+				// @TODO: display the molecule name of loaded model
+				/*
+				: = ZUIPanel {
+					style = styleGroupL
+					layout_cellFill = w
+					pack_fillLast = 1
+
+					: = ZUIText {
+						style = styleSubheader
+						text = "Filename "
+					}
+
+					:modelFilename = ZUIText {
+						layout_cellFill = w
+						panelColor = textAreaColor
+						text = "<none selected>"
+						wordWrap = 1
+					}
+				}
+
+				:= ZUILine {
+					lineEmbossed = 1
+				}
+				*/
+			}
+		}
+
+			
+		// NEW Model Panel Using ZUIList
+		//-----------------------------------------------------------------
+		:datalistContainerPanel = ZUIPanel {
+			style = styleIndent1
+			pack_side = t
+			layout_cellFill = w
+			*layout_padX = 2
+			*layout_padY = 2
+
+			:= ZUIPanel {
+				panelColor = 0
+				layout_forceW = 385
+
+				:= ZUIButton {
+					text = '+'
+					selected = 1
+					toggle = 1
+					sendMsgOnSelect = "type=ZUIShow toZUI=datalistPanel; type=ZUISet key=text val='-' toZUI=$this"
+					sendMsgOnUnselect = "type=ZUIHide toZUI=datalistPanel; type=ZUISet key=text val='+' toZUI=$this"
+				}
+
+				:= ZUIText {
+					style = styleCmoilSectionHeader
+					text = "Models"
+				}
+			}
+			
+			:datalistPanel = ZUIPanel {
+				style = styleGroupT
+				pack_fillOpposite = 1
+				layout_cellFill = w
+				layout_indentL = 5
+				layout_indentR = 5
+
+				: = ZUILine {
+					lineEmbossed = 1
+				}
+			
+				:fixedDatalistPanel = ZUIPanel {
+					panelColor = 0
+					pack_side = t
+					pack_fillOpposite = 1
+					panelFrame = 2
+					layout_cellFill = w
+					layout_indentR = 2
+					layout_indentB = 1
+					
+					:dataList = ZUIList {
+						scrollYMinItems = 11
+					}
+				}
+				: = ZUILine {
+					lineEmbossed = 1
+				}
+				
+				: = ZUIPanel {
+					layout = table
+					table_cols = 4
+					table_colDistributeEvenly = 1
+					+layout_cellFill = wh
+					panelColor = 0
+
+					: = ZUIButton {
+						text = "All Off"
+						sendMsg = "type=Zmoil_DisplayModels none=1"
+					}					
+					: = ZUIButton {
+						text = "All On"
+						sendMsg = "type=Zmoil_DisplayModels all=1"
+					}					
+					: = ZUIButton {
+						text = "Unload"
+						sendMsg = "type=Zmoil_ModelUnload"
+					}
+					: = ZUIButton {
+						text = "Unload All"
+						sendMsg = "type=Zmoil_ModelUnload all=1"
+					}
+					:AlignButton = ZUIButton {
+						text = "Align"
+						toggle = 1
+						selected = 0
+						sendMsgOnSelect = "type=ZUIShow toZUIGroup=modelAlign"
+						sendMsgOnUnselect = "type=ZUIHide toZUIGroup=modelAlign" 
+					}
+					:BoxColor = ZUIButton {
+						text = "BoxColor"
+						toggle = 1
+						selected = 0
+						sendMsgOnSelect = "type=Zmoil_BoxColor colors=1; type=ZUIShow toZUIGroup=boxcolor"
+						sendMsgOnUnselect = "type=Zmoil_BoxColor colors=0; type=ZUIHide toZUIGroup=boxcolor" 
+					}
+					:CrdColor = ZUIButton {
+						text = "CrdColor"
+						toggle = 1
+						selected = 0
+						sendMsgOnSelect = "type=Zmoil_CrdColor colors=1"
+						sendMsgOnUnselect = "type=Zmoil_CrdColor colors=0" 
+					}
+					:AutoColor = ZUIButton {
+						text = "AutoColor"
+						toggle = 1
+						selected = 0
+						sendMsgOnSelect = "type=Zmoil_AutoColor colors=1"
+						sendMsgOnUnselect = "type=Zmoil_AutoColor colors=0" 
+					}
+				}
+				: = ZUIPanel {
+					group = boxcolor
+					layout = table
+					table_cols = 2
+					table_colWeight1 = 4
+					table_colWeight2 = 1
+					+layout_cellFill = wh
+					panelColor = 0
+					
+					:boxcolorfile = ZUIText {
+						text = 'BoxColor:'
+					}
+					
+					: = ZUIButton {
+						text = 'Choose'
+						sendMsg = "type=Zmoil_ChooseBoxColorFile"
+					}
+				}
+
+				
+				//
+				// Alignment UI is toggled with the Align button above
+				//
+				
+				: = ZUILine {
+					group = modelAlign
+					lineEmbossed = 1
+					hidden = 1
+				}
+				
+			
+				: = ZUIPanel {
+					hidden = 1
+					style = styleGroupL
+					group = modelAlign
+					layout = table
+					table_cols = 2
+					table_colWeight1 = 1
+					table_colWeight2 = 1
+
+					:tmalign = ZUIButton {
+						text = "TM-Align"
+						sendMsg = "type=Zmoil_TMAlign"
+					}
+					
+					: = ZUIPanel {
+						style = styleGroupTChecks
+
+						:manualAlign = ZUICheck {
+							text = "Manual Adjust Struct"
+							selected = 0
+							sendMsgOnSelect = "type=Zmoil_ManualAdjust val=1"
+							sendMsgOnUnselect = "type=Zmoil_ManualAdjust val=0"
+	//						layout_cellAlign = c
+						}
+						
+						:tm_trivial = ZUICheck {
+							text = "Trivial 1:1 Alignment"
+							selected = 0
+	//						layout_cellAlign = c
+						}
+					}
+
+					: = ZUIButton {
+						text = "Clear Alignment"
+						sendMsg = "type=Zmoil_ClearAlignment"
+					}
+					: = ZUIButton {
+						text = 'Write Transformed PDB'
+						sendMsg = "type=Zmoil_WriteTransformedPDB" 
+					}	
+				}
+			}
+		}
+
+
+		// Display Options
+		//-----------------------------------------------------------------
+		:displayEditContainerPanel = ZUIPanel {
+			style = styleIndent1
+			pack_side = t
+			layout_cellFill = w
+			*layout_padX = 2
+			*layout_padY = 2
+
+			:= ZUIPanel {
+				panelColor = 0
+
+				:= ZUIButton {
+					text = '+'
+					selected = 1
+					toggle = 1
+					layout_cellAlign = c
+					sendMsgOnSelect = "type=ZUIShow toZUI=displayEditPanel; type=ZUISet key=text val='-' toZUI=$this"
+					sendMsgOnUnselect = "type=ZUIHide toZUI=displayEditPanel; type=ZUISet key=text val='+' toZUI=$this"
+				}
+
+				:= ZUIText {
+					style = styleCmoilSectionHeader
+					text = "Display Options"
+				}
+			}
+
+			:displayEditPanel = ZUIPanel {
+				style = styleGroupT
+
+				:= ZUILine {
+					lineEmbossed = 1
+				}
+
+				: = ZUIText {
+					style = styleSubheader
+					text = "General Display:"
+				}
+
+				: = ZUIPanel {
+					layout_padX = 4
+					layout_padY = 4
+					panelColor = 0
+					*group = genDisplayButtons
+				
+					: = ZUIPanel {
+						style = styleGroupTChecks
+
+						:gen1 = ZUICheck {
+							text = 'White Background'
+							sendMsgOnSelect = "type=Zmoil_DisplayGeneral mode=WBACKGRND val=1"
+							sendMsgOnUnselect = "type=Zmoil_DisplayGeneral mode=WBACKGRND val=0"
+						}
+
+						: = ZUICheck {
+							text = 'Depth Cue (Fog)'
+							selected = 1
+							sendMsgOnSelect = "type=Zmoil_DisplayGeneral mode=FOG val=1"
+							sendMsgOnUnselect = "type=Zmoil_DisplayGeneral mode=FOG val=0"
+						}
+
+						: = ZUICheck {
+							text = 'Draw Axes'
+							sendMsgOnSelect = "type=Zmoil_DisplayGeneral mode=AXES val=1"
+							sendMsgOnUnselect = "type=Zmoil_DisplayGeneral mode=AXES val=0"
+						}
+
+						: = ZUICheck {
+							text = 'Show Structure Info'
+							selected = 1
+							sendMsgOnSelect = "type=Zmoil_DisplayGeneral mode=SINDEX val=1"
+							sendMsgOnUnselect = "type=Zmoil_DisplayGeneral mode=SINDEX val=0"
+						}
+
+						: = ZUICheck {
+							text = 'Show Sequence'
+							selected = 0
+							sendMsgOnSelect = "type=Zmoil_DisplayGeneral mode=SEQ val=1"
+							sendMsgOnUnselect = "type=Zmoil_DisplayGeneral mode=SEQ val=0"
+						}
+						
+						: = ZUICheck {
+							text = 'Display Water'
+							selected = 0
+							sendMsgOnSelect = "type=Zmoil_DisplayGeneral mode=WATER val=1"
+							sendMsgOnUnselect = "type=Zmoil_DisplayGeneral mode=WATER val=0"
+						}
+						
+						: = ZUICheck {
+							text = 'Display Hydrogen Bonds'
+							selected = 0
+							sendMsgOnSelect = "type=Zmoil_DisplayGeneral mode=HBONDS val=1"
+							sendMsgOnUnselect = "type=Zmoil_DisplayGeneral mode=HBONDS val=0"
+						}
+
+
+						: = ZUIPanel {
+							panelColor = invisible
+							pack_side = l
+							layout_indent = 4
+
+							: = ZUIText {
+								layout_forceW = 120
+								text = "H-Bond Distance:"
+							}
+
+							: = ZUIVar {
+								style = styleCmoilTwiddler
+								type = float
+								val  = 2.0
+								rangeLow = 1.0
+								rangeHigh = 4.0
+								formatShortest = 1
+								layout_forceW = 100
+								sendMsgOnVarChanging = "type=Zmoil_HBondDistance twiddle=1"
+								sendMsgOnEditComplete = "type=Zmoil_HBondDistance"
+							}
+						}
+					}
+				}
+		
+				:= ZUILine {
+					lineEmbossed = 1
+				}
+
+				: = ZUIText {
+					style = styleSubheader
+					text = "Stereo Display Mode:"
+				}
+
+				: = ZUIPanel {
+					layout_padX = 4
+					layout_padY = 4
+					panelColor = 0
+				
+					: = ZUIPanel {
+						style = styleGroupTChecks
+						*group = steroRadioButtons
+
+						:st1 = ZUIRadioButton {
+							text = 'Off'
+							selected = 1
+							sendMsgOnSelect = "type=Zmoil_StereoMode mode=NONE_STEREO"
+						}
+
+						:st2 = ZUIRadioButton {
+							text = 'Anaglyph Stereo'
+							sendMsgOnSelect = "type=Zmoil_StereoMode mode=ANAGLYPH_STEREO"
+						}
+
+						:st3 = ZUIRadioButton {
+							text = 'Color Anaglyph Stereo'
+							sendMsgOnSelect = "type=Zmoil_StereoMode mode=ANAGLYPH_STEREO color=1"
+						}
+					}
+				}
+
+				:= ZUILine {
+					lineEmbossed = 1
+				}
+
+
+				: = ZUIText {
+					style = styleSubheader
+					text = "Display Mode:"
+				}
+				
+				: = ZUIPanel {
+					layout_padX = 4
+					layout_padY = 4
+					panelColor = 0
+					*group = dispModeButtons
+				
+					:= ZUIPanel {
+						style = styleGroupTChecks
+						*group = dispModeRadioButtons
+
+						:dm0 = ZUIRadioButton {
+							text = 'None'
+							selected = 1
+							sendMsgOnSelect = "type=Zmoil_DisplayMode mode=SKIP val=1"
+						}
+			
+						:dm1 = ZUIRadioButton {
+							text = 'Stick'
+							sendMsgOnSelect = "type=Zmoil_DisplayMode mode=STICK val=1"
+						}
+
+						:dm2 = ZUIRadioButton {
+							text = 'Stick-Ball'
+							sendMsgOnSelect = "type=Zmoil_DisplayMode mode=STICKBALL val=1"
+						}
+
+						:dm3 = ZUIRadioButton {
+							text = 'Space Filling'
+							sendMsgOnSelect = "type=Zmoil_DisplayMode mode=SPACEBALL val=1"
+						}
+					}
+					
+					: = ZUIPanel {
+						layout_padX = 4
+						layout_padY = 4
+						panelColor = 0
+						style = styleGroupT
+
+						:dmhq = ZUICheck {
+							text = 'High Quality'
+							sendMsgOnSelect = "type=Zmoil_DisplayQuality mode=STICK val=1"
+							sendMsgOnUnselect = "type=Zmoil_DisplayQuality mode=STICK val=0"
+						}
+						
+						: = ZUIPanel {
+							panelColor = 0
+							pack_side = l
+
+							: = ZUIText {
+								layout_forceW = 90
+								text = "Ball Scale:  "
+							}
+
+							:ballScale = ZUIVar {
+								style = styleCmoilTwiddler
+								type = float
+								val  = 1
+								rangeLow = .1
+								rangeHigh = 10
+								formatShortest = 1
+								layout_forceW = 60
+							}
+						}
+						
+						: = ZUIPanel {
+							panelColor = invisible
+							pack_side = l
+
+							: = ZUIText {
+								layout_forceW = 90
+								text = "Shininess:"
+							}
+
+							:gen2 = ZUIVar {
+								style = styleCmoilTwiddler
+								type = float
+								val  = .5
+								rangeLow = 0
+								rangeHigh = 1.0
+								formatShortest = 1
+								layout_forceW = 60
+								sendMsgOnVarChanging = "type=Zmoil_DisplayGeneral mode=SHINY"
+								sendMsgOnEditComplete = "type=Zmoil_DisplayGeneral mode=SHINY"
+							}
+						}
+
+					}
+				}
+		
+				: = ZUIText {
+					style = styleSubheader
+					text = "Backbone/Ribbon/Secondary:"
+				}
+
+				: = ZUIPanel {
+					style = styleGroupL
+				
+					: = ZUIPanel {
+						style = styleGroupTChecks
+
+						:brs1 = ZUICheck {
+							text = Backbone
+							sendMsgOnSelect = "type=Zmoil_DisplayMode mode=BACKBONE val=1"
+							sendMsgOnUnselect = "type=Zmoil_DisplayMode mode=BACKBONE val=0"
+						}
+
+						:brs2 = ZUICheck {
+							text = Ribbon
+							sendMsgOnSelect = "type=Zmoil_DisplayMode mode=RIBBON val=1; type=ZUISet key=selected val=0 toZUI=brs3"
+							sendMsgOnUnselect = "type=Zmoil_DisplayMode mode=RIBBON val=0"
+						}
+
+						:brs3 = ZUICheck {
+							text = 'Secondary Struct'
+							sendMsgOnSelect = "type=Zmoil_DisplayMode mode=STRUCT2nd val=1; type=ZUISet key=selected val=0 toZUI=brs2"
+							sendMsgOnUnselect = "type=Zmoil_DisplayMode mode=STRUCT2nd val=0"
+						}
+						:brs4 = ZUICheck {
+							text = 'Nucleic Acid Backbone'
+							sendMsgOnSelect = "type=Zmoil_DisplayMode mode=RNABACKBONE val=1"
+							sendMsgOnUnselect = "type=Zmoil_DisplayMode mode=RNABACKBONE val=0"
+						}
+
+					}
+
+					: = ZUIPanel {
+						style = styleGroupT
+
+						:drawsheets = ZUICheck {
+							text = 'Draw Beta Sheets'
+							selectedVar = Zmoil_DrawSheets
+							selected = 1;
+						}
+
+						:brshq = ZUICheck {
+							text = 'High Quality'
+							sendMsgOnSelect = "type=Zmoil_DisplayQuality mode=BACKBONE val=1"
+							sendMsgOnUnselect = "type=Zmoil_DisplayQuality mode=BACKBONE val=0"
+	//						selected = 1
+						}
+
+						: = ZUIPanel {
+							style = styleGroupL
+				
+							: = ZUIButton {
+								text = 'Width +'
+								sendMsg = "type=Zmoil_DisplaySize elem=ribbon increase=1"
+							}
+
+							: = ZUIButton {
+								text = 'Width -'
+								sendMsg = "type=Zmoil_DisplaySize elem=ribbon"
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// Orientation/Scale
+		//-----------------------------------------------------------------
+		:orientationScaleContainerPanel = ZUIPanel {
+			style = styleIndent1
+			pack_side = t
+			layout_cellFill = w
+			*layout_padX = 2
+			*layout_padY = 2
+
+			:= ZUIPanel {
+				panelColor = 0
+
+				:= ZUIButton {
+					text = '+'
+					selected = 1
+					toggle = 1
+					layout_cellAlign = c
+					sendMsgOnSelect = "type=ZUIShow toZUI=orientationScalePanel; type=ZUISet key=text val='-' toZUI=$this"
+					sendMsgOnUnselect = "type=ZUIHide toZUI=orientationScalePanel; type=ZUISet key=text val='+' toZUI=$this"
+				}
+
+				:= ZUIText {
+					style = styleCmoilSectionHeader
+					text = "Orientation / Scale"
+				}
+			}
+
+			:orientationScalePanel = ZUIPanel {
+				style = styleGroupT
+
+				:= ZUILine {
+					lineEmbossed = 1
+				}
+
+				:= ZUIText {
+					style = styleSubheader
+					text = ' [ Hold shift to rotate opposite ]'
+				}
+
+				: = ZUIPanel {
+					layout_padX = 4
+					layout_padY = 4
+					panelColor = 0
+					layout = table
+					table_cols = 3
+					table_colWeight1 = 1
+					table_colWeight2 = 1
+					table_colWeight3 = 1
+
+					:= ZUIButton {
+						text = 'Rot X'
+						keyBinding = x
+						sendMsg = "type=Zmoil_DisplayControl cmd=rotX val=-1"
+					}
+
+					:= ZUIButton {
+						text = 'Rot Y'
+						keyBinding = y
+						sendMsg = "type=Zmoil_DisplayControl cmd=rotY val=-1"
+					}
+
+					:= ZUIButton {
+						text = 'Rot Z'
+						keyBinding = z
+						sendMsg = "type=Zmoil_DisplayControl cmd=rotZ val=-1"
+					}
+
+					:= ZUIButton {
+						text = 'Trans X'
+						sendMsg = "type=Zmoil_DisplayControl cmd=tranX val=1"
+					}
+
+					:= ZUIButton {
+						text = 'Trans Y'
+						sendMsg = "type=Zmoil_DisplayControl cmd=tranY val=1"
+					}
+
+					:= ZUIButton {
+						text = 'Trans Z'
+						sendMsg = "type=Zmoil_DisplayControl cmd=tranZ val=1"
+					}
+
+					:= ZUIButton {
+						text = 'Scale Up'
+						keyBinding = =
+						sendMsg = "type=Zmoil_DisplayControl cmd=scale val=1"
+					}
+
+					:= ZUIButton {
+						text = 'Scale Dn'
+						keyBinding = -
+						sendMsg = "type=Zmoil_DisplayControl cmd=scale val=-1"
+					}
+
+					:= ZUIButton {
+						text = 'Reset All'
+						keyBinding = !
+						sendMsg = "type=Zmoil_DisplayControl cmd=reset"
+					}
+				}
+				
+							:= ZUILine {
+					lineEmbossed = 1
+				}
+				
+				: = ZUIText {
+					style = styleSubheader
+					text = "Center of Mass Auto-Update:"
+				}
+
+				: = ZUIPanel {
+					layout_padX = 8
+					layout_padY = 4
+					panelColor = 0
+					layout = table
+					table_cols = 2
+					table_colWeight1 = 1
+					table_colWeight2 = 1
+				
+					: = ZUIPanel {
+						style = styleGroupTChecks
+						*group = comRadioButtons
+
+						:comNever = ZUIRadioButton {
+							text = 'Never'
+							sendMsgOnSelect = "type=Zmoil_UpdateCoM when=never"
+						}
+						:comFirst = ZUIRadioButton {
+							text = 'Index 1'
+							sendMsgOnSelect = "type=Zmoil_UpdateCoM when=first"
+							selected = 1
+						}
+						:comAlways = ZUIRadioButton {
+							text = 'Every Index'
+							sendMsgOnSelect = "type=Zmoil_UpdateCoM when=always"
+						}
+					}
+					
+					: = ZUIPanel {
+						style = styleGroupT
+						: = ZUIButton {
+							text = "Update CoM Now"
+							layout_forceW = 100
+							sendMsg = "type=Zmoil_UpdateCoM when=now"
+						}
+						: = ZUIButton {
+							text = "Clear CoM Now"
+							layout_forceW = 100
+							sendMsg = "type=Zmoil_UpdateCoM clear=1"
+						}
+					}
+
+				}
+			}
+		}
+
+		// Picking
+		//-----------------------------------------------------------------
+		:pickingContainerPanel = ZUIPanel {
+			style = styleIndent1
+			pack_side = t
+			layout_cellFill = w
+			*layout_padX = 2
+			*layout_padY = 2
+
+			:= ZUIPanel {
+				panelColor = 0
+
+				:= ZUIButton {
+					text = '+'
+					selected = 1
+					toggle = 1
+					layout_cellAlign = c
+					sendMsgOnSelect = "type=ZUIShow toZUI=pickingPanel; type=ZUISet key=text val='-' toZUI=$this"
+					sendMsgOnUnselect = "type=ZUIHide toZUI=pickingPanel; type=ZUISet key=text val='+' toZUI=$this"
+				}
+
+				:= ZUIText {
+					style = styleCmoilSectionHeader
+					text = "Picking"
+				}
+			}
+
+			:pickingPanel = ZUIPanel {
+				style = styleGroupT
+
+				:= ZUILine {
+					lineEmbossed = 1
+				}
+
+				:= ZUIPanel {
+					style = styleGroupT
+					layout_padX = 4
+					layout_padY = 4
+
+					:pickPanel = ZUIPanel {
+						style = styleGroupL
+						layout = table
+						table_cols = 3
+						table_colWeight1 = 1
+						table_colWeight2 = 1
+						table_colWeight3 = 1
+	//					layout_colDistributeEvenly = 1  
+	// this doesn't automatically use the whole width
+
+						:= ZUIButton {
+							text = Angle
+							sendMsg = "type=Zmoil_PickInfo info=angle"
+							keyBinding = a
+						}
+						:= ZUIButton {
+							text = Distance
+							sendMsg = "type=Zmoil_PickInfo info=distance"
+							keyBinding = d
+						}
+						:= ZUIButton {
+							text = Torsion
+							sendMsg = "type=Zmoil_PickInfo info=torsion"
+							keyBinding = t
+						}
+					}
+					:= ZUIPanel {
+						style = styleGroupL
+						layout = table
+						table_cols = 2
+						table_colWeight1 = 1
+						table_colWeight2 = 1
+						:= ZUIButton {
+							text = 'Reset Pick Queue'
+							sendMsg = "type=Zmoil_ProgramMode mode=pick"
+							keyBinding = p
+						}
+						:= ZUIButton {
+							text = 'Center Last Picked'
+							sendMsg = 'type=Zmoil_UpdateCoM which=lastpickedatom"
+							keyBinding = l
+						}
+					}
+
+				}
+			}
+		}
+
+
+
+
+		// Structure Controls
+		//-----------------------------------------------------------------
+		:structureEditContainerPanel = ZUIPanel {
+			style = styleIndent1
+			pack_side = t
+			layout_cellFill = w
+			*layout_padX = 2
+			*layout_padY = 2
+
+			:= ZUIPanel {
+				panelColor = 0
+
+				:= ZUIButton {
+					text = '+'
+					selected = 1
+					toggle = 1
+					layout_cellAlign = c
+					sendMsgOnSelect = "type=ZUIShow toZUI=structureEditPanel; type=ZUISet key=text val='-' toZUI=$this"
+					sendMsgOnUnselect = "type=ZUIHide toZUI=structureEditPanel; type=ZUISet key=text val='+' toZUI=$this"
+				}
+
+				:= ZUIText {
+					style = styleCmoilSectionHeader
+					text = "Structure Animation Controls"
+				}
+			}
+
+			:structureEditPanel = ZUIPanel {
+				style = styleGroupT
+
+				:= ZUILine {
+					lineEmbossed = 1
+				}
+
+				:structIndex = ZUIText {
+					style = styleSubheader
+					text = "Structure Index:"
+				}
+
+				:structSlider = ZUISlider {
+					panelColor = invisible
+					layout_cellFill = w
+					min = 0
+					max = 1
+					sendMsg = "type=Zmoil_StructSlider"
+				}
+
+				: = ZUIPanel {
+					layout_padX = 4
+					layout_padY = 4
+					panelColor = 0
+
+					:= ZUIButton {
+						text = '<< Back'
+						keyBinding = b
+						sendMsg = "type=Zmoil_StructNext step=-1"
+					}
+
+					:= ZUIButton {
+						text = 'Next >>'
+						keyBinding = n
+						sendMsg = "type=Zmoil_StructNext step=1"
+					}
+
+	/*
+					:= ZUIButton {
+						text = 'Next Chain'
+						keyBinding = c
+						// disabled = 1
+						sendMsg = "type=Zmoil_ChainNext"
+					}
+	*/
+				}
+
+				: = ZUIPanel {
+					layout_padX = 10
+					layout_padY = 4
+					panelColor = 0
+
+					:= ZUIText {
+						text = FramesPerSec:
+						layout_forceW = 100
+					}
+					:fps = ZUIVar {
+						style = styleCmoilTwiddler
+						type = int
+						rangeLow = 1
+						rangeHigh = 60
+						val = 30
+						formatShortest = 1
+						layout_forceW = 50
+						sendMsgOnVarChanging = "type=Zmoil_MovieParam param=fps"
+						sendMsgOnEditComplete = "type=ZUIDirty toZUI=structureEditPanel; type=Zmoil_MovieParam param=fps"
+					}
+				}
+
+				: = ZUIPanel {
+					style = styleGroupTChecks
+					layout_padX = 10
+					panelColor = 0
+
+					:movieMode = ZUICheck {
+						text = 'Movie Mode'
+						keyBinding = m
+						selected = 0
+						sendMsgOnSelect = "type=Zmoil_ProgramMode mode=movie val=1"
+						sendMsgOnUnselect = "type=Zmoil_ProgramMode mode=movie val=0"
+					}
+					:rockingMode = ZUICheck {
+						text = 'Rocking Mode'
+						keyBinding = r
+						selected = 0
+						sendMsgOnSelect = "type=Zmoil_ProgramMode mode=rock val=1"
+						sendMsgOnUnselect = "type=Zmoil_ProgramMode mode=rock val=0"
+					}
+					:peptidePlaneFlipping = ZUICheck {
+						text = 'Allow Peptide-Plane Flipping'
+						selected = 0
+						sendMsgOnSelect = "type=Zmoil_ProgramMode mode=allowPPFlip val=1"
+						sendMsgOnUnselect = "type=Zmoil_ProgramMode mode=allowPPFlip val=0"
+					}
+					:atomVelocities = ZUICheck {
+						text = 'Display Atom Velocities'
+						selected = 0
+						sendMsgOnSelect = "type=Zmoil_ProgramMode mode=atomVelocity val=1"
+						sendMsgOnUnselect = "type=Zmoil_ProgramMode mode=atomVelocity val=0"
+					}
+				}
+			}
+		}
+
+		// Surface Display
+		//-----------------------------------------------------------------
+		:surfaceEditContainerPanel = ZUIPanel {
+			style = styleIndent1
+			pack_side = t
+			*layout_padX = 2
+			*layout_padY = 2
+
+			:= ZUIPanel {
+				panelColor = 0
+
+				:= ZUIButton {
+					text = '+'
+					selected = 1
+					toggle = 1
+					layout_cellAlign = c
+					sendMsgOnSelect = "type=ZUIShow toZUI=surfaceEditPanel; type=ZUISet key=text val='-' toZUI=$this"
+					sendMsgOnUnselect = "type=ZUIHide toZUI=surfaceEditPanel; type=ZUISet key=text val='+' toZUI=$this"
+				}
+
+				:= ZUIText {
+					style = styleCmoilSectionHeader
+					text = "Surface Display"
+				}
+
+				:= ZUIPanel {
+					layout_cellFill = wh
+					layout_padX = 30
+					layout_padY = 5
+					panelColor = 0;
+
+					:sdm1 = ZUICheck {
+						text = 'Display Surface'
+						sendMsgOnSelect = "type=Zmoil_Surface cmd=Display val=1; type=ZUISet key=disabled val=0 toZUIGroup=surfaceEdit;  type=ZUISet key=disabled val=0 toZUIGroup=surfaceColorModes; type=ZUIDirtyAll"
+						sendMsgOnUnselect = "type=Zmoil_Surface cmd=Display val=0; type=ZUISet key=disabled val=1 toZUIGroup=surfaceEdit;  type=ZUISet key=disabled val=1 toZUIGroup=surfaceColorModes; type=ZUIDirtyAll"
+					}
+				}
+			}
+
+			:surfaceEditPanel = ZUIPanel {
+				style = styleGroupT
+				layout_indent = 4
+				*group = surfaceEdit
+
+				:= ZUILine {
+					lineEmbossed = 1
+				}
+
+
+				: = ZUIText {
+					style = styleSubheader
+					text = "Surface Display Modes:"
+				}
+
+				: = ZUIPanel {
+					style = styleGroupL
+
+					: = ZUIPanel {
+						style = styleGroupTChecks
+						layout_padX = 4
+						// layout_padY = 4
+
+						:sdm8 = ZUICheck {
+							text = "Unique Colors"
+							sendMsgOnSelect = "type=Zmoil_Surface cmd=UniqueColors val=1"
+							sendMsgOnUnselect = "type=Zmoil_Surface cmd=UniqueColors val=0"
+						}
+					
+						:sdm2 = ZUICheck {
+							text = Transparent
+							sendMsgOnSelect = "type=Zmoil_Surface cmd=Transparent val=1"
+							sendMsgOnUnselect = "type=Zmoil_Surface cmd=Transparent val=0"
+						}
+
+						:sdm3 = ZUICheck {
+							text = Mesh
+							sendMsgOnSelect = "type=Zmoil_Surface cmd=Mesh val=1"
+							sendMsgOnUnselect = "type=Zmoil_Surface cmd=Mesh val=0"
+						}
+
+						:sdm4 = ZUICheck {
+							text = 'Show Selected Area'
+							sendMsgOnSelect = "type=Zmoil_Surface cmd=ShowSelected val=1; type=ZUISet key=selected val=0 toZUI=sdm5"
+							sendMsgOnUnselect = "type=Zmoil_Surface cmd=ShowSelected val=0"
+						}
+
+						:sdm5 = ZUICheck {
+							text = 'Show Cavity Only'
+							sendMsgOnSelect = "type=Zmoil_Surface cmd=CavityOnly val=1; type=ZUISet key=selected val=0 toZUI=sdm4"
+							sendMsgOnUnselect = "type=Zmoil_Surface cmd=CavityOnly val=0"
+						}
+					}
+
+					: = ZUIPanel {
+						style = styleGroupTChecks
+						layout_padX = 4
+					
+						:sdm6 = ZUICheck {
+							text = RaviNormal
+							sendMsgOnSelect = "type=Zmoil_Surface cmd=RaviNormal val=1"
+							sendMsgOnUnselect = "type=Zmoil_Surface cmd=RaviNormal val=0"
+						}
+
+						:sdm7 = ZUICheck {
+							text = RaviNormalCoarse
+							sendMsgOnSelect = "type=Zmoil_Surface cmd=RaviNormalCoarse val=1"
+							sendMsgOnUnselect = "type=Zmoil_Surface cmd=RaviNormalCoarse val=0"
+						}
+					}
+				}
+
+				:= ZUILine {
+					lineEmbossed = 1
+				}
+
+				: = ZUIText {
+					style = styleSubheader
+					text = "Surface Color Mode:"
+				}
+
+				: = ZUIPanel {
+					style = styleGroupTChecks
+					*group = surfaceColorModes
+
+					:sc1 = ZUIRadioButton {
+						text = 'Off'
+						selected = 1
+						sendMsgOnSelect = "type=Zmoil_Surface cmd=ColorNone"
+					}
+
+					:sc2 = ZUIRadioButton {
+						text = 'Color Atoms'
+						sendMsgOnSelect = "type=Zmoil_Surface cmd=ColorAtoms"
+					}
+
+					:sc3 = ZUIRadioButton {
+						text = 'Color Residues (grn[pol] grey[hyd] purp[?])'
+						sendMsgOnSelect = "type=Zmoil_Surface cmd=ColorResidues"
+					}
+				}
+
+				:= ZUILine {
+					lineEmbossed = 1
+				}
+
+				: = ZUIText {
+					style = styleSubheader
+					text = "Surface Cutoff:"
+				}
+
+				: = ZUIPanel {
+					style = styleGroupT
+					layout_padX = 4
+					layout_padY = 4
+					panelColor = 0
+
+					: = ZUIPanel {
+						panelColor = invisible
+						layout = table
+						table_cols = 2
+						//layout_colDistributeEvenly = 1  // why isn't this working?
+						table_colWeight1 = 1
+						table_colWeight2 = 1
+
+
+
+						: = ZUIButton {
+							text = 'Clear Cutoff'
+							sendMsg = "type=Zmoil_Surface cmd=CutoffClear"
+						}
+						: = ZUIButton {
+							text = 'Set to picked plane'
+							sendMsg = "type=Zmoil_Surface cmd=CutoffPlane"
+						}
+					}
+
+
+					: = ZUIPanel {
+						panelColor = invisible
+						layout = table
+						table_cols = 2
+						//layout_colDistributeEvenly = 1  // why isn't this working?
+						table_colWeight1 = 1
+						table_colWeight2 = 1
+
+						: = ZUIButton {
+							text = 'Cutoff Flip'
+							sendMsg = "type=Zmoil_Surface cmd=CutoffFlip"
+						}
+						: = ZUIButton {
+							text = 'Cycle axis (X/Y/Z)'
+							sendMsg = "type=Zmoil_Surface cmd=CutoffCycleAxis"
+						}
+					
+					}
+
+
+					: = ZUIPanel {
+						panelColor = invisible
+						layout = table
+						table_cols = 2
+						//layout_colDistributeEvenly = 1  // why isn't this working?
+						table_colWeight1 = 1
+						table_colWeight2 = 1
+
+						: = ZUIButton {
+							text = ' << Cutoff Nearer'
+							sendMsg = "type=Zmoil_Surface cmd=CutoffNearer"
+						}
+						: = ZUIButton {
+							text = 'Cutoff Farther >>'
+							sendMsg = "type=Zmoil_Surface cmd=CutoffFarther"
+						}
+
+					}
+				
+					: = ZUIPanel {
+						panelColor = invisible
+						pack_side = l
+						layout_padX = 20
+						layout_cellAlign = c
+
+
+						: = ZUIText {
+							layout_forceW = 135
+							text = "Cutoff Jump Distance:"
+						}
+
+						:cutoffJumpDist = ZUIVar {
+							group = surfaceEdit
+							style = styleCmoilTwiddler
+							type = float
+							val  = 1
+							rangeLow = .5
+							rangeHigh = 64
+							formatShortest = 1
+							layout_forceW = 100
+							sendMsgOnVarChanging = "type=Zmoil_CutoffJumpDistance"
+							sendMsgOnEditComplete = "type=Zmoil_CutoffJumpDistance"
+						}
+					}
+				}
+			}
+		}
+
+			// Image Capture
+		//-----------------------------------------------------------------
+		:imageCaptureContainerPanel = ZUIPanel {
+			style = styleIndent1
+			pack_side = t
+			layout_cellFill = w
+			*layout_padX = 2
+			*layout_padY = 2
+
+			:= ZUIPanel {
+				panelColor = 0
+
+				:= ZUIButton {
+					text = '+'
+					selected = 1
+					toggle = 1
+					layout_cellAlign = c
+					sendMsgOnSelect = "type=ZUIShow toZUI=imageCapturePanel; type=ZUISet key=text val='-' toZUI=$this"
+					sendMsgOnUnselect = "type=ZUIHide toZUI=imageCapturePanel; type=ZUISet key=text val='+' toZUI=$this"
+				}
+
+				:= ZUIText {
+					style = styleCmoilSectionHeader
+					text = "Image Capture"
+				}
+			}
+
+			:imageCapturePanel = ZUIPanel {
+				style = styleGroupT
+
+				:= ZUILine {
+					lineEmbossed = 1
+				}
+
+				: = ZUIText {
+					style = styleSubheader
+					text = "Image Resolution:"
+				}
+
+				: = ZUIPanel {
+					style = styleGroupL
+					layout_padX = 4
+					layout_padY = 4
+					panelColor = 0
+				
+					: = ZUIPanel {
+						style = styleGroupTChecks
+						*group = resolutionRadioButtons
+
+						:rez1 = ZUIRadioButton {
+							text = 'Use onscreen resolution'
+							selected = 1
+						}
+
+						:rez2 = ZUIRadioButton {
+							text = 'Use custom resolution: '
+							disabled = 1
+							//@TODO
+						}
+
+					}
+
+					
+					:rezVal = ZUIVar {
+						layout_cellAlign = s
+						style = styleCmoilTwiddler
+						layout_forceW = 40
+						type = int
+						val = 1024
+						rangeLow  = 256
+						rangeHigh = 4096
+						hidden = 1
+						// @TODO
+					}
+				}
+
+				:= ZUILine {
+					lineEmbossed = 1
+				}
+
+				: = ZUIText {
+					style = styleSubheader
+					text = "Image Type:"
+				}
+
+				: = ZUIPanel {
+					style = styleGroupL
+					layout_padX = 4
+					layout_padY = 4
+					panelColor = 0
+					layout = table
+					table_cols = 2
+					table_colWeight1 = 1
+					table_colWeight2 = 2
+
+				
+					: = ZUIPanel {
+						style = styleGroupTChecks
+						*group = imageTypeRadioButtons
+
+						:png = ZUIRadioButton {
+							text = 'png'
+							selected = 1
+							sendMsgOnSelect = "type=Zmoil_ImageType itype=png"
+						}
+
+						:tif = ZUIRadioButton {
+							text = 'tif'
+							sendMsgOnSelect = "type=Zmoil_ImageType itype=tif"
+						}
+
+						:mpeg = ZUIRadioButton {
+							text = 'mpeg (saves multiple PNG files)'
+							sendMsgOnSelect = "type=Zmoil_ImageType itype=mpeg"
+						}
+
+						:gif = ZUIRadioButton {
+							text = 'Animated GIF'
+							sendMsgOnSelect = "type=Zmoil_ImageType itype=gif"
+						}
+					}
+
+					: = ZUIPanel {
+						style = styleGroupT
+						layout_cellAlign = c
+						hidden = 1
+						//@TODO
+
+						: = ZUIPanel {
+							style=styleGroupL
+							*group = multiCapture
+							: = ZUIText {
+								text = "Struct Begin: "
+								layout_forceW = 100
+							}
+							:captureStructBegin = ZUIVar {
+								style = styleCmoilTwiddler
+								layout_forceW = 40
+								type = int
+								val = 1
+								rangeLow = 1
+								rangeHigh = 45
+							}
+						}
+						: = ZUIPanel {
+							style=styleGroupL
+							*group = multiCapture
+							: = ZUIText {
+								text = "Struct End: "
+								layout_forceW = 100
+							}
+							:captureStructEnd = ZUIVar {
+								style = styleCmoilTwiddler
+								layout_forceW = 40
+								type = int
+								val = 1
+								rangeLow = 1
+								rangeHigh = 45
+							}
+						}
+					}
+				}
+
+				:= ZUILine {
+					lineEmbossed = 1
+				}
+
+				: = ZUIPanel {
+					style = styleGroupL
+					layout_cellFill = w
+					pack_fillLast = 1
+
+					: = ZUIText {
+						style = styleSubheader
+						text = "Filename "
+					}
+
+					:captureFilename = ZUIText {
+						layout_cellFill = w
+						panelColor = textAreaColor
+						text = "<none selected>"
+						wordWrap = 1
+					}
+				}
+
+				:= ZUIPanel {
+					style = styleGroupL
+					layout = table
+					table_cols = 2
+					//layout_colDistributeEvenly = 1  // why isn't this working?
+					table_colWeight1 = 1
+					table_colWeight2 = 1
+
+					:= ZUIButton {
+						text = "Pick Filename..."
+						sendMsg = "type=Zmoil_SetImageCaptureFilename"
+					}
+
+					:= ZUIButton {
+						text = "Perform Capture"
+						keyBinding = s
+						sendMsg = "type=Zmoil_SaveImage"
+					}
+				}
+			}
+		}
+
+			// EXTRAS container
+		//-----------------------------------------------------------------
+		:extrasContainerPanel = ZUIPanel {
+			//style = styleIndent1
+			pack_side = t
+			layout_cellFill = w
+			layout_padX = 10
+			layout_padY = 10
+			panelColor = 0;
+
+			: = ZUIButton {
+				textColor = 0x8080807F
+				selected = 0
+				toggle = 1
+				layout_forceW = 100
+				buttonColor = 0xa8a8a82F
+				buttonTextColor = 0x505050FF
+				sendMsgOnSelect = "type=ZUIShow toZUI=credits; type=ZUISet key=text val='Hide' toZUI=$this"
+				sendMsgOnUnselect = "type=ZUIHide toZUI=credits; type=ZUISet key=text val='Credits' toZUI=$this"
+			}
+
+			:credits = ZUIText {
+				textColor = 0x808080BF
+				wordWrap = 1
+				!multilineIgnoreWhitespace text
+					\n
+					\n
+					ZMoil is free molecular viewing software written and maintained by Thomas Blom for the Computational Life
+					Sciences and Biology (CLSB) group at the Institute for Computational Engineering and Sciences (ICES), the
+					University of Texas at Austin, under the direction of Dr. Ron Elber.
+					\n
+					\n
+					ZMoil is the successor to CMoil, which was written primarly by Baohua Wang at Cornell University.  Much of
+					the original CMoil code remains intact.
+					\n
+					\n
+					ZMoil is developed using the Zlab software framework written by Zachary Booth Simpson. 
+					\n
+					\n
+					\n
+                			For more information about this sofware and CLSB, see http://clsb.ices.utexas.edu
+					\n
+					\n
+					\n
+				!endmultiline
+			}
+		}
+	}
+}
+
+:zmoilTutorial = ZUIPanel {
+	style = styleDialog
+	hidden = 0
+	layoutManual = 1
+	layoutManual_x = W w - 2 /
+	layoutManual_y = H h - 2 /
+	layoutManual_w = 500
+	layoutManual_h = 420
+	parent = root
+	layout_indentL = 5
+	layout_indentT = 5
+	layout_indentR = 5
+	layout_indentB = 5
+	pack_fillLast = 1
+	pack_side = t
+	panelColor = 0xA0E0A0FF
+
+	: = ZUIPanel {
+		style = styleGroupL
+		layout_cellFill = wh
+
+		: = ZUIText {
+			style = styleDialogTitle
+			text = "Welcome to ZMoil"
+		}
+	}
+
+	: = ZUILine {
+		lineEmbossed = 1
+	}
+	
+	: = ZUIText {
+		wordWrap = 1
+		!multilineIgnoreWhitespace text
+			The UI panel to the left is scrollable: use the mouse wheel or right-mouse-drag to
+			scroll it up and down to access UI.  The named subsections may be expanded or collapsed
+			to aid workflow.
+			\n
+			\n
+			Numeric values may be clicked to enter a new value, or may be
+			left-mouse-dragged to scroll the values.  The "Structure Index" slider may be similarly dragged.
+			\n
+			\n
+			You may launch Zmoil standalone, in which case it will load the last model you were
+			viewing.  You may open multiple PDB files from within Zmoil, as well as input
+			files generated from the MOIL View Structure worksheet (*.in).  The fileopen dialog will
+			accept wildcards such as *.pdb or *.in to limit displayed files to aid selection. Hit
+			<Enter> after typing wildcard selection to update the file list.
+			\n
+			\n
+			rotate model	  : left mouse button drag
+			\n
+			select atoms    : hold shift key + left click
+			\n
+			translate model : right mouse button drag
+			\n
+			zoom in/out      : mouse wheel      
+			\n
+			\n
+			http://clsb.ices.utexas.edu
+		!endmultiline
+		      
+	}
+
+	: = ZUILine {
+		lineEmbossed = 1
+	}
+
+	:skipTutorial = ZUICheck {
+		text = "Do not show this message again"
+	}
+
+	: = ZUIButton {
+		layout_cellAlign = c
+		text = "OK"
+		sendMsg = "type=ZUIHide toZUI=$parent; type=Zmoil_TutorialOK"
+		layout_forceW = 50
+	}
+}
+
+
+
+
+

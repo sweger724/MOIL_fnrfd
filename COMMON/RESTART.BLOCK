@@ -1,0 +1,11 @@
+c restarting data for dynamics
+c urst_crd   - unit number for coordinates to restart the dynamics
+c urtst - unit number to save the current MD step number
+c start_dyna - the starting step for dynamics
+c cont_yes   - if true the present run is a continuation
+c
+	integer urst_crd,start_dyna,urst
+	logical cont_yes
+
+	common /restart/urst_crd,start_dyna,urst
+	common /restart1/cont_yes

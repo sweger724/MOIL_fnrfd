@@ -1,0 +1,3 @@
+        double precision dStmp_initial, dStmp_final, Hamilt
+
+        COMMON/sdp_double/ dStmp_initial, dStmp_final, Hamilt

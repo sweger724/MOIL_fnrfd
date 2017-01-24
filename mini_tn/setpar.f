@@ -1,0 +1,14 @@
+      SUBROUTINE SETPAR(N)
+c      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      INTEGER LSUB(14)
+      integer n,lwtest,i
+      COMMON/SUBSCR/ LSUB,LWTEST
+C
+C SET UP PARAMETERS FOR THE OPTIMIZATION ROUTINE
+C
+      DO 10 I = 1,14
+          LSUB(I) = (I-1)*N + 1
+10    CONTINUE
+      LWTEST = LSUB(14) + N - 1
+      RETURN
+      END

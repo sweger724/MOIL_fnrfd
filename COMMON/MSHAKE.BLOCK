@@ -1,0 +1,11 @@
+c Mshak, revised, RE 1/00
+c
+	double precision cmat(3,3)
+	double precision tolcons
+	double precision reqoh2,reqhh2,invmh,invmo
+	integer nshakm,  tip3_mono
+        logical tip3p_yes,tip4p_yes
+
+	common /dmshak/ cmat,tolcons,reqoh2,reqhh2,invmh,invmo
+	common /imshak/ nshakm,tip3_mono
+        common /lmshak/tip3p_yes,tip4p_yes

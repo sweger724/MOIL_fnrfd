@@ -1,0 +1,5 @@
+       double precision rotat(3,3), Acm(3), Bcm(3),rmsarray(maxpt)
+       integer rms_pick(maxpt)
+
+       common /ovlp_dbl/ rotat, Acm, Bcm, rmsarray
+       common /ovlp_int/rms_pick

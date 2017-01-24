@@ -1,0 +1,8 @@
+c see fp/rgyrconst.f
+c
+
+	integer rgcnpt, rgcnpick, rgcnpointr(maxpt)
+        double precision rgk, rg20
+
+	common /RGYRC/rgcnpt,rgcnpick,rgcnpointr
+        common /RGYRCDP/rgk,rg20

@@ -1,0 +1,130 @@
+c a common block for one of the parallel segments of the action
+c (last modified in 25/2/96 by RO)
+c
+c grid - number of grid points for the Onsager path (see LENGTH.BLOCK)
+c degfmax - maximum number of degrees of freedom (for the whole
+c         discrete representation of the path). Including fix points
+c degfmin  - number of degrees of freedom for the path excluding
+c        fix points
+c maxpt3- maximum number of particles (for a single copy of the
+c         system) multiply by 3
+c proc  - number of processes to which the path is divided
+c pseg  - number of structures in a path segment (assigned to one
+c                process.
+c npt2 and npt3 - npt is the ACTUAL number of particles in a single 
+c        copy of the system, npt2 and npt2 are 2 times and 3 times
+c        the same number.
+c ndgef - actual number of degrees of freedom to be optimized in
+c        a given process. I.e. 3*npt*(grid-2)/proc
+c me, lme, upper, lup, lower, low - characters that include the names
+c        of the present machine me), the machine after (upper) and 
+c        the machine before (lower) and their corresponding lengths:
+c        lme,lup and low
+c nstepopt - number of optimization steps
+c npri  - number of steps between writing reports
+c nwcrd - number of steps between writing coordinates
+c smlp  - number of optimization steps before comunication between 
+c       procesors
+c level - if 1 you are in a big trouble (program stop), if 0 you are
+c        in a small trouble (program issues a warning)
+c nliststo - number of steps between update of non-bonded lists and
+c         recall to pwl_sto
+c first, last - if "first" this is the first machine, if "last" this
+c        is the last machine
+c fixend- if "fixend" the end points are fixed. This is the
+c                only option supported now
+c lap   - if "lap" overlap structures along the path.
+c tolg  - convergence crierion, if gradient norm less than tolg, stop.
+c estred- estimated reduction in function in the first step
+c onsager - current value of the onsager action
+c dtsto    - time step along the path (picoseconds)
+c gamma   - friction constant
+c twodtsto   - twice the time step
+c r       - vector with all the coordinates of the path segment
+c        in the present process
+c donsger - vector with the derivatives of the onsager action in
+c        the present process
+c mdt2    - vector. a useful constant for the calculation of
+c        the derivatives and the actual value of the onsager action.
+c me,upper,lower - characters with the names of the present processes
+c  and the machines it is connected to from "below" and "above".
+c lme, lup and low - the length of the above characters.
+c dtopt   - propagation time step (for steepest descent and annealing)
+c tempanl    - initial temperature for the annealing
+c irandsto   - seed for the random number generator
+c ianlmax - number of iterations of annealing
+c anlfac  - reduction factor of the temperature for annealing
+c sepfast - logical flag for separtion of slow and fast modes
+c allupdate - logical flag for each step update of lists (when true)
+c lanneal - logical flag for linear annealing of the temperature,
+c              when false exponential annealing is used
+c temporary solution for shake !!
+c shakm - logical flag
+c
+czva        logical shakm
+        integer pseg,maxpt3,degfmin
+c
+        parameter (maxpt3=3*maxpt)
+c.......stochastic1
+        parameter (pseg=(grid-4)/proc_max)
+c.......stochastic (old)
+c        parameter (pseg=(grid-2)/proc)
+        parameter (degfmin=pseg*maxpt3)
+
+ct......calls related to the talk() subroutine for comunication
+ct......between workstations (tcpip protocol)  
+ct
+ct
+ct        proj_id --The project ID assigned by Ron, it will used as
+ct                ID of a project, for identifying the project.
+ct        max_proc--The total number of processes running for a project.
+ct
+ct        integer proj_id, max_proc
+c
+c
+	integer uwpth
+        integer npt2,npt3,proc_id
+        integer nstepopt,npri,nwcrd,smlp
+        integer level,nliststo,ndegf
+        integer my_pe,n_pes
+        integer lme,lup,low
+	integer irandsto,ianlmax
+        character*80 me,upper,lower
+        character*4 crdstyl
+        logical first,last,fixend,lap,bc1,bc2,damp,paral,sepfast
+        logical allupdate,lanneal
+        double precision tolg,estred,onsager,dtsto,
+     >    gamma,twodtsto
+czva
+        double precision stoscale,stobeta
+        double precision donsmsq,donsmax,drmsqons,drmaxons
+czva
+        double precision r(degfmax),donsger(degfmax)
+        double precision mdt2(maxpt3)
+	double precision mpi_buffer(30*maxpt)
+        double precision dtopt,tempanl,anlfac
+
+        common /actlog/first,last,fixend,lap,bc1,bc2,damp,paral,
+     1                sepfast,allupdate,lanneal
+czva       ,shakm
+        common /actint/npt2,npt3,nstepopt,npri,nwcrd,my_pe,n_pes,
+     1                level,nliststo,ndegf,lme,lup,low,
+     >                proc_id,smlp,irandsto,
+     2                ianlmax,uwpth
+        common /actchr/crdstyl,me,upper,lower
+        common /actdbl/tolg,estred,onsager,dtsto,gamma,twodtsto,
+     >                r,donsger,
+     1                mdt2,dtopt,tempanl,anlfac,stoscale,stobeta,
+     2                donsmsq,donsmax,drmsqons,drmaxons,mpi_buffer
+c
+ct......calls related to the talk() subroutine for comunication
+ct......between workstations (tcpip protocol)  
+ct
+ct
+ct        common /actint/proj_id,max_proc
+c
+
+
+
+
+

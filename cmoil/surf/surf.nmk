@@ -1,0 +1,38 @@
+# Generated for compiling on Windows with VC6++      --B.Wang
+#
+#
+CXX = cl 
+DEL = del
+COPY= copy /Y 
+MOVE= move /Y 
+LINK= link
+CD  = cd 
+
+SRC_DIR=.\ 
+OBJ_DIR=.\ 
+OUT_DIR=..\..\..\moil.exe\ 
+
+CFLAGS = /nologo /O2 /MT /W0 /I. /D _CRT_SECURE_NO_WARNINGS
+
+LFLAGS = /LIBPATH:"%MSVCDir%\lib" /NODEFAULTLIB /INCREMENTAL:NO /MACHINE:IX86 
+#/PDB:NONE
+ 
+OBJS = $(OBJ_DIR)surf.obj           $(OBJ_DIR)io.obj            $(OBJ_DIR)compute.obj        $(OBJ_DIR)dual.obj \
+       $(OBJ_DIR)utils.obj          $(OBJ_DIR)lp.obj            $(OBJ_DIR)chull.obj          $(OBJ_DIR)tessel_cases.obj \
+       $(OBJ_DIR)tessel_patches.obj $(OBJ_DIR)tessel_convex.obj $(OBJ_DIR)tessel_concave.obj $(OBJ_DIR)tessel_torus.obj  
+
+HDRS = surf.h 
+
+all:  surf.exe
+
+surf.exe : $(OBJS) $(HDRS)
+	$(CXX) $(CFLAGS) $(NOSTDGLUT) $(OBJS)
+	$(MOVE) .\surf.exe $(OUT_DIR)surf.exe 
+clean :
+	-$(DEL) $(OBJ_DIR)*.obj
+
+clobber: clean
+	$(DEL) $(OUT_DIR)surf.exe
+
+{$(SRC_DIR)}.c{$(OBJ_DIR)}.obj:
+	$(CXX) $(CFLAGS) -c $< /Fo$@

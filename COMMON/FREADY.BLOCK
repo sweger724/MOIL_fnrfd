@@ -1,0 +1,47 @@
+c
+c parameter required for CG Model Calculation
+c sparsity - max fraction of pairs forming LJ contacts 
+c       cutoff - distance for counting a LJ energy
+c       Ncyscys - number of S-S bonds in the system     
+
+        integer Namino, N2ndary, Ncyscys
+        double precision E_CG_max
+        parameter (Namino=20)
+        parameter (N2ndary=6)
+        parameter (E_CG_max=100)
+
+        logical Fix_2nd_structure,smooth_hardcore
+
+c variables for full CG model
+        double precision LJa(3*Namino*Namino,0:11),
+     &     LJr(3*Namino*Namino,1:5), CGBond(0:(Namino+2),1:12), 
+     &     CGAngle(3*Namino+N2ndary-1,1:12), 
+     &     CGTor(4*(Namino**2+N2ndary**2),1:10)
+
+        double precision CMmass(20),SSbond(100,2)
+
+        integer bondType(maxbond),anglType(maxangl),torType(maxtors) 
+     &          ,LJ_Type(maxCGcontacts)
+        
+        integer LJ_list1(0:maxpt),LJ_list2(maxCGcontacts),CGid(maxpt)
+        double precision CG_cutoff, LJ_14(maxCGcontacts),
+     &       ddsi(maxtors),ddco(maxtors),CGstr(maxpt)   
+        character Structure2nd(maxpt)
+
+C variables for backbone HB:
+        integer HBbond1(maxmono),HBbond2(maxmono)
+     &         ,HBtype1(maxmono),HBtype2(maxmono)
+        double precision HB_cutoff,App(3),Bpp(3),rpp(3),epp(3) 
+        
+        common /CG_integer/ bondType, anglType, torType, LJ_list1, 
+     &                 LJ_list2, LJ_Type,Ncyscys,
+     &                 HBbond1,HBbond2,HBtype1,HBtype2,CGid
+        common /CG_double/ LJa,LJr,CGBond,CGAngle,CGTor,CG_cutoff,
+     &                     CMmass,SSbond,
+     &                     HB_cutoff,App,Bpp,rpp,epp,
+     &                     LJ_14,ddco,ddsi,CGstr
+        
+        common /CG_char/ Structure2nd
+
+        common /CG_logical/ Fix_2nd_structure
+     &                      ,smooth_hardcore

@@ -1,0 +1,5 @@
+c Common Block for velocities 
+c LENGTH.BLOCK defines maxpt (maximum number of particles)
+c
+	double precision velo(3,maxpt)
+	common /VEL/velo

@@ -1,0 +1,11 @@
+
+C	I have no idea how to parameter arrays so i will
+C	just define them in eforce_external for now
+
+	double precision Konstants(3)	
+
+	logical eexternal
+
+	parameter(eexternal=.false.)
+
+	common /EEXT/ Konstants

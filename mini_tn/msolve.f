@@ -1,0 +1,16 @@
+      SUBROUTINE MSOLVE(G,Y,N,W,LW,UPD1,YKSK,GSK,
+     *     YRSR,LRESET,FIRST)
+c      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      integer n,lw,lgv,lz1,lzk,lv,lsk,lyk,ldiagb,lsr,lyr
+      integer lhyr,lhg,lhyk,lpk,lemat,lwtest
+      DOUBLE PRECISION G(N),Y(N),W(LW),YKSK,GSK,YRSR
+      LOGICAL UPD1,LRESET,FIRST
+C
+C THIS ROUTINE SETS UPT THE ARRAYS FOR MSLV
+C
+      COMMON/SUBSCR/ LGV,LZ1,LZK,LV,LSK,LYK,LDIAGB,LSR,LYR,
+     *     LHYR,LHG,LHYK,LPK,LEMAT,LWTEST
+      CALL MSLV(G,Y,N,W(LSK),W(LYK),W(LDIAGB),W(LSR),W(LYR),W(LHYR),
+     *     W(LHG),W(LHYK),UPD1,YKSK,GSK,YRSR,LRESET,FIRST)
+      RETURN
+      END

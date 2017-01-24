@@ -1,0 +1,23 @@
+C LINE2 is a common block for typical data read and used by
+C the parser.
+C
+
+c	 name - name of current routine
+c	 coortyp - type of coordinate format (e.g. CHARM)
+c
+	character*10 name
+	character*4 coortyp
+
+c	 namel- lentgh of the character that is thename of the routine
+c	 level- integer indicating the level of error, if 0 continues
+c		execution in 1 quits
+	integer namel,level
+
+c	 ucon - a unit number for the file with connectivity
+c	 ucor - a unit numberof the file with the coordinates
+c	 udata- a unit on which some data is written (e.g. energy value)
+	integer ucon,ucor,udata
+
+
+	common/line2i/namel,level,ucon,ucor,udata
+	common/line2c/name,coortyp

@@ -1,0 +1,13 @@
+c temporary space available on the integer vector BUFFER
+c
+c used   - space already taken on the integer array
+c cused  - space already taken on the character array
+c ispace - maximum allowed integer elements
+c ichar  - maximum allowed character elements
+c	parameter (ispace=100000,ichar=1000)
+c	integer used,cused,buffer(ispace)
+c	character*1 bufchr(ichar)
+c	common /buff/buffer,used,cused
+c	common /bufc/bufchr
+	integer buffer1(maxbond),buffer2(maxbond)
+	common /buff/buffer1,buffer2

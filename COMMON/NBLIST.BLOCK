@@ -1,0 +1,50 @@
+c     variables used for non-bonding interactions
+c     rmax - a single cutoff distance. Kept for compatability with
+c		old output
+c     cutvdw2  - square of the cutoff for van der Waals interactions
+c       cutvbig2 - square of the second (buffer) cutoff for vdw
+c     cutele2  - cutoff for electrostatic interaction
+c       cutebig2 - second cutoff for electrostatic interactions
+c     hydro_th - cutfoff for hydrophobic interactions
+c     cutmono2  - cutoff distance for the creation of monomer list
+c   mono_cent(3,maxmono) - a vector with the center of mass of the
+c	monomers. used as a starting point to compute the nonbonded lists
+c point[1-3] pointers to the 3 non-bonded list (list[1-3])
+c point1[1-3] pointers to the non-bonded "special" lists (list1[1-3])
+c poinwat[1-2] - pointer to the water list. Water- water interactions are 
+c		handled via separate monomer lists (1 - short - van der Waals
+c		cutoff ; 2 - long - electrostatic cutoff)
+c my_nwat      - number of water interactions at the current processor
+c
+c RE Sept-97 (potential bug fix)
+c watptr is a point from the index of monomer divisions to the actual
+c		water molcules. Its length is in general LARGER than maxmono
+c		and is equal to number of monomer division. Here it is taken a factor
+c		of 2 larger.
+c RE May-11 a hack to allow cooling by velocity scaling of waters far away
+c from the center of the box and far away from the solute in the center
+c is scale_away is true this mechanism of scaling is used
+c
+	logical scale_away
+        integer no_of_away
+        
+  
+        double precision cutvdw2,cutvbig2,cutele2,cutebig2,hydro_th
+	double precision rmax,cutmono2
+	double precision mono_cent(3,maxmono*maxdiv)
+        integer point1(0:maxpt),point2(0:maxpt),point3(0:maxpt)
+	integer poinwat1(0:maxmono),poinwat2(0:maxmono)
+	integer watptr(2*maxmono)
+        integer far_water(maxpt)
+        integer spoint11(0:maxspcl),spoint21(0:maxspcl)
+        integer list1(ichgvdw),list2(ivdw),list3(ichg)
+	integer listwt1(wtrshrt),listwt2(wtrlng)
+        integer slist11(sichgvdw),slist21(sichgvdw)
+	integer my_nwat
+        common /NB_D/cutvdw2,cutvbig2,cutele2,cutebig2,hydro_th,rmax,
+     1		cutmono2,mono_cent
+     	common /NB_I/poinwat1,poinwat2,watptr,listwt1,listwt2,
+     1          point1,point2,point3,spoint11,spoint21,
+     2		list1,list2,list3,slist11,slist21,my_nwat,far_water,
+     3          no_of_away
+        common /NB_L/scale_away     

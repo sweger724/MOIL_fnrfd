@@ -1,0 +1,244 @@
+c-----------------------------------------------------------------
+c++++ LENGTHS OF VECTORS
+	integer ichunk,maxumon,maxptmo,igene,igene1,maxunq,maxubnd
+	integer maxuagl,maxutrs,maxuimp,maxpt,maxmono,maxbond,maxangl
+	integer maxtors,maximp,maxex,maxspec,MAXBULK,maxptbn,maxcnst
+	integer maxsmon
+	integer ihugemo,maxshak,ipermax,isym,maxpwat
+	integer ichgvdw,ivdw,ichg,lgrid,nudi,mudi,chunk
+        integer maxnpts
+        integer maxNodes,maxNeighbors,maxStru
+c# 7/95 - water:water list
+	integer wtrshrt,wtrlng
+	integer sichgvdw,sihugemo
+	integer maxmorsb,maxspcl,maxsx,maxs14,istore,maxcopy
+        integer maxcpy
+c parameters for constraints
+      integer maxc,mcoupc,mcoupp
+c# for sto
+	integer grid,degfmax,proc_max
+C# for parallelization
+	integer maxpe
+c# parameter for spherical solvent boundary
+	integer nalm
+c parameter for virtual particles
+        integer nvptmax
+C maximum number of contacts in CG models
+	integer maxCGcontacts
+C randomSize - size of an array of random numbers
+        integer randomSize
+        parameter (randomSize=1000)
+c  maximum number of reduced parameters
+        integer max_reducedCoor
+        parameter(max_reducedCoor = 10)
+
+
+c-----------------------------------------------------------------------
+c length of dimension need for vectorization of code
+c
+	parameter(ichunk=96)
+c-----------------------------------------------------------------------
+
+c-----------------------------------------------------------------------
+c maxunq  - maximum number of distinguishable particles
+c maxumon - maximum number of distinguishable monomers
+c maxptmo - maximum number of particles in a monomer
+c maxubnd - maximum number of distinguishable bonds
+c maxuagl - maximum number of distinguishable angles
+c maxutrs - maximum number of distinguishable torsions
+c maxuimp - maximum number of distinguishable torsions
+	parameter(maxumon=400,maxptmo=ichunk)
+c	parameter(igene=1000,igene1=10000)
+	parameter(igene=400,igene1=2100)
+	parameter(maxunq=igene,maxubnd=igene1,maxuagl=igene1)
+	parameter(maxutrs=igene1,maxuimp=igene1)
+c-----------------------------------------------------------------------
+
+c-----------------------------------------------------------------------
+c maxpt   - maximum number of particles in the system
+c maxcpy   - chen - maximum number of copies for a partical
+c maxmono - maximum number of monomers
+c maxsmono - maximum number of special monomers
+c MAXBULK - maximum number of molecular systems (BULK)
+c maxbond - maximum number of bonds
+c maxtors - maximum number of torsions
+c maximp  - maximum number of improper torsions
+c maxex   - maximum number of exclusions
+c maxspec - maximum number of special (1-4) interactions
+c maxptbn - maximum number of bonds to a particle
+c maxcnst - maximum number of (dihedral) constraints
+c
+
+		parameter(maxpt=40000,maxmono=3000,maxbond=2*maxpt)
+        parameter(maxnpts=50)
+        parameter(maxcpy=10)
+        parameter(maxangl=200000,maxtors=200000,maximp=50000)
+        parameter(maxex=200000,maxspec=200000)
+        parameter(MAXBULK=2)
+        parameter(maxptbn=20)
+        parameter(maxcnst=800)
+		parameter(maxCGcontacts=100000)
+
+
+c-----------------------------------------------------------------------
+
+c-----------------------------------------------------------------------
+c length of vectors for non-bonded list
+c there are three atom lists, since different cutoff are used for
+c van der Waals and electrostatic
+c The first list (ichgvdw), includes charged particles interacting
+c     via short range distance and therefore also electrostatic is done.
+c The second list (ivdw) includes at list one uncharged particle
+c     interacting via short distance. Only vdw is done.
+c The third list includes particles above the vdw cutoff but below the elec
+c     cutoff only electrostatic is done.
+c the other two list are short and long range lists for water (TIP3).
+c 	TIP3 non-bonded interactions are computed on the group
+c	(and not atom) level.
+c
+        parameter(ichgvdw=18200000)
+        parameter(ivdw   =12000000)
+        parameter(ichg   =12000000)
+        parameter(ihugemo=1000000)
+        parameter(wtrshrt=4000000)
+        parameter(wtrlng =3200000)
+
+
+
+c----------------------------------------------------------------------
+c length of vectors for shake constraints
+c in the worst case scenario the number of shake constraints will
+c be slightly larger than the number of bonds, since H...H "bonds"
+c in groups like H-X-H are included in shake.
+c
+c	parameter(maxshak=50500)
+	parameter(maxshak=4*maxbond)
+
+c---------------------------------------------------------------------
+c lgrid used in chain calculations (maximum number of grid points
+
+		parameter(lgrid=100)
+c
+        parameter (maxNodes = 1)
+        parameter (maxneighbors = 1)
+        parameter (maxStru = 2)
+c
+c----------------------------------------------------------------------
+C nudi    - number of pieces in which the 3*2*npt coordinates transmited
+C           between processors in sdel are chopped (see moil.doc/sdel)
+c        parameter(nudi=1)
+c        parameter(mudi=mod(maxpt,nudi))
+	parameter(chunk=4000)
+c----------------------------------------------------------------------
+c isym    - number of symmetry operation (for cubic lattice symmetry
+c           is equal to 13 with rotation to 26
+c ipermax - maximum number of symmetry related particles
+c maxpwat - maximum number of symmetry generated waters
+	parameter(isym=26)
+c BEWARE!!!! multiplication by 5 for symmetry particles may be too small
+	parameter(ipermax=5*maxpt)
+	parameter(maxpwat=5*maxmono)
+
+c---------------------------------------------------------------------
+c maxcopy - This is the maximum number of les copies for a monomer IF
+c           the weight option is used. If the weight option is not used
+c	    the number of copies is bound only by the maximum number
+c	    of monomers
+c
+	parameter(maxcopy=200)
+
+c--------------------------------------------------------------------
+c istore - parameter for space allocation to the truncated newton-raphson
+c          minimization minimum is 14
+
+	parameter(istore=14)
+c
+c maxmorsb - maximum number of morse type bonds
+c sichgvdw - length of non-bonded list of excited state
+c sihugemo - length of monomer list for excited state
+c maxsmon  - maximum number of monomers used in excited state
+c maxsx    - maximum number of exclusion for excited state
+c maxs14   - maximum number of 1-4 interactions in the excited state
+c
+
+	parameter(maxmorsb=4)
+	parameter(sichgvdw=100000)
+	parameter(sihugemo=100000)
+	parameter(maxsmon=500)
+	parameter(maxspcl=500)
+	parameter(maxsx=2000)
+	parameter(maxs14=5000)
+
+c next things for matrix shake
+
+c mcoupp is max # particles that are in a coupled constraint set
+c maxc is max constraints
+c mcoupc is max coupled constraints
+c
+      PARAMETER (maxc=23000,mcoupc=3,mcoupp=3)
+
+c parameters for sto (stochastic path runs)
+c
+        parameter (grid=12,proc_max=4)
+c.......stochastic1
+        parameter (degfmax=((grid-4)/proc_max+4)*3*maxpt)
+c.......stochastic(old)
+
+c For (standard) parallelization:
+c maxpe - maximum number of processing elements (nodes)
+c
+	parameter (maxpe=16)
+c chen
+c	maximal number of atoms shared by two PEs
+	integer mx_shk_shr
+	parameter(mx_shk_shr=5)
+c	maximal number of atoms that a single PE may share with the others
+	integer mx_shk_shr_tot
+	parameter(mx_shk_shr_tot = mx_shk_shr * maxpe)
+c	maximal number of particles shaked by a single PE
+	integer max_shk_pe
+	parameter(max_shk_pe = 2*( maxshak/maxpe + maxpe))
+
+c yael
+c the maximal number of parts for a monomer.
+        integer maxdiv
+        parameter(maxdiv=9)
+c for parallel shake - the maximum number of bonds between two
+c different processors.
+        integer maxlink
+        parameter(maxlink=6)
+c for virtual particles
+        parameter(nvptmax=10)
+
+
+c deb
+C----------For SSBP --------------------------
+        PARAMETER (nalm=15000)
+
+C----------For EWALD -------------------------
+c sizes: maxord - max. order of interpolation over the grid in k-space
+c
+c        maxt - max. size of the Q matrix, containig grided charges
+c               this parameter defines the overall memory requirements
+c               and should be adjusted to the requested grid density
+c
+c        perft  - max. number of grid points per unit interval for inerp. erfc
+c        maxtau - max. dimension of temporary matrix tau for values of erfc
+c        pth - max. dimension of matricies storing cubic spline interpolation coefficients
+c              for grided charges
+c
+      integer MAXS, MAXN, MAXORD, MAXT, pth, perft, maxtau
+c templ      parameter(MAXN=1000,MAXORD=14,MAXT=300000,MAXS=maxpt)
+      parameter(MAXN=4000,MAXORD=4,MAXT=5000000,MAXS=maxpt)
+      parameter(pth=maxord*MAXS,maxtau=200000,perft=10000)
+c
+
+c Parameters for second derivative calculations (see SCNDRV for
+c  definition of arrays)
+c
+        integer maxpt2d,ichvd2,ivdw2,ichg2,ispec2,mbond2,mangl2,mtors2
+        integer mimp2,ibeta2
+        parameter(maxpt2d=1000,ichvd2=12000,ivdw2=12000,ichg2=100)
+        parameter(ispec2=257,mbond2=151,mangl2=214,mtors2=147,mimp2=59)
+        parameter(ibeta2=300)
+

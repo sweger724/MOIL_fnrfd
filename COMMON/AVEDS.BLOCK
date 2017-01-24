@@ -1,0 +1,70 @@
+
+
+c     The avedS_dyn subroutine runs dynamics on fast particles (water), 
+c     while keeping the protein frozen, in order to find solvent
+c     averaged quantities needed to calculate dsall in avedS_sds()
+c     
+c
+c	This block of code contains the COMMON files for the subroutine,
+c	and declares and defines variables.
+c
+c     common blocks for COORDinates and potential ENERGY derivatives
+c     
+      include 'COMMON/CONVERT.BLOCK'
+      include 'COMMON/LENGTH.BLOCK'
+      include 'COMMON/ACTPARA1.BLOCK'
+      include 'COMMON/PVM_LOCAL.BLOCK'
+      include 'COMMON/COMM_LOCAL.BLOCK'
+      include 'COMMON/ENERGY.BLOCK'
+      include 'COMMON/COORD.BLOCK'
+      include 'COMMON/NBLIST.BLOCK'
+      include 'COMMON/SYMM.BLOCK'
+      include 'COMMON/EWALD.BLOCK'	
+      include 'COMMON/UNITS.BLOCK'
+      include 'COMMON/PDQ.BLOCK'
+
+c     common blocks to run dynamics on fast particles
+c      include 'COMMON/DYNA.BLOCK'
+      include 'COMMON/SDELAVE.BLOCK'
+      include 'COMMON/FREEZ.BLOCK'
+      include 'COMMON/SHAKE.BLOCK'
+      include 'COMMON/MSHAKE.BLOCK'
+      include 'COMMON/VELOC.BLOCK'
+
+C     common blocks for calling matvec
+      include 'COMMON/SCNDRV.BLOCK'
+      include 'COMMON/GETVEC.BLOCK'
+
+      integer nstruc, igrid
+      double precision tempstruc
+      double precision tmp
+c
+      logical debug1
+      logical savesymm
+      integer npt3s
+      integer npt
+c 
+      integer i,m,l,jp1,j0,jm1
+      integer istep,k
+
+c 	 integer j?n? not used apparently!
+     
+      double precision kenergy
+      double precision r(3,*), d0mass(LGRID)
+      double precision diag11_total(3,maxnpts),diag12_total(3,maxnpts)
+      double precision diag11_fast(3,maxnpts),diag12_fast(3,maxnpts)
+      double precision dpot_slow(3,maxnpts),e_slow
+
+      double precision e0_ave(LGRID),p_ave(LGRID), psq_ave(LGRID)
+      double precision ujk_ave(3,maxnpts,LGRID)
+      double precision ujksq_ave(3,maxnpts,LGRID)
+      double precision pujk_ave(3,maxnpts,LGRID)
+      double precision ujkp_ave(3,maxnpts,LGRID)
+      double precision diagprts11_ave(3,maxnpts,LGRID) 
+      double precision diagprts12_ave(3,maxnpts,LGRID) 
+      double precision diagprts22_ave(3,maxnpts,LGRID)
+      double precision diagprts21_ave(3,maxnpts,LGRID)
+      double precision diagprts23_ave(3,maxnpts,LGRID)
+      double precision diagprts24_ave(3,maxnpts,LGRID)
+      double precision diagprts31_ave(3,maxnpts,LGRID)
+

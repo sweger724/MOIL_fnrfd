@@ -1,0 +1,6 @@
+c used for loop variables
+c
+	double precision var1(maxcnst),var2(maxcnst)
+	integer loop(maxcnst),nvar,varstep(maxcnst)
+	common /varb/var1,var2
+	common /ivarb/varstep,loop,nvar

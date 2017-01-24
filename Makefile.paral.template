@@ -1,0 +1,422 @@
+# SDEL make file as of 11/13/2007.  
+#
+################################################################
+#
+# There are sections below to comment/uncomment depending on     
+# your system and compiler.  Systems common at UT/ICES/TACC
+# are at the top.  You may define FCMOIL and FFLAGSMOIL in
+# your environment to override the settings for the FORTRAN
+# compiler and flags used.
+#
+# Updated Mar 02, 2009. Thomas Blom
+#
+###############################################################
+
+# Ucomment for Windows:
+#MV = mv.bat 
+#CLEAN = del /Q /S *.o *.obj
+#
+# Uncomment for Unix/Linux/OSX
+MV = mv
+CLEAN = rm -f */*.o 
+
+
+################################################################
+
+.f.o:
+	$(FC) $(FFLAGS) -c $<
+	$(MV) $(*F).o $(<D)
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+	$(MV) $(*F).o $(<D)
+
+# DEFAULT: intel fortran on stampede
+#MPIDIR = /share/apps/openmpi/intel/1.5
+#FC = $(MPIDIR)/bin/mpif77 
+#FFLAGS = -C -g -convert big_endian -I./  -I$(MPIDIR)/include -L$(MPIDIR)/lib
+
+
+#: intel fortran on Ranger
+#MPIDIR = /share/apps/intel10_1/openmpi/1.2.4
+#FC = $(MPIDIR)/bin/mpif77 
+#FFLAGS = -O3 -xW -convert big_endian -I./  -I$(MPIDIR)/include -L$(MPIDIR)/lib
+#: Lonestar
+#FC = mpif77
+#FFLAGS = -O3 -xSSE4.2 -convert big_endian -I./
+#FFLAGS = -traceback -g -check bounds -convert big_endian -I./
+
+# intel fortran on junior
+#MPIDIR=/share/apps/openmpi/intel/1.3
+#FC=$(MPIDIR)/bin/mpif77
+#FFLAGS = -O3 -xT -convert big_endian  -I./  -I$(MPIDIR)/include -L$(MPIDIR)/lib              
+
+
+# ices ubuntu desktops, using openmpi and gfortran:
+#MPIDIR = /usr
+FC = mpif77
+#FFLAGS = -O3 -m64 -static-libgfortran -frecord-marker=4 -fconvert=swap -I./  -I$(MPIDIR)/include -L$(MPIDIR)/lib
+FFLAGS = -O3 -xhost -convert big_endian -I./
+
+
+# Biosim at Cornell
+#MPIDIR=/opt/mpich-pgi
+#FC = $(MPIDIR)/bin/mpif77 
+#FFLAGS =-Mbounds -g -byteswapio -I./  -I$(MPIDIR)/include -L$(MPIDIR)/lib
+
+
+#       NON MPI VERSION COMPILERS (should be used for compilation of sdelS):
+#       however, compilation of sdelS is also done in Makefile
+
+# default template: gfortran (osx etc)
+# FC = gfortran
+# FFLAGS = -O3 -m64 -frecord-marker=4 -fconvert=swap -I .
+# FFLAGS = -I .
+
+# ices ubuntu desktops, using 64bit intel fortran:
+#IFCDIR=/opt/intel/Compiler/11.1/073/bin/intel64
+#FC=$(IFCDIR)/ifort					#intel 11
+#FFLAGS = -O2 -convert big_endian -I .                  # ifort at ices ubuntu desktops
+
+# intel fortran on stampede
+#IFCDIR=/share/apps/intel/Compiler/11.1/073
+# FC=$(IFCDIR)/bin/intel64/ifort 
+# FFLAGS = -O3 -xT -convert big_endian -I .              # ifort on stampede
+
+# If these are defined in the environment, they will override the settings in this file.
+ifdef MPIFCMOIL
+FC = $(MPIFCMOIL)
+FFLAGS = $(MPIFFLAGSMOIL)
+endif	
+
+###############################################################################################
+
+everything: all 
+
+all: exe/dynapt exe/dyna_prl exe/coupledDyna 
+# note: exe/sdel and exe/sdp are not part of "all" because they require a separate LENGTH.BLOCK
+# which must be copied before a build
+
+common_files = COMMON/ACTPARA1.BLOCK COMMON/ACTPARA.BLOCK COMMON/AVE.BLOCK \
+COMMON/AVEDS.BLOCK COMMON/BUFFER.BLOCK COMMON/CCRD.BLOCK \
+COMMON/CON_GRAD.BLOCK COMMON/CONNECT2.BLOCK \
+COMMON/CONNECT.BLOCK COMMON/CONSPECL1.BLOCK COMMON/CONSPECL2.BLOCK \
+COMMON/CONSPECL4.BLOCK COMMON/CONSTRAN.BLOCK COMMON/CONVERT.BLOCK \
+COMMON/COORD.BLOCK COMMON/CRBM.BLOCK COMMON/DEBUG.BLOCK \
+COMMON/DYNA.BLOCK COMMON/ENERGY.BLOCK COMMON/ENERGY_DEE.BLOCK \
+COMMON/EWALD.BLOCK COMMON/EXTERNAL.BLOCK COMMON/FREEZ.BLOCK COMMON/GETVEC.BLOCK \
+COMMON/LENGTH.BLOCK COMMON/LINE2.BLOCK COMMON/LINE.BLOCK COMMON/METAL.BLOCK \
+COMMON/MONOMERS.BLOCK COMMON/MSHAKE.BLOCK COMMON/NBLIST.BLOCK \
+COMMON/PARALLEL.BLOCK COMMON/PDQ.BLOCK COMMON/PROPERT.BLOCK COMMON/RESTART.BLOCK \
+COMMON/ROTAGEN.BLOCK COMMON/ROTAINT.BLOCK COMMON/SC2.BLOCK \
+COMMON/SCNDRV_SDEL.BLOCK COMMON/SCNDRV_DSK.BLOCK COMMON/SDELAVE.BLOCK \
+COMMON/SGB.BLOCK COMMON/SHAKE.BLOCK \
+COMMON/SPECL.BLOCK COMMON/SPW.BLOCK COMMON/SSBP.BLOCK \
+COMMON/SWITCH.BLOCK COMMON/SYMM.BLOCK COMMON/TETHER.BLOCK \
+COMMON/TMP_CONNECT.BLOCK COMMON/UNITS.BLOCK COMMON/VARBLE.BLOCK COMMON/VELOC.BLOCK \
+COMMON/ELASTIC.BLOCK COMMON/FREADY.BLOCK COMMON/PATH.BLOCK COMMON/PT.BLOCK \
+COMMON/LD.BLOCK COMMON/OVERLAP.BLOCK COMMON/SEARCH.BLOCK COMMON/COUPLED_DYNA.BLOCK COMMON/STEER.BLOCK
+
+COMM_DUMMY =    comm_dummy/tcliballgather.o     comm_dummy/tcliballgatherv.o \
+                comm_dummy/tcliballreduce.o     comm_dummy/tclibbroadcast.o \
+                comm_dummy/tcliberrormessage.o  comm_dummy/tclibshiftleft.o \
+                comm_dummy/tclibshiftright.o    comm_dummy/terra_open_scratch.o \
+                comm_dummy/load_balance.o \
+                comm_dummy/gather_vel.o         comm_dummy/eforce_reduce.o \
+                comm_dummy/gather_crd.o         comm_dummy/reduce_n.o \
+                comm_dummy/reduce_1.o           comm_dummy/gather_v.o \
+                comm_dummy/send_all.o \
+                comm_dummy/reduce_energies.o    comm_dummy/gather_nbmlists.o \
+                comm_dummy/gather_nblists.o     comm_dummy/reduce_int.o \
+                comm_dummy/gather_shake.o       comm_dummy/gather_mshake.o \
+                comm_dummy/vdble_reduce.o       comm_dummy/gather_force.o \
+                comm_dummy/recv_stru.o          comm_dummy/send_stru.o \
+		comm_dummy/Send_Double.o        comm_dummy/Recv_Double.o \
+		comm_dummy/Send_Integer.o       comm_dummy/Recv_Integer.o \
+                comm_dummy/init_path_paral.o    comm_dummy/Transmit.o \
+		comm_dummy/Send_First.o         comm_dummy/Receive_First.o \
+		comm_dummy/comm_exit.o          comm_dummy/broadcast_state.o
+$(COMM_DUMMY) : $(common_files)
+
+communication_files =  comm/getnumberpes.o \
+	comm/errormessage.o    \
+	comm/gather_nbmlists.o \
+	comm/reduce_1.o   comm/reduce_n.o \
+	comm/comm_exit.o   \
+	comm/gather_nblists.o  comm/cputimeMPI.o \
+	comm/reduce_int.o   comm/eforce_reduce.o \
+	comm/load_balance.o  \
+	comm/reduce_energies.o comm/recv_stru.o comm/send_stru.o \
+	comm/Send_Double.o comm/Recv_Double.o comm/init_path_paral.o \
+	comm/Send_Integer.o comm/Recv_Integer.o comm/Send_First.o \
+	comm/Receive_First.o comm/Transmit.o comm/getmypenumberpath.o \
+        comm/gather_shake.o comm/gather_int.o \
+        comm/init_paral.o  comm/parallel_end.o \
+        comm/broadcast_int.o comm/getmypenumber.o comm/broadcast_state.o \
+        comm/TransposeData.o
+
+$(communication_files): $(common_files)
+
+generic_files = generic/close_open.o generic/dump_param.o generic/find_bond.o \
+	generic/getcrd.o generic/house.o generic/of.o \
+	generic/ovrlpck.o generic/pick.o \
+	generic/putcrd.o generic/rcon_specl1.o generic/rcon_specl2.o \
+	generic/rconn.o generic/rm_elem.o generic/rpath.o generic/rpxyz.o \
+	generic/search.o generic/unit.o \
+	generic/wconn.o generic/wpath.o generic/zerov.o \
+        generic/rpath_seq.o generic/rmsd_weight.o generic/ranlux.o \
+        generic/draw_normal.o generic/open_scratch.o 
+
+$(generic_files): $(common_files)
+
+intrprtr_files = intrprtr/alert.o intrprtr/brkpair.o intrprtr/echo.o \
+	intrprtr/find.o intrprtr/fopen.o intrprtr/get4c.o \
+	intrprtr/getc.o intrprtr/getd.o intrprtr/geti.o intrprtr/getL.o \
+	intrprtr/intgr.o intrprtr/next.o intrprtr/number.o \
+	intrprtr/rline.o intrprtr/testl.o
+
+$(intrprtr_files): $(common_files)
+
+fready_force_files = fready/CGinit.o fready/eCG_bond.o fready/eCG_LJ.o \
+          fready/eCG_Torsion.o dynamics/getvel.o fready/nbfinitCG.o \
+          fready/eCG_WellBondPot.o fready/CG_nb_list.o \
+          fready/eCG_NB.o  fready/Read_CG_input.o fready/Read_CG_input2.o \
+          fready/initCGmass.o fready/eCG.o  fready/eCG_theta.o \
+          fready/eCG_tors.o fready/eCG_WellAnglePot.o  \
+          fready/getCGid.o fready/eCG_backboneNB.o \
+          fready/angle.o fready/CGtorsion.o fready/eCG_backboneHB.o \
+          fready/read_CG_parameters.o
+
+force_files = pot/amid.o pot/cdie.o pot/cdie_arith.o \
+        pot/cdie_ewald.o pot/cdie_spcl.o pot/cnstrn.o \
+        pot/ebond.o pot/ebond_specl.o pot/ecent.o pot/esteer.o \
+        pot/eforce.o pot/ehydro.o pot/eimphi.o \
+        pot/emorse.o pot/ener14.o pot/ephi.o pot/deriv_test.o\
+        pot/etether.o pot/etheta.o pot/etheta_specl.o \
+        pot/ewald_receip.o pot/exlist.o pot/force_norm.o \
+        pot/half_harm.o pot/init_ef.o pot/init_ssbp.o \
+        pot/init_var.o pot/init_wre.o pot/metal_wall.o \
+        pot/nbfinit.o pot/nbond.o pot/nbond_spcl.o \
+        pot/nbondm.o pot/nbondm_spcl.o pot/num_drv.o \
+        pot/rdie.o pot/repuls.o pot/set_ssbp.o \
+        pot/shft_cdie.o pot/special.o pot/ssbp.o \
+        pot/test_distances.o pot/virt_prtc.o \
+        pot/watwat.o pot/watwat_ewald.o pot/eball.o pot/wener.o \
+        pot/eenm.o pot/G_deriv.o pot/network.o pot/D_one_dihedral.o fready/enm_lists.o \
+        pot/interface_constraint.o pot/angle_constraint.o dim/GetReducedCoors.o \
+        GB/mysff_f.o GB/make_rborn.o GB/init_gb_nonpol.o GB/egb_nonpol2.o \
+        fp/torsion.o fp/alabarrier.o fp/ctors.o fp/rgyrconst.o search/DistAngle.o \
+	pot/e_field.o pot/repulsive_wall.o \
+	pot/urey.o pot/urey_init.o \
+	$(fready_force_files)
+
+$(force_files): $(common_files)        
+
+symm_files = symm/erfcfun.o symm/ewald_init.o symm/nbmsym.o \
+	symm/nbsym.o symm/nbsym_metal.o symm/squeeze.o \
+	symm/symcdie.o symm/symcdie_ewald.o symm/syminit.o \
+	symm/symwat.o symm/symwat_ewald.o 
+
+$(symm_files) : $(common_files)
+
+s2d_files  =  s2d/matvec_14.o    s2d/matvec_die.o  s2d/matvec_theta.o \
+    s2d/matvec_bond.o     s2d/matvec_tors.o    s2d/matvec_diag.o \
+    s2d/matvec_impto.o    s2d/cdie2_wat.o      s2d/getvec.o \
+    s2d/bond2_pcs.o       s2d/cdie2_pcs2.o     s2d/eimphi2_pcs.o \
+    s2d/theta2_pcs.o      s2d/cdie2_pcs1.o     s2d/cdie2_pcs3.o \
+    s2d/etors2_pcs.o      s2d/cdie2_14.o \
+    s2d/d2vanlyt.o        s2d/convnotpair.o  s2d/convpair.o 
+
+$(s2d_files) : $(common_files)    
+
+vopt_files = vopt/vcomprs.o vopt/vecmin.o vopt/vcopy.o vopt/vscalar.o vopt/vinit.o vopt/vadd.o \
+        vopt/vsub_mul.o vopt/scalar_mu_vec1.o vopt/scalar_mu_vec2.o vopt/vec_mul_add.o \
+        vopt/normalize_vec.o vopt/vnorm2.o
+
+$(vopt_files) : $(common_files)
+
+
+path_files =   path/path.o \
+        path/comc.o  path/crbm.o   path/UpdateLists.o \
+        path/path_2.o  path/GetDave.o  path/path_anneal.o \
+        path/Communicate_Positions.o path/sds_constraint.o \
+        $(generic_files) $(intrprtr_files) $(symm_files) \
+        $(force_files) dynamics/rdyncrd.o path/Write2Path.o \
+        path/mass_weight_coordinates.o path/Write2File.o \
+        path/orthg.o path/rchainparal.o path/path_test.o \
+        path/open_inout.o $(vopt_files) \
+        path/GatherAction.o path/Get_Dls.o path/Fast_2nd_deriv.o \
+
+$(path_files) : $(common_files)
+
+sdel_files =  sdel/initPath.o sdel/line_loop.o  \
+            sdel/sds.o sdel/Communicate_Momenta.o 
+#      path/T_derivative.o $(s2d_files) path/Getvec_Approx.o
+#   add path/T_derivative.o and $(s2d_files) for exact derivatives
+
+$(sdel_files) : $(common_files)
+
+exe/sdel : $(sdel_files) $(path_files) $(communication_files)
+	$(FC) $(FFLAGS) -o exe/sdel $(sdel_files) $(path_files) $(communication_files)
+
+exe/sdelS : $(sdel_files) $(path_files) $(COMM_DUMMY)
+	$(FC) $(FFLAGS) -o exe/sdelS $(sdel_files) $(path_files) $(COMM_DUMMY)
+
+
+SDP_files =  sdp/initPath.o sdp/line_loop.o  \
+             sdp/sds.o sdp/Communicate_dSmtp.o
+
+$(SDP_files) : $(common_files)
+
+exe/sdp : $(SDP_files) $(path_files) $(communication_files)
+	$(FC) $(FFLAGS) -o exe/sdp $(SDP_files) $(path_files) $(communication_files)
+
+exe/sdpS : $(SDP_files) $(path_files) $(COMM_DUMMY)
+	$(FC) $(FFLAGS) -o exe/sdpS $(SDP_files) $(path_files) $(COMM_DUMMY)
+
+dynamics_files = dynamics/con_grad_shak.o dynamics/dump_dyna.o \
+        dynamics/frz_eval.o dynamics/rm_degf.o \
+        dynamics/info.o dynamics/init_con.o dynamics/init_dyna.o \
+        dynamics/invmat.o dynamics/lan_zen.o PT/prepare_random_numbers.o \
+        dynamics/mshakinit.o dynamics/mshakpt.o dynamics/mshakvl.o \
+        dynamics/multemp.o dynamics/ortho.o dynamics/picktemp.o \
+        dynamics/prbm.o dynamics/prob.o dynamics/rdyncrd.o \
+        dynamics/set_cutoffs.o dynamics/shakefr.o dynamics/shakept.o \
+        dynamics/shakevl.o dynamics/shakinit.o dynamics/up_res.o \
+        dynamics/velinit.o dynamics/wdyncrd.o dynamics/wdynvel.o \
+        dynamics/getRandomDisplacement.o steep/stdc.o puth/pos.o \
+
+Edynamics_files = dynamics/con_grad_shak.o dynamics/dump_dyna.o \
+        dynamics/frz_eval.o dynamics/rm_degf.o \
+        dynamics/info.o dynamics/init_con.o \
+        dynamics/invmat.o dynamics/lan_zen.o \
+        dynamics/mshakinit.o dynamics/mshakpt.o dynamics/mshakvl.o \
+        dynamics/multemp.o dynamics/ortho.o dynamics/picktemp.o \
+        dynamics/prbm.o dynamics/prob.o dynamics/rdyncrd.o \
+        dynamics/set_cutoffs.o dynamics/shakefr.o dynamics/shakept.o \
+        dynamics/shakevl.o dynamics/shakinit.o dynamics/up_res.o \
+        dynamics/velinit.o dynamics/wdyncrd.o dynamics/wdynvel.o \
+        dynamics/getRandomDisplacement.o \
+        steep/stdc.o puth/pos.o \
+        dynamics/Andersen_thermostat.o 
+
+search_files = search/search.o search/search_2.o search/Brownian.o \
+        search/Distance2.o search/ClusterStructures.o search/AddCenter.o \
+        search/SortCenters.o search/EvaluateNewCenters.o \
+        $(generic_files) $(intrprtr_files) $(symm_files) \
+        $(force_files) $(dynamics_files) path/open_inout.o \
+        path/mass_weight_coordinates.o search/rchainparal.o \
+        path/comc.o path/orthg.o search/line_loop.o path/Write2File.o \
+        search/removeSmallCenters.o $(vopt_files)
+
+$(search_files) : $(common_files)
+
+exe/search : $(search_files) $(communication_files)
+	$(FC) $(FFLAGS) -o exe/search $(search_files) $(communication_files)
+
+coupledDyna_files = coupledDyna/con_grad_shak.o coupledDyna/dump_dyna.o \
+        coupledDyna/frz_eval.o coupledDyna/rm_degf.o \
+        coupledDyna/info.o coupledDyna/init_con.o coupledDyna/init_dyna.o \
+        coupledDyna/invmat.o dynamics/lan_zen.o coupledDyna/line_loop.o \
+        coupledDyna/mshakinit.o coupledDyna/mshakpt.o coupledDyna/mshakvl.o \
+        coupledDyna/multemp.o coupledDyna/ortho.o coupledDyna/picktemp.o \
+        coupledDyna/prbm.o dynamics/prob.o coupledDyna/rdyncrd.o \
+        coupledDyna/set_cutoffs.o coupledDyna/shakefr.o coupledDyna/shakept.o \
+        coupledDyna/shakevl.o coupledDyna/shakinit.o coupledDyna/up_res.o \
+        dynamics/velinit.o coupledDyna/wdyncrd.o coupledDyna/wdynvel.o \
+        coupledDyna/open_inout.o coupledDyna/ralign.o \
+        coupledDyna/homology_force.o coupledDyna/init_mpi_var.o \
+        puth/pos.o coupledDyna/dyna.o  \
+        $(generic_files) $(intrprtr_files) \
+        $(force_files) $(symm_files) steep/stdc.o \
+        $(COMM_DUMMY) $(vopt_files)
+
+$(coupledDyna_files) : $(common_files)
+
+exe/coupledDyna : $(coupledDyna_files)
+	$(FC) $(FFLAGS) -o exe/coupledDyna $(coupledDyna_files)
+
+dyna_files = dynamics/con_grad_shak.o dynamics/dump_dyna.o \
+        dynamics/frz_eval.o dynamics/rm_degf.o \
+        dynamics/info.o dynamics/init_con.o dynamics/init_dyna.o \
+        dynamics/invmat.o dynamics/lan_zen.o dynamics/line_loop.o \
+        dynamics/mshakinit.o dynamics/mshakpt.o dynamics/mshakvl.o \
+        dynamics/multemp.o dynamics/ortho.o dynamics/picktemp.o \
+        dynamics/prbm.o dynamics/prob.o dynamics/rdyncrd.o \
+        dynamics/set_cutoffs.o dynamics/shakefr.o dynamics/shakept.o \
+        dynamics/shakevl.o dynamics/shakinit.o dynamics/up_res.o \
+        dynamics/velinit.o dynamics/wdyncrd.o dynamics/wdynvel.o \
+        dynamics/dyna.o puth/pos.o dynamics/press_dummy.o
+
+$(dyna_files) : $(common_files)
+
+
+dynapt_files = PT/init_io.o PT/prepare_random_numbers.o \
+        PT/ptempering.o PT/swap_conformations.o \
+        $(generic_files) $(intrprtr_files) \
+        $(force_files) $(symm_files) steep/stdc.o \
+        $(communication_files) $(dyna_files) $(vopt_files)
+
+$(dynapt_files) : $(common_files)
+
+exe/dynapt : $(dynapt_files)
+	$(FC) $(FFLAGS) -o exe/dynapt $(dynapt_files)
+
+dynaptF_files = PT_disk/init_io.o PT_disk/prepare_random_numbers.o \
+        PT_disk/ptempering.o PT_disk/swap_conformations.o \
+        PT_disk/putdata.o PT_disk/getdata.o \
+        $(generic_files) $(intrprtr_files) \
+        $(force_files) $(symm_files) steep/stdc.o \
+        $(communication_files) $(dyna_files) $(vopt_files)
+
+$(dynaptF_files) : $(common_files)
+
+exe/dynaptF : $(dynaptF_files)
+	$(FC) $(FFLAGS) -o exe/dynaptF $(dynaptF_files)
+
+dyna_p_files = $(dyna_files) \
+        $(generic_files) $(vopt_files) $(intrprtr_files) \
+        $(force_files) $(symm_files) steep/stdc.o \
+        $(communication_files) dynamics/parall_io.f \
+        dynamics/PT_dummy.o
+
+$(dyna_p_files) : $(common_files)
+
+exe/dyna_prl : $(dyna_p_files)
+	$(FC) $(FFLAGS) -o exe/dyna_prl $(dyna_p_files)
+
+mfep_files = mfep/mfep.o mfep/dyna_mfep.o \
+        mfep/vecmin_fp.o mfep/vecmin_upw.o mfep/dist2_fp.o mfep/com_fp.o \
+        generic/dist2.o generic/normalize.o \
+        mfep/crbm.o mfep/comc.o mfep/comc_fxd.o mfep/wmlst.o mfep/dist2_pp.o \
+        mfep/open_inout.o mfep/init_paral2.o comm/getmypenumber.o\
+        mfep/recv_pep.o   \
+        mfep/reparam.o mfep/repulsion.o \
+        $(generic_files) $(vopt_files) $(intrprtr_files) $(force_files) \
+        $(dynamics_files) mfep/deselect.o mfep/projf.o \
+        umbrella/hot_umbr.o mfep/orthg.o sdp/line_loop.o \
+        mfep/getmlst.o mfep/mvplane.o \
+        mfep/getpd.o $(symm_files) $(COMM_DUMMY)
+
+exe/mfep: $(mfep_files)
+	$(FC) $(FFLAGS) -o exe/mfep $(mfep_files)
+
+$(mfep_files) : $(common_files)
+
+dim_sample_files = dim/dim_sample.o dim/dim_sample_MD.o \
+        dim/init_dyna.o \
+        $(generic_files) $(intrprtr_files) $(symm_files) \
+        $(force_files) $(Edynamics_files) \
+        path/mass_weight_coordinates.o search/rchainparal.o \
+        path/comc.o path/orthg.o dim/line_loop.o path/Write2File.o \
+        dim/parall_io.o search/Distance.o
+
+$(dim_sample_files) : $(common_files)
+
+exe/dim_sample : $(dim_sample_files) $(communication_files) $(vopt_files)
+	$(FC) $(FFLAGS) -o exe/dim_sample $(dim_sample_files) $(communication_files) $(vopt_files)
+
+clean:
+	$(CLEAN) 
+
+

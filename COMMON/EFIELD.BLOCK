@@ -1,0 +1,13 @@
+c efbox = size of the box [D]
+c efield = value of the electric field [D]
+c nefield = direction parallel to efield [I]
+c DVtype = type of potential applied [I]
+c DV = potential difference [D]
+c efield_yes = flag [L]
+c e_efield = energy of efield [D]
+        integer nefield,DVtype
+        double precision efbox,efield,DV,e_efield
+        logical efield_yes
+        common / iefil / nefield,DVtype
+        common / defil / efbox,efield,DV,e_efield
+        common / lefil / efield_yes

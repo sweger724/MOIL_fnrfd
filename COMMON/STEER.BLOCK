@@ -1,0 +1,8 @@
+c a common block for steered MD
+c
+	double precision kxy,kz
+        integer pick_steer(maxpt),pick_steer_compress(maxpt)
+        integer nsteer
+
+        common/steerdble/kxy,kz
+        common/steerint/pick_steer,pick_steer_compress,nsteer

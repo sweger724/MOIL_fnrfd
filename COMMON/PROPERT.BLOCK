@@ -1,0 +1,100 @@
+
+c-----------------------------------------------------------------
+c++++ INDIVIDUAL PARTICLE PROPERTIES (LENGTH MAXUNQ)
+c basenm  - char*4 vector with names of particles 
+c basems  - double precision vector of particle masses
+c basechg - double precision vector of particle charges
+c baseeps - double precision vector with particle van der
+c		Waals binding energy (epsilon)
+c basesgm - double precision vector with particle van der
+c		Waals radius (sigma)
+	character*4 basenm(maxunq)
+	double precision basems(maxunq),basechg(maxunq)
+	double precision baseeps(maxunq),basesgm(maxunq)
+c-----------------------------------------------------------------
+
+c-----------------------------------------------------------------
+c++++ BOND PARAMETERS
+c BONDS ---  EB = basekb / 2 * ( r - basereq ) ^2
+c bondp   - integer,2 vector which points to bonded atoms
+c		bondp(i,1) bpoint(i,2) are the firs and the second 
+c		unique particles participate in the bond
+c basekb  - double precision vector of bond force constants (bond index)
+c basereq - double precision vector of bond eq. positions   (bond index)
+c
+	integer bondp(maxubnd,2)
+	double precision basekb(maxubnd),basereq(maxubnd)
+c----------------------------------------------------------------
+
+
+c----------------------------------------------------------------
+c++++ ANGLE PARAMETERS
+c ANGLES ---- EANGLE =  basekt * ( angle - baseaeq ) ^2
+c anglp   - integer,3 vector which points to atoms in angles
+c		anglp(i,1) anglp(i,2) anglp(i,3) first to third unique
+c		particles in an angles
+c basekt  - double precision vector of angle force constants (angle index)
+c baseaeq - double precision vector of equilibrium angle (angle index)
+c
+	integer anglp(maxuagl,3)
+	double precision basekt(maxuagl),baseaeq(maxuagl)
+c----------------------------------------------------------------
+
+c----------------------------------------------------------------
+c+++++ TORSION PARAMETERS
+c TORSIONS --- ETORSION =  baseamp [1-3] * cos ( baseper * torsion + basephs[1-3] )
+c torsp   - integer,4 vector points to atoms in torsions
+c		torsp(i,1) torsp(i,2) torsp(i,3) torsp(i,4)
+c basamp[1-3] - double precision vector of amplitude for torsion (torsion index)
+c baseper - integer vector with the torsion periodicity
+c basephs[1-3]- double precision vector with phases (torsion index)
+c
+	integer torsp(maxutrs,4),baseper(maxutrs)
+	double precision basamp1(maxutrs),basephs3(maxutrs)
+	double precision basamp2(maxutrs),basamp3(maxutrs)
+        double precision basephs2(maxutrs),basephs1(maxutrs)
+c----------------------------------------------------------------
+
+c----------------------------------------------------------------
+c++++ IMPROPER TORSION PARAMETERS
+c IMPROPER TORSIONS --- EIMPRO = baseimp * ( impro - baseieq ) ^2
+c improp  - integer,4 vector points to atoms in torsions
+c		improp(i,1) improp(i,2) improp(i,3) improp(i,4)
+c baseimp - double precision vector of force constant for impr. torsion
+c baseieq - double precision vector of equi. position of improper torsion
+c
+	integer improp(maxuimp,4)
+	double precision baseimp(maxuimp),baseieq(maxuimp)
+c----------------------------------------------------------------
+
+c-----------------------------------------------------------------
+c Actual number of parameters found
+c totunq  - total number of unique particles
+c totubnd - total number of unique bonds
+c totuagl - total number of unique angles
+c totutrs - total number of unique torsions
+c totuimp - total number of unique improper torsions
+c
+	integer totunq,totubnd,totuagl,totutrs,totuimp
+c----------------------------------------------------------------
+
+
+C----------------------------------------------------------------
+c parameters for 1-4 interactions
+c v14  - scaling factor for 1-4 van der Waals interactions
+c el14 - scaling factor for 1-4 electrostatic interaction
+	double precision v14,el14
+
+c----------------------------------------------------------------
+c++++ GATHER EVERYTHING TO A COMMON BLOCK
+c
+	common/propert/
+     1		basems,basechg,baseeps,basesgm,
+     2		basekb,basereq,
+     3		basekt,baseaeq,
+     4		basamp1,basamp2,basamp3,basephs1,basephs2,basephs3,
+     5		baseimp,baseieq
+	common/propchr/basenm
+	common/propint/bondp,anglp,torsp,baseper,improp,
+     1		totunq,totubnd,totuagl,totutrs,totuimp
+c-----------------------------------------------------------------

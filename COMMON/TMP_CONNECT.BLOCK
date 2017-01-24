@@ -1,0 +1,182 @@
+C temporary block for storage of molecule conectivity. 
+c based on CONNECT.BLOCK
+
+c-----------------------------------------------------------------------
+c *** vectors of length npt (number of particles in the system)
+c		npt < maxpt
+c tpoimon  - integer vector with monomer pointer
+c		(poimon(ipt) = the # of the monomer of the ipt 
+c               particle)
+c tpoidmon - integer vector that points into division number
+c		given the atmic index
+c tptid    - integer vector with id of particle types
+c tptnm    - (char*4) name of the particle as a function of the 
+c            particle number
+c tptms    - (double) mass of the particle                "
+c tinvms   - (double) 1/mass of particle, added by carlos for shake
+c             speed
+c tptchg   - (double) charge of particle                  "
+c tepsgm6  - (double) twice square root of van der Waals energy 
+c            times sigma^6
+c tepsgm12 - (double) twice square root of van der Waals energy 
+c            times sigma^12
+c tptwei   - (double) particle special weight used in LES 
+c             calculations
+c tlesid   - integer id of LES residue. If normal residue set to 0 
+c            if les residue all the copies under a single MULT are 
+c 	     set to the same number
+c tflagchr  - is a flag charge. It is set to true of the particle is 
+c             charged and to false if it is not.
+c 
+	integer tpoimon(maxpt),tptid(maxpt),tlesid(maxpt)
+	integer tpoidmon(maxpt)
+        logical tflagchr(maxpt)
+	character*4 tptnm(maxpt)
+	double precision tptms(maxpt),tptchg(maxpt),tepsgm6(maxpt)
+	double precision tepsgm12(maxpt),tptwei(maxpt),tinvms(maxpt)
+c-----------------------------------------------------------------------
+
+
+c-----------------------------------------------------------------------
+c tBULK - character vector with the name of BULK (molecular systems)
+c assembled
+c tpbulk - pointer to the last particle of the i-th BULK
+c
+	character*4 tBULK(MAXBULK)
+	integer tpbulk(MAXBULK)
+c-----------------------------------------------------------------------
+
+
+c-----------------------------------------------------------------------
+c *** vector of length imono (number of monomers in the molecule)
+c		imono < maxmono
+c tmoname  - character*4 vector with the name of monomers type
+c tpoipt   - From monomers to particles poipt(i) is the last 
+c particle of monomer i
+c
+	character*4 tmoname(maxmono)
+	integer tpoipt(0:maxmono)
+	integer mdivlist_tmp(0:maxdiv+1,maxmono)
+c-----------------------------------------------------------------------
+
+c-----------------------------------------------------------------------
+c *** vectors of length nb (number of bonds) nb < maxbond
+c tib1 tib2   - pointers to particles that are bonded
+c             ib1(k) is the pointer to particle k.
+c tkbond     - (double) force constant for harmonic energy of bonds
+c treq       - (double) equilibrium position for harmonic energy of
+c	        bonds
+c timb1 timb2 - pointers to morse bonds
+c trmeq      - equilibrium distance for morse potential
+c tD,talpha   - parameters of Morse potential
+c tArep      - parameter of repulsion energy function
+c tBrep      - parameter of repulsion energy function
+c tbeta1
+c      - parameter of repulsion energy function
+c
+	integer tib1(maxbond),tib2(maxbond),timb1(maxmorsb),
+     *          timb2(maxmorsb)
+	double precision tkbond(maxbond),treq(maxbond),
+     *                   trmeq(maxmorsb)
+	double precision tD(maxmorsb),talpha(maxmorsb),tArep
+	double precision tbeta1(maxmorsb),tBrep
+c-----------------------------------------------------------------------
+
+c-----------------------------------------------------------------------
+c *** vectors of length nangl (number of angles)
+c		nangl < maxangl
+c tiangl1 tiangl2 tiangl3 - pointers to particles in angles
+c tkangl   - (double) force constant for harmonic energy of angles
+c tangleq  - (double) equilibrium position for harmonic energy of 
+c angles
+c
+	integer tiangl1(maxangl),tiangl2(maxangl),tiangl3(maxangl)
+	double precision tkangl(maxangl),tangleq(maxangl)
+c-----------------------------------------------------------------------
+
+c-----------------------------------------------------------------------
+c *** vectors of length ntors (number of torsions)
+c	nunmer of torsion =< maxtors
+c titor1 titor2 titor3 titor4 - pointers to particles in torsions
+c tktors[1-3]   - (double) amplitude for torsional energy
+c tperiod  - (integer) period of rotation (e.g.  2 for C=C, 3 for 
+c C-C)
+c tphase[1-3]   - (double) phase factor for torsional energy
+c
+	integer titor1(maxtors),titor2(maxtors),titor3(maxtors)
+	integer titor4(maxtors)
+	integer tperiod(maxtors)
+	double precision tktors1(maxtors),tktors2(maxtors)
+        double precision tphase1(maxtors),tphase2(maxtors)
+	double precision tktors3(maxtors),tphase3(maxtors)
+c-----------------------------------------------------------------------
+
+
+c-----------------------------------------------------------------------
+c *** vectors of length nimp (number of improper torsions)
+c		nimp =< maximp
+c tiimp1 tiimp2 tiimp3 tiimp4 - pointers to particles in 
+c improper torsions
+c tkimp    - (double) force constant for all improper torsions
+c timpeq   - (double) equilibrium position for improper torsion
+c
+	integer tiimp1(maximp),tiimp2(maximp),tiimp3(maximp),
+     *          tiimp4(maximp)
+	double precision tkimp(maximp)
+	double precision timpeq(maximp)
+c-----------------------------------------------------------------------
+
+c----------------------------------------------------------------------
+c Exclusion lists between 1-2 1-3 and  aspecial list for 1-4.
+c exc1 is a pointer to exc2, i.e. exc2(exc1(i)) is the last
+c particles to be excluded from interaction with i
+c Similarly spec1 is a pointer to spec2
+c
+	integer texc1(0:maxpt),texc2(maxex)
+	integer tspec1(0:maxspec),tspec2(maxspec)
+	double precision tp14(3,maxspec)
+c----------------------------------------------------------------------
+
+c----------------------------------------------------------------------
+c *** integers define actual size of molecule, initially are set
+c to 0
+c ttotmon  - total number of monomers
+c tnpt     - total number of particles
+c tnb      - total number of bonds
+c tnmb     - total numberof morse bonds
+c tnangl   - total number of angles
+c tntors   - total number of torsion
+c tnimp    - total number of improper torsions
+c tlestyp  - total number of different types of LES monomers
+c ttotex  - number of exclusions of particle interactions
+c ttotspe  - number of special (1-4) interactions
+c tnexc    - number of exclusions of particle interactions
+c tnspec   - number of special (1-4) interactions
+c tNBULK   - number of "bulk" (molecular systems)
+c tnchg    - the number of charged particles in the molecule(s
+c *** tlesflagt - if true, les particles are present
+c
+	integer ttotmon,tnpt,tnb,tnmb,tnangl,tntors,tnimp,tlestyp,
+     *          tNBULK
+	integer ttotex,ttotspe,tnchg
+	integer ttotex3,ttotspe3
+	logical tlesflag
+
+
+
+c-----------------------------------------------------------------------
+c Now gather everything into common blocks
+c
+	common /tCONNLOG/tlesflag,tflagchr
+	common /tCONNINT/tpoimon,tlesid,tptid,tpbulk,tpoipt,tib1,tib2,
+     *          tiangl1,tpoidmon,
+     1		tiangl2,tiangl3,titor1,titor2,titor3,titor4,tperiod,
+     2		tiimp1,tiimp2,tiimp3,tiimp4,texc1,texc2,tspec1,tspec2,
+     4		ttotmon,tnpt,tnb,tnangl,tntors,tnimp,tlestyp,tNBULK,
+     5		ttotex,ttotspe,ttotex3,ttotspe3,timb1,timb2,tnmb,
+     6          tnchg,mdivlist_tmp
+	common /tCONNDBL/tptms,tinvms,tptchg,tepsgm6,tepsgm12,tptwei,
+     1		tkbond,treq,tkangl,tangleq,tktors1,tktors2,tktors3,
+     *          tphase1,tphase2,tphase3,tp14,
+     2		tkimp,timpeq,trmeq,tD,talpha,tArep,tbeta1,tBrep
+	common /tCONNCHR/tptnm,tmoname,tBULK

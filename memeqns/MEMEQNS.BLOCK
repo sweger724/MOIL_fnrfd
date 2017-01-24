@@ -1,0 +1,9 @@
+
+	integer maxmlst, maxtraj, maxbins, maxqk
+ 	parameter(maxmlst=1000)
+	parameter(maxtraj=2000)
+	parameter(maxbins=1000)
+	parameter(maxqk=10000)
+
+	character*10 mode
+	COMMON /COM/mode

@@ -1,0 +1,57 @@
+c-------------------------------------------------------------------
+c++++BASIC LENGTHS (DEFINED IN LENGTH.BLOCK)
+c maxumon - maximum number of unique monomers allowed (must be larger
+c	        or equal to the some of normal monomers (numno) and
+c		glue monomers (numglu) found 
+c maxptmo - maximum number of particles in a monomer
+c-------------------------------------------------------------------
+
+
+c-------------------------------------------------------------------
+c GETTING MONOMERS PROPERTIES
+c mono  - character*4 names of monomers
+c nprt  - intg pointr to particle indices in the monomer
+c		nprt(i) is the last particle of monomer i
+c mono_pt - vectors of names of particles in a monomer
+c		mono_pt(nprt(k-1)+i) is the unique atom name
+c		of the i-th particle in the k-1 monomer
+c nbnd    - integer pointer to bond indices in the monomer. nbnd(i)
+c		is the last bond of monomer i
+c monob1 monob2 - pointer to specific bonds monob[1-2](nbnd(k-1)+i) the
+c		the i-th bond in the k-th monomer
+c updown  - particle identifier used in GLUE monomers
+c		updown(nprt(k-1)+i) corresponds to an action to take
+c		on the i-th particle of a the k-th glue monomer
+c		updown = -1  -> particle from the monomer before
+c		updown =  0  -> particle from the current monomer
+c		updown =  1  -> particle from the next monomer
+c		updown = 999 -> particle to be deleted from next monomer
+c		updown =-999 -> particle to be deleted from previous monomer
+c iden    - a pointer to particle index. iden(nprt(k-1)+i) is the property
+c		index of the i-th particle in the k-th monomer
+c yaell
+c monodiv - The division of the monomer type to particle groups.
+c          monodiv(i,j) - how many particles in the j'th part of
+c          the i'th monomer.
+
+
+	character*4 mono(maxumon)
+	character*4 mono_pt(maxumon*maxptmo)
+	integer nprt(maxumon)
+	integer nbnd(maxumon)
+	integer monob1(maxumon*maxptmo),monob2(maxumon*maxptmo)
+	integer updown(maxumon*maxptmo)
+	integer iden(maxumon*maxptmo)
+        integer monodiv(0:maxdiv+1,maxumon)
+        double precision m_charge(maxumon*maxptmo)
+        integer m_said(maxumon*maxptmo)
+
+c-------------------------------------------------------------------
+
+c-------------------------------------------------------------------
+c++++ GATHER EVERYTHING IN A COMMON BLOCK
+c
+	COMMON /MONMRS/nprt,nbnd,monob1,monob2,updown,iden,monodiv
+	COMMON /MONCHR/mono,mono_pt
+        COMMON /MONDBL/m_charge
+        COMMON /MONINT/m_said

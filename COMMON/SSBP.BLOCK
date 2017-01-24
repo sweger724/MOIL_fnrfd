@@ -1,0 +1,61 @@
+c Solvent boundary potential (D.Beglov and B.Roux 1993).
+c QSSBP            logical flag to setup the solvent term
+c QFIX              logical flag to use flexible/fixed RMAX of the region
+c QKIRK             logical flag to setup dielectric reaction field part
+c QCAVI             logical flag to setup the cavity part
+c QHSR              logical flag to setup P*V+ sigma*S part
+c QANGU             logical flag to setup Angular potential
+c LSTSSBP            list of atoms under the solvent boundary potential
+c NMULT             number of multipoles in reaction field part
+c IPA               number of the atom corresponding to RMAX
+c DIECST            dielectric constant
+c DRMAX1            deltaRMAX for the reaction field part
+c DRMAX2            deltaRMAX for the cavity part
+c PRESI             Pressure in the system
+c FXCAS             RMAX if it is fixed
+c ENFA, ENFB, DRHA  Parameters of angular potential
+c STENS             Surface tension constant
+c I....             Identificators of the arrays in HEAP
+c                   necessary for the reaction field calculations.
+
+      LOGICAL QFIX, QKIRK, QCAVI, QHSR, 
+     ,QANGU, QSSBP,QHARM 
+
+c Logical
+      COMMON / BSSBP1 / QFIX, QKIRK, 
+     ,                  QCAVI,QHSR,QANGU,QSSBP,QHARM
+
+C INTEGER
+C SSBP
+      INTEGER NTSSBP, LSTSSBP(maxpt), LMA, LMA2, LL12,
+     ,        NMULT, IPA,  
+     ,        ITVAR12,   IRLR3,  IZYR3, IXRL, IZXR3, IYRL,
+     ,        IXR2,   IYR2,   IZR2,  IQLMSX, IQLMSY, IQLMSZ,
+     ,        IFACT,  IAPOL,  IAPOL1,   ICOMR,  ICOMI, IRCH, ITVAR,
+     ,        IYLMR1, IYLMR2, IYLMR3,IYLMR4,
+     ,        IYLMI1, IYLMI2, IYLMI3,IYLMI4, IRADIST,NHARM,HARM(maxpt)
+      COMMON / QSSBP2 / 
+     ,              NTSSBP, LSTSSBP, LMA,   LMA2, LL12,
+     ,              NMULT, IPA,
+     ,              ITVAR12,   IRLR3,  IZYR3, IXRL, IZXR3, IYRL,
+     ,              IXR2,   IYR2,   IZR2,  IQLMSX, IQLMSY, IQLMSZ,
+     ,              IFACT, IAPOL, IAPOL1, ICOMR, ICOMI, IRCH, ITVAR,
+     ,              IYLMR1, IYLMR2, IYLMR3,IYLMR4, 
+     ,              IYLMI1, IYLMI2, IYLMI3,IYLMI4, IRADIST,NHARM,HARM
+
+C REAL
+C SSBP
+
+      double precision  RMAXM, DIECST, DRMAX1, DRMAX2, PRESI,  
+     ,                  FXCAS, CANG(5), ACAV(7), BCAV(7), DRHA, STENS,
+     ,                  FACT(41),ENSSBP,ENKIR,ENCAV,ENHSR,ENANGU,
+     ,                  RADIST(maxpt),APOL(21),APOL1(21),
+     ,                  RATOM2(maxpt),RSXY(maxpt),RATOM3(maxpt),
+     ,                  RRDIST(maxpt),ENHARM
+C----FACT should have the dimension (2*no. of multipoples + 1)
+      COMMON / QSSBP3 / RMAXM, DIECST, DRMAX1, DRMAX2,  
+     ,                  PRESI, FXCAS, CANG, ACAV, BCAV, DRHA, 
+     ,                  STENS,FACT,ENSSBP,ENKIR,ENCAV,ENHSR,ENANGU,
+     ,                  RADIST,APOL,APOL1,RATOM2,RSXY,RATOM3,RRDIST,
+     ,                  ENHARM
+ 

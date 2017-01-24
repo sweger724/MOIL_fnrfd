@@ -1,0 +1,17 @@
+Makefile templates of the form Makefilename.template are provided which contain entries for several
+popular platforms and compilers.  To build MOIL, you must copy the templates to makefiles of the 
+same name (omitting the .template extension) and comment in/out the appropriate FORTRAN compiler
+for your platform.
+
+The script ./copyTemplates will copy all templates to makefiles, which you may then edit.
+
+The script ./make_all will prompt you and automatically execute ./copyTemplates if it cannot find a Makefile.
+
+./make_all builds all of the command line MOIL programs.  To build MOIL, and in addition build any
+components for visualization, you may use the make_distro_<platform> script in the moil/make_distribution
+folder instead, which calls make_all among other things.
+
+For more information, see the CLSB wiki:      https://wiki.ices.utexas.edu/clsb/wiki
+
+clsb // June 2, 2008
+

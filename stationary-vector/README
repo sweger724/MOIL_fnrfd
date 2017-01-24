@@ -1,0 +1,88 @@
+stationary-vector
+=================
+
+1. Introduction
+---------------
+
+This program computes stationary vectors of large, sparse milestoning
+matrices.
+
+2. Dependencies
+---------------
+
+It is necessary that some version of ARPACK [1, 2] is available on
+your system.  If you don't have this library, check Section 3.1 for
+instructions on how to set it up.
+
+[1] https://github.com/opencollab/arpack-ng (newer version, recommended)
+[2] http://www.caam.rice.edu/software/ARPACK (original version)
+
+3. Compilation
+--------------
+
+3.1. Quick instructions to compile LAPACK and ARPACK
+----------------------------------------------------
+
+Carry out the following steps only if your system does not already
+have a recent version of ARPACK installed.
+
+1. Download LAPACK from http://www.netlib.org/lapack/#_software
+
+2. Configure and install LAPACK:  After unpacking the tarball, do:
+
+mkdir build
+cmake -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=$HOME \
+      -DBUILD_SHARED_LIBS=ON ..
+make
+make install
+
+3. Download ARPACK from
+https://github.com/opencollab/arpack-ng/releases.  After unpacking the
+tarball, do:
+
+export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/lib/pkgconfig
+./configure --prefix=$HOME --with-lapack=$HOME/lib/liblapack.so \
+           --with-blas=$HOME/lib/libblas.so
+make
+make install
+
+3.2 Compiling the stationary-vector program
+-------------------------------------------
+
+Follow these steps:
+
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make
+
+4. Usage
+--------
+
+The program takes a matrix as input and produces an output file
+containing the (suitably normalized) stationary vector.
+
+Run it from the command line as follows:
+
+./stationary-vector matrix-file-name output-file-name
+
+5. Matrix file format
+---------------------
+
+The input matrix file is a text file that begins with a line
+containing the dimension of the matrix.  The subsequent lines are of
+the form: row-index whitespace column-index whitespace value.  Only
+non-zero values will be read into memory.
+
+For example, the following three lines would correspond to a 2 x 2
+identity matrix:
+
+2
+1 1 1.0
+2 2 1.0
+
+6. Support
+----------
+
+Contact jmb at ices.utexas.edu.

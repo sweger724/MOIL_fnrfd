@@ -1,0 +1,102 @@
+C DEFINITION OF THE MOLECULE TOPOLOGY AND POTENTIAL ENERGY TERMS
+C *** SPECIAL PART (SWITCHING BETWEEN BONDED AND NON-BONDED PARTS)
+
+
+c-----------------------------------------------------------------------
+c *** vectors of length snpt1 (number of particles in the system)
+c		snpt1 < maxspcl
+c spoimon1  - integer vector with monomer pointer
+c		(spoimon1(ipt) = the # of the monomer of the ipt particle)
+c sptid1    - integer vector with id of particle types
+c sptnm1    - (char*4) name of the particle as a function of the particle number
+c sptms1    - (double) mass of the particle                "
+c sptchg1   - (double) charge of particle                  "
+c sepsgm16  - (double) square root of van der Waals energy times sigma^6
+c sepsgm112 - (double) square root of van der Waals energy times sigma^12
+c sptwei1   - (double) particle special weight used in LES calculations
+c slesid1   - integer id of LES residue. If normal residue set to 0 if les
+c		residue all the copies under a single MULT are set to the
+c		same number
+c smutaid1  - integer id for mutation. If atom is not mutant is set to 0
+c               if it is mutant to 1 and 2.
+c styp1     - integer id of unit of special particles
+c 
+	integer spoimon1(maxspcl),sptid1(maxspcl),slesid1(maxspcl)
+        integer smutaid1(maxspcl)
+	integer styp1(maxspcl),stotex1,stotspe1
+	character*4 sptnm1(maxspcl)
+	double precision sptms1(maxspcl),sptchg1(maxspcl)
+	double precision sepsgm16(maxspcl)
+	double precision sepsgm112(maxspcl),sptwei1(maxspcl)
+c-----------------------------------------------------------------------
+
+
+c-----------------------------------------------------------------------
+c *** vector of length imono (number of monomers in the molecule)
+c		simono1 < maxmono
+c smoname1  - character*4 vector with the name of monomers type
+c spoipt1   - From monomers to particles poipt(i) is the last particle
+c		of monomer i
+c
+	character*4 smoname1(maxsmon)
+	integer spoipt1(maxsmon)
+c-----------------------------------------------------------------------
+
+c-----------------------------------------------------------------------
+c *** vectors of length nb (number of bonds) nb < maxbond
+c sib11 sib12 - pointers to particles that are bonded
+c           sib11(k) is the pointer to particle k.
+c skbond1   - (double) force constant for harmonic energy of bonds
+c sreq1     - (double) equilibrium position for harmonic energy of bonds
+c
+	integer sib11(maxspcl),sib12(maxspcl)
+	double precision skbond1(maxspcl),sreq1(maxspcl)
+c-----------------------------------------------------------------------
+
+c-----------------------------------------------------------------------
+c parameters for morse potential: D - binding energy, alpha - range parameter
+c req is taken from the harmonic term
+c
+
+c-----------------------------------------------------------------------
+c *** vectors of length nangl (number of angles)
+c		snangl1 < maxangl
+c siangl11 siangl12 siangl13 - pointers to particles in angles
+c skangl1   - (double) force constant for harmonic energy of angles
+c sangleq1  - (double) equilibrium position for harmonic energy of angles
+c
+	integer siangl11(maxspcl),siangl12(maxspcl),siangl13(maxspcl)
+	double precision skangl1(maxspcl),sangleq1(maxspcl)
+c stmon1    - total number of monomers
+c snpt1     - total number of particles
+c snb1      - total number of bonds
+c snangl1   - total number of angles
+c
+	integer stmon1,snpt1,snb1(0:maxmorsb),snang1(0:maxmorsb)
+	integer lz14_1(0:maxmorsb)
+c
+c NOTE THAT NO TORSION OR IMPROPER TORSION ARE TAKEN CARE OF
+c
+c-----------------------------------------------------------------------
+c Exclusion lists between 1-2 1-3 
+c sexc11 is a pointer to sexc12, i.e. sexc12(sexc11(i)) is the last
+c particles to be excluded from interaction with i
+c 1-4 list:
+c sspec11 & sspec12, are pairs of special van der Waals
+c interactions 
+c s1p14(3,maxs14) - are the scale van der Waals and electrostatic parameters
+        integer sexc11(0:maxspcl),sexc12(maxsx)
+        integer sspec11(maxs14),sspec12(maxs14)
+
+	double precision s1p14(3,maxs14)
+
+
+c Now gather everything into common blocks
+c
+	common /SCONINT1/spoimon1,slesid1,sptid1,spoipt1,sib11,sib12,
+     1           siangl11,siangl12,siangl13,stotex1,stotspe1,sspec11,
+     2           stmon1,snb1,snang1,styp1,sexc11,sexc12,sspec12,snpt1,
+     3		 lz14_1,smutaid1
+	common /SCONDBL1/sptms1,sptchg1,sepsgm16,sepsgm112,sptwei1,
+     1		skbond1,sreq1,skangl1,sangleq1,s1p14
+	common /SCONCHR1/sptnm1,smoname1

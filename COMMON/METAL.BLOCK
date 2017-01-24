@@ -1,0 +1,7 @@
+c a common block for metal (wall) energy
+c wall is defined in the X,Z plane and energy is:
+c e_wall = a0*exp(-alfa*y)
+c v_elec = The Electric potential that may be set at the metal plane.
+c
+        double precision a0_metal,alfa_metal,b_wall,v_elec
+        common / metal_common / a0_metal,alfa_metal,b_wall,v_elec

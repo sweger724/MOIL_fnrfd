@@ -1,0 +1,24 @@
+C A Common block holding the data for switching (according to 
+C Landau-Zener) between two energy surfaces
+c
+c R - the L-Z coordinate
+c temp - where the cartesian component of the L-Z distance are stored
+c Rcros - the position of the crossing point
+c Rcros1 & Rcros2 - upper and lower boundaries for Rcros
+c dRcros - the crossing interval
+c irand1 - initiate the random number generator as of to cross or not
+c switch - passage between different electronic curves is possible
+c probabi - the probability for crossing
+C
+c ---------------------------------------
+	double precision R
+	double precision temp(3)
+	double precision Rcros,Rcros1,Rcros2,dRcros
+        double precision photon_per_step
+        integer irand1
+        logical switch,probabi(maxmorsb)
+c ----------------------------------------
+	common /switchi/irand1
+	common /switchl/switch,probabi
+	common /switchd/r,temp,rcros,rcros1,rcros2,
+     1       drcros,photon_per_step

@@ -1,0 +1,9 @@
+C nwall = direction normal to the wall, ie for a wall on y=-10 plano nwall=2
+C weps = energy*sigma^6 for the repulsion of the wall
+C w0 = position of the wall on the nwall axis
+        integer nwalls,normw(6)
+        double precision weps,w0(6),e_rwall
+        logical rwall
+        common/iwall/nwalls,normw
+        common/dwall/weps,w0,e_rwall
+        common/lwall/rwall

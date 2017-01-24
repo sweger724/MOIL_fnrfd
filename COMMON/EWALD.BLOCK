@@ -1,0 +1,81 @@
+c PME summation of long range interactions
+c for periodic boundary conditions; Jarek Meller; 1996
+c
+c ewaldyes          logical flag to setup the PME ewald summation
+c
+c cutd, cutr        cutoffs for direct and receiprocal sums
+c dtol              tolerance for direct space cutoff
+c ewaldcof          Ewald coefficient
+c
+c e_self
+c e_corr            correction terms for electrostatic receiprocal sum
+c e_dir
+c e_ew_receip       direct and receiprocal energies
+c
+c sizes: maxord - max. order of interpolation over the grid in k-space
+c        maxt - max. size of the Q matrix, containig grided charges
+c
+c        maxerf - max. size of matrix containing cubic spline coeff. for
+c                 interpolating erfc = 4*maxtau
+c        perft  - max. number of grid points per unit interval for inerp. erfc
+c        maxtau - max. dimension of temporary matrix tau for values of erfc
+c  the above parameters has been  moved to LENGTH.BLOCK
+
+c        nfft1,2,3 - sizes of the grid
+
+C INTEGER
+      integer maxlespt
+      parameter(maxlespt=2*maxcopy)
+
+      LOGICAL ewaldyes, leskill(maxlespt,2) 
+
+c Logical
+      COMMON / EWALD1 / ewaldyes, leskill 
+
+
+      INTEGER nfft1, nfft2, nfft3, intrpord, 
+     ,         sizfftab, sizffwrk, siztheta, siz_Q, 
+     ,         sizheap, sizstack, numles, lespt(maxlespt),
+     ,         lespoint(2*maxlespt), killer(maxlespt), 
+     ,         tmples(maxlespt), pair(maxlespt)
+c
+      COMMON / EWALD2 / nfft1, nfft2, nfft3, intrpord, 
+     ,                   sizfftab, sizffwrk, siztheta, siz_Q, 
+     ,                   sizheap, sizstack, numles, lespt,
+     ,                   lespoint, killer, tmples, pair
+c
+c      integer MAXS, MAXN, MAXORD, MAXT, pth, perft, maxtau, maxerf
+c templ      parameter(MAXN=1000,MAXORD=14,MAXT=300000,MAXS=maxpt)
+c      parameter(MAXN=1000,MAXORD=4,MAXT=500000,MAXS=maxpt)
+c      parameter(pth=maxord*MAXS,maxtau=200000,perft=10000)
+c      parameter(maxerf=4*maxtau)
+c
+C REAL
+C			*** TO ACCOMODATE THE EWALD CALCULATIONS OF METAL
+C			*** IMAGES THE LENGTHS OF fr[1-3} IS INCREASED to 2*maxpt
+
+      double precision  sgridx, sgridy, sgridz, cutd, cutr, pi,
+     '                  dtol, ewaldcof, e_self, e_corr, reclng(3),
+     '                  recip(3,3), e_ew_receip, ffwork(MAXT),
+     '			fr1(2*maxpt), fr2(2*maxpt), fr3(2*maxpt),
+     '                  QQ(MAXT), theta1(pth), theta2(pth), 
+     '                  theta3(pth), dtheta1(pth), dtheta2(pth),
+     '                  dtheta3(pth), e_dir, erf_arr(4,maxtau),
+     '                  tau(maxtau), erftbdns, lesdpot(3,maxlespt),
+     '			fftable(MAXN), leshole, tmp_self, fpme,
+     '			bsp_mod1(MAXN), bsp_mod2(MAXN),
+     '			bsp_mod3(MAXN), lesqm(maxlespt,4)
+c
+      COMMON / EWALD3 / sgridx, sgridy, sgridz, cutd, cutr, pi,
+     '                  dtol, ewaldcof, e_self, e_corr, reclng,
+     '                  recip, e_ew_receip, ffwork, 
+     '			fr1, fr2, fr3, QQ,
+     '                  theta1,theta2,theta3,dtheta1,dtheta2,
+     '                  dtheta3, e_dir, erf_arr, tau, erftbdns, lesdpot,
+     '			 fftable , leshole, tmp_self, fpme,
+     '			 bsp_mod1, bsp_mod2,
+     '			 bsp_mod3, lesqm
+ 
+
+
+

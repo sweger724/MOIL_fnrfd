@@ -1,0 +1,7 @@
+c off diagonal element for second derivative of non-polar term
+c
+        double precision offdiaggbnp(180 * MAXPT)
+        common /GBSNDDRV2/ offdiaggbnp
+
+    
+

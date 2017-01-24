@@ -1,0 +1,40 @@
+The file externals.svn is used with the svn propset svn:externals command to link folders to external svn repositories.  The contents of those folders listed are pulled from the external repository given.
+
+This file is kept in here version controlled to make it easy to add, remove, or edit external references, and then set them again with the command
+
+svn propset svn:externals . -F externals.svn
+
+tfb 22 oct 2009
+
+---------------------------------------------------
+UPDATE:
+
+I have removed the externals property from the zmoil folder and instead "forked" a copy of the external
+folders into this one, so that the CLSB svn repository has no external dependencies per Ron's request.
+
+This was accomplished by first svn up as usual, getting the latest from ICMB.  Then I removed the .svn
+meta-data folders from the sdkpub, zbslib, and zlabcore folders by running this command within each of
+them:
+
+find . -name ".svn" | xargs -n1 rm -rf
+
+From the zmoil folder, I then add these as new code to be added to the CLSB repo:
+
+svn add sdkpub
+svn add zbslib
+svn add zlabcore
+
+Commit the newly forked code:
+
+svn commit -m "forked ICMB code"
+
+And finally remove the externals definitions:
+
+svn propdel svn:externals .
+
+(and a final svn up and svn commit to commit the propdel)
+
+I am leaving this file and the externals.svn file in place for reference.
+
+
+tfb 27 nov 2012

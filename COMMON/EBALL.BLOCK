@@ -1,0 +1,2 @@
+	double precision rcball(3), rball, fball
+	common /ball/rcball,rball,fball

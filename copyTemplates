@@ -1,0 +1,5 @@
+cp Makefile.template Makefile
+cp Makefile.chmin.template Makefile.chmin
+cp Makefile.paral.template Makefile.paral
+cp Makefile.second.template Makefile.second
+

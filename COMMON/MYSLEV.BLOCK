@@ -1,0 +1,7 @@
+c see fp/myslevconst.f
+c
+
+	integer dispn
+        double precision myslevangk,myslevang0
+
+	common /MYSLEVC/dispn,myslevangk,myslevang0

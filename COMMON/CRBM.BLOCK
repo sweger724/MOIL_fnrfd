@@ -1,0 +1,21 @@
+c parametersa required for the elimination of rigid body motions from the
+c system of interest
+c sigma(6)  - the value of the rigid body constraints for coordinates
+c sigmav(6) - the value of the rigid body constraints for velocities
+c scalar(6) - temporary vector to store the computed values of the constrnts.
+c grdcm[x-z]- vectors with the derivative of the center of mass position
+c		with respect to the atom coordinate, total of three vectors
+c		from x to z
+c grdl[x-z] - same thing as for the center of mass position. This time
+c		 orientation constraint to set global rotation to zero.
+
+	integer nselec,pointr(maxpt)
+        double precision scalar(6),sigma(6),sigmav(6)
+        double precision grdcmx(3*maxpt),grdcmy(3*maxpt)
+        double precision grdcmz(3*maxpt)
+        double precision grdlx(3*maxpt),grdly(3*maxpt)
+        double precision grdlz(3*maxpt)
+
+	common /rbd_blck/scalar,sigma,sigmav,grdcmx,grdcmy,grdcmz,
+     1		grdlx,grdly,grdlz
+	common /rbi_blck/nselec,pointr

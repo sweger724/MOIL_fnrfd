@@ -1,0 +1,209 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXFileReference section */
+		E92AA19D0C9188520066BB77 /* cmoil_aminoacids.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_aminoacids.cpp; sourceTree = "<group>"; };
+		E92AA19E0C9188520066BB77 /* cmoil_aminoacids.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_aminoacids.h; sourceTree = "<group>"; };
+		E92AA19F0C9188520066BB77 /* cmoil_atom.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_atom.cpp; sourceTree = "<group>"; };
+		E92AA1A00C9188520066BB77 /* cmoil_atom.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_atom.h; sourceTree = "<group>"; };
+		E92AA1A10C9188520066BB77 /* cmoil_bspline.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_bspline.cpp; sourceTree = "<group>"; };
+		E92AA1A20C9188520066BB77 /* cmoil_bspline.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_bspline.h; sourceTree = "<group>"; };
+		E92AA1A30C9188520066BB77 /* cmoil_camera.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_camera.h; sourceTree = "<group>"; };
+		E92AA1A40C9188520066BB77 /* cmoil_ce.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_ce.cpp; sourceTree = "<group>"; };
+		E92AA1A50C9188520066BB77 /* cmoil_const.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_const.h; sourceTree = "<group>"; };
+		E92AA1A60C9188520066BB77 /* cmoil_crd.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_crd.h; sourceTree = "<group>"; };
+		E92AA1A70C9188520066BB77 /* cmoil_dib.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_dib.cpp; sourceTree = "<group>"; };
+		E92AA1A80C9188520066BB77 /* cmoil_dib.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_dib.h; sourceTree = "<group>"; };
+		E92AA1A90C9188520066BB77 /* cmoil_drawshape.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_drawshape.cpp; sourceTree = "<group>"; };
+		E92AA1AA0C9188520066BB77 /* cmoil_drawshape.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_drawshape.h; sourceTree = "<group>"; };
+		E92AA1AB0C9188520066BB77 /* cmoil_globals.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_globals.h; sourceTree = "<group>"; };
+		E92AA1AC0C9188520066BB77 /* cmoil_keysim.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_keysim.cpp; sourceTree = "<group>"; };
+		E92AA1AD0C9188520066BB77 /* cmoil_magick.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_magick.cpp; sourceTree = "<group>"; };
+		E92AA1AE0C9188520066BB77 /* cmoil_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_menu.cpp; sourceTree = "<group>"; };
+		E92AA1AF0C9188520066BB77 /* cmoil_menu.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_menu.h; sourceTree = "<group>"; };
+		E92AA1B00C9188520066BB77 /* cmoil_movieprint.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_movieprint.cpp; sourceTree = "<group>"; };
+		E92AA1B10C9188520066BB77 /* cmoil_movieprint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_movieprint.h; sourceTree = "<group>"; };
+		E92AA1B20C9188520066BB77 /* cmoil_msgboard.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_msgboard.cpp; sourceTree = "<group>"; };
+		E92AA1B30C9188520066BB77 /* cmoil_msgboard.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_msgboard.h; sourceTree = "<group>"; };
+		E92AA1B40C9188520066BB77 /* cmoil_parm.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_parm.cpp; sourceTree = "<group>"; };
+		E92AA1B50C9188520066BB77 /* cmoil_parm.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_parm.h; sourceTree = "<group>"; };
+		E92AA1B60C9188520066BB77 /* cmoil_pick.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_pick.cpp; sourceTree = "<group>"; };
+		E92AA1B70C9188520066BB77 /* cmoil_pick.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_pick.h; sourceTree = "<group>"; };
+		E92AA1B80C9188520066BB77 /* cmoil_rms.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_rms.cpp; sourceTree = "<group>"; };
+		E92AA1B90C9188520066BB77 /* cmoil_rms.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil_rms.h; sourceTree = "<group>"; };
+		E92AA1BA0C9188520066BB77 /* cmoil_test.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_test.cpp; sourceTree = "<group>"; };
+		E92AA1BB0C9188520066BB77 /* cmoil_util.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil_util.cpp; sourceTree = "<group>"; };
+		E92AA1BC0C9188520066BB77 /* cmoil.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = cmoil.cpp; sourceTree = "<group>"; };
+		E92AA1BD0C9188520066BB77 /* cmoil.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = cmoil.h; sourceTree = "<group>"; };
+		E92AA1BE0C91888A0066BB77 /* gifmerge.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = gifmerge.cpp; sourceTree = "<group>"; };
+		E92AA1BF0C91888A0066BB77 /* gifmerge.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = gifmerge.h; sourceTree = "<group>"; };
+		E92AA1C00C91888A0066BB77 /* Makefile.osx */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = Makefile.osx; sourceTree = "<group>"; };
+		E92AA1C10C91888A0066BB77 /* swap4.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = swap4.cpp; sourceTree = "<group>"; };
+		E92AA1C20C91888A0066BB77 /* swap8p.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = swap8p.cpp; sourceTree = "<group>"; };
+		E92AA1C30C91888A0066BB77 /* trackball.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = trackball.cpp; sourceTree = "<group>"; };
+		E92AA1C40C91888A0066BB77 /* trackball.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = trackball.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* cmoil */ = {
+			isa = PBXGroup;
+			children = (
+				E92AA1BE0C91888A0066BB77 /* gifmerge.cpp */,
+				E92AA1BF0C91888A0066BB77 /* gifmerge.h */,
+				E92AA1C00C91888A0066BB77 /* Makefile.osx */,
+				E92AA1C10C91888A0066BB77 /* swap4.cpp */,
+				E92AA1C20C91888A0066BB77 /* swap8p.cpp */,
+				E92AA1C30C91888A0066BB77 /* trackball.cpp */,
+				E92AA1C40C91888A0066BB77 /* trackball.h */,
+				E92AA19D0C9188520066BB77 /* cmoil_aminoacids.cpp */,
+				E92AA19E0C9188520066BB77 /* cmoil_aminoacids.h */,
+				E92AA19F0C9188520066BB77 /* cmoil_atom.cpp */,
+				E92AA1A00C9188520066BB77 /* cmoil_atom.h */,
+				E92AA1A10C9188520066BB77 /* cmoil_bspline.cpp */,
+				E92AA1A20C9188520066BB77 /* cmoil_bspline.h */,
+				E92AA1A30C9188520066BB77 /* cmoil_camera.h */,
+				E92AA1A40C9188520066BB77 /* cmoil_ce.cpp */,
+				E92AA1A50C9188520066BB77 /* cmoil_const.h */,
+				E92AA1A60C9188520066BB77 /* cmoil_crd.h */,
+				E92AA1A70C9188520066BB77 /* cmoil_dib.cpp */,
+				E92AA1A80C9188520066BB77 /* cmoil_dib.h */,
+				E92AA1A90C9188520066BB77 /* cmoil_drawshape.cpp */,
+				E92AA1AA0C9188520066BB77 /* cmoil_drawshape.h */,
+				E92AA1AB0C9188520066BB77 /* cmoil_globals.h */,
+				E92AA1AC0C9188520066BB77 /* cmoil_keysim.cpp */,
+				E92AA1AD0C9188520066BB77 /* cmoil_magick.cpp */,
+				E92AA1AE0C9188520066BB77 /* cmoil_menu.cpp */,
+				E92AA1AF0C9188520066BB77 /* cmoil_menu.h */,
+				E92AA1B00C9188520066BB77 /* cmoil_movieprint.cpp */,
+				E92AA1B10C9188520066BB77 /* cmoil_movieprint.h */,
+				E92AA1B20C9188520066BB77 /* cmoil_msgboard.cpp */,
+				E92AA1B30C9188520066BB77 /* cmoil_msgboard.h */,
+				E92AA1B40C9188520066BB77 /* cmoil_parm.cpp */,
+				E92AA1B50C9188520066BB77 /* cmoil_parm.h */,
+				E92AA1B60C9188520066BB77 /* cmoil_pick.cpp */,
+				E92AA1B70C9188520066BB77 /* cmoil_pick.h */,
+				E92AA1B80C9188520066BB77 /* cmoil_rms.cpp */,
+				E92AA1B90C9188520066BB77 /* cmoil_rms.h */,
+				E92AA1BA0C9188520066BB77 /* cmoil_test.cpp */,
+				E92AA1BB0C9188520066BB77 /* cmoil_util.cpp */,
+				E92AA1BC0C9188520066BB77 /* cmoil.cpp */,
+				E92AA1BD0C9188520066BB77 /* cmoil.h */,
+			);
+			name = cmoil;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		D28A88AD04BDD90700651E21 /* cmoil */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "-f ./Makefile.osx $(ACTION)";
+			buildConfigurationList = 1DEB918F08733D9F0010E9CD /* Build configuration list for PBXLegacyTarget "cmoil" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			dependencies = (
+			);
+			name = cmoil;
+			passBuildSettingsInEnvironment = 1;
+			productName = cmoil;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "cmoil" */;
+			hasScannedForEncodings = 1;
+			mainGroup = 08FB7794FE84155DC02AAC07 /* cmoil */;
+			projectDirPath = "";
+			targets = (
+				D28A88AD04BDD90700651E21 /* cmoil */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB919008733D9F0010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = cmoil;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		1DEB919108733D9F0010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = cmoil;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		1DEB919408733D9F0010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Debug;
+		};
+		1DEB919508733D9F0010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB918F08733D9F0010E9CD /* Build configuration list for PBXLegacyTarget "cmoil" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB919008733D9F0010E9CD /* Debug */,
+				1DEB919108733D9F0010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "cmoil" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB919408733D9F0010E9CD /* Debug */,
+				1DEB919508733D9F0010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

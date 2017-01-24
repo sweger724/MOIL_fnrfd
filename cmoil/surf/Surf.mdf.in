@@ -1,0 +1,13 @@
+MODULE Surf 
+CATEGORY XTM Chemistry
+DESCRIPTION Fast molecular surface calculation
+LOADABLE @prefix@/modules_@ARCH@/Surf
+INPUT field; field; (none); input molecule field
+INPUT probe; scalar; 1.4; probe radius
+INPUT resolution; scalar; 1.2; maximum triangle dimension
+INPUT maxpolys; integer; 10; maximum expected polys x 1000
+INPUT hashdim; integer; 50; dimension of hashing grid
+INPUT nohash; integer; 0; hash? 0=no 1=yes
+INPUT colorflag; integer; 0; pass through colors data?
+OUTPUT field; field; triangles with normals
+

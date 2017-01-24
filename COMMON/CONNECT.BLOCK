@@ -1,0 +1,299 @@
+C DEFINITION OF THE MOLECULE TOPOLOGY AND POTENTIAL ENERGY TERMS
+
+
+c-----------------------------------------------------------------------
+c *** vectors of length npt (number of particles in the system)
+c		npt < maxpt
+c poimon  - integer vector with monomer pointer
+c		(poimon(ipt) = the # of the monomer of the ipt particle)
+c ptid    - integer vector with id of particle types
+c ptnm    - (char*4) name of the particle as a function of the particle number
+c ptms    - (double) mass of the particle                "
+c invms   - (double) 1/mass of particle, added by carlos for shake speed
+c ptchg   - (double) charge of particle                  "
+c epsgm6  - (double) twice square root of van der Waals energy times sigma^6
+c epsgm12 - (double) twice square root of van der Waals energy times sigma^12
+c p14     - (double) parameters for 1-4 interactions
+c ptwei   - (double) particle special weight used in LES calculations
+c lesid   - integer id of LES atom. If normal atom set to 0 if les
+c		atom all the copies under a single MULT are set to the
+c		same number
+c cplbl   - (integer) 0 for non les particles. For les particles, equivalent 
+c           particlps with the same lesid will get different cplbl.
+c mutaid  - integer id for mutation. If atom is not mutant is set to 0
+c               if it is mutant to 1 and 2.
+c exm1-2  - special exclusion list for mutants
+c flagchr  - is a flag charge. It is set to true of the particle is charged
+c             and to false if it is not.
+c ptsaid   - (integer) particle type for surface area calulation
+c 
+c 
+c numtyp, denstyp, sqinvms were added for dynapress: moil with pressure as coded 
+c by luca and ported to moil by thomas 07 may 2008
+
+	integer poimon(maxpt),ptid(maxpt),lesid(maxpt)
+	integer numtyp(maxpt)
+	integer cplbl(maxpt), ptsaid(maxpt)
+        integer mutaid(maxpt)
+        logical flagchr(maxpt)
+	character*4 ptnm(maxpt)
+	double precision ptms(maxpt),ptchg(maxpt),epsgm6(maxpt)
+	double precision epsgm12(maxpt),ptwei(maxpt),invms(maxpt)
+	double precision denstyp(maxpt), sqinvms(maxpt)
+c-----------------------------------------------------------------------
+
+ccccccccccccccccccccccccc huhnkie start cccccccccccccccccccccccc
+c-----------------------------------------------------------------------
+c *** vectors of length maxunq*maxunq (number of pair types)
+c	
+c A_arr(i,j) stores epsgm12(i)*epsgm12(j), 
+c where i and j are particle types (i.e. ptid).
+c B_arr(i,j) stores epsgm6(i)*epsgm6(j)
+c Q_arr(i,j) stores ptchg(i)*ptchg(j)*kofdie/eps
+c              
+c-----------------------------------------------------------------------
+	double precision A_arr(maxunq,maxunq)
+	double precision B_arr(maxunq,maxunq)
+	double precision Q_arr(maxunq,maxunq)
+
+c num_pairs stores the total number of pair types
+	integer num_pairs
+ccccccccccccccccccccccccc huhnkie end ccccccccccccccccccccccccccc
+
+c-----------------------------------------------------------------------
+c BULK - character vector with the name of BULK (molecular systems)
+c assembled
+c pbulk - pointer to the last particle of the i-th BULK
+c
+	character*4 BULK(MAXBULK)
+	integer pbulk(MAXBULK)
+c-----------------------------------------------------------------------
+c
+c CHAIN is a one character identifier of a chain and is kept for c ompatability 
+c with PDB chain identified. Not used internally in MOIL
+c but printed out in crd file for convenience
+c
+	character*1 chain(maxpt)
+
+
+c-----------------------------------------------------------------------
+c *** vector of length imono (number of monomers in the molecule)
+c		imono < maxmono
+c moname  - character*4 vector with the name of monomers type
+c poipt   - From monomers to particles poipt(i) is the last particle
+c		of monomer i
+c HYDROPHOBICITY POTENTIALS: Taken from Casari & Sippl JMB 224,725(1992)
+c The parameters are initialized in set_hydro
+c betap   - a pointer to beta carbons, used for hydrophobicity potential
+c           For glycine the hydrophobic force is placed on the CA
+c cbeta       - vector with constants for hydrophobicity calculations
+c avg_hydro   - avergae hydrophobicity for all residues
+c hydro_scale -  constant set the relative weight of the regular energy as
+c		 compared to the hydrophobic forces.
+c idxtip3     - integer vector : 
+c		goes from 1 to nwaters (number of water molecules) and
+c		includes the indicies of the water monomers in an ascending
+c		order.
+c
+	character*4 moname(maxmono)
+	integer poipt(0:maxmono)
+	integer betap(maxmono)
+	integer idxtip3(maxmono)
+	integer indxwat(maxdiv*maxmono)
+	double precision cbeta(maxmono)
+	double precision avg_hydro,hydro_scale
+c-----------------------------------------------------------------------
+
+c-----------------------------------------------------------------------
+c *** vectors of length nb (number of bonds) nb < maxbond
+c ib1 ib2   - pointers to particles that are bonded
+c             ib1(k) is the pointer to particle k.
+c kbond     - (double) force constant for harmonic energy of bonds
+c req       - (double) equilibrium position for harmonic energy of bonds
+c imb1 imb2 - pointers to morse bonds
+c rmeq      - equilibrium distance for morse potential
+c D,alpha   - parameters of Morse potential
+c Arep      - parameter of repulsion energy function
+c Brep      - parameter of repulsion energy function
+c beta1      - parameter of repulsion energy function
+c
+	integer ib1(maxbond),ib2(maxbond)
+        integer imb1(maxmorsb),imb2(maxmorsb)
+	double precision kbond(maxbond),req(maxbond),rmeq(maxmorsb)
+	double precision D(maxmorsb),alpha(maxmorsb),Arep(maxmorsb)
+	double precision beta1(maxmorsb),Brep(maxmorsb)
+c-----------------------------------------------------------------------
+
+c-----------------------------------------------------------------------
+c *** vectors of length nangl (number of angles)
+c		nangl < maxangl
+c iangl1 iangl2 iangl3 - pointers to particles in angles
+c kangl   - (double) force constant for harmonic energy of angles
+c angleq  - (double) equilibrium position for harmonic energy of angles
+c
+	integer iangl1(maxangl),iangl2(maxangl),iangl3(maxangl)
+	double precision kangl(maxangl),angleq(maxangl)
+c-----------------------------------------------------------------------
+
+c-----------------------------------------------------------------------
+c *** vectors of length ntors (number of torsions)
+c	nunmer of torsion =< maxtors
+c itor1 itor2 itor3 itor4 - pointers to particles in torsions
+c ktors[1-3]   - (double) amplitude for torsional energy
+c period  - (integer) period of rotation (e.g.  2 for C=C, 3 for C-C)
+c phase[1-3]   - (double) phase factor for torsional energy
+c
+	integer itor1(maxtors),itor2(maxtors),itor3(maxtors)
+	integer itor4(maxtors)
+	integer period(maxtors)
+	double precision ktors1(maxtors),ktors2(maxtors)
+        double precision phase1(maxtors),phase2(maxtors)
+	double precision ktors3(maxtors),phase3(maxtors)
+c-----------------------------------------------------------------------
+
+
+c-----------------------------------------------------------------------
+c *** vectors of length nimp (number of improper torsions)
+c		nimp =< maximp
+c iimp1 iimp2 iimp3 iimp4 - pointers to particles in improper torsions
+c kimp    - (double) force constant for all improper torsions
+c impeq   - (double) equilibrium position for improper torsion
+c
+	integer iimp1(maximp),iimp2(maximp),iimp3(maximp),iimp4(maximp)
+	double precision kimp(maximp)
+	double precision impeq(maximp)
+c-----------------------------------------------------------------------
+
+c----------------------------------------------------------------------
+c Exclusion lists between 1-2 1-3 and  aspecial list for 1-4.
+c exc1 is a pointer to exc2, i.e. exc2(exc1(i)) is the last
+c particles to be excluded from interaction with i
+c Similarly spec1 is a pointer to spec2
+c
+	integer exc1(0:maxpt),exc2(maxex)
+	integer spec1(maxspec),spec2(maxspec)
+	double precision p14(3,maxspec)
+c Special exclusion lists for mutants
+        integer exm1(maxpt),exm2(maxex)
+c----------------------------------------------------------------------
+
+c----------------------------------------------------------------------
+c *** integers define actual size of molecule, initially are set to 0
+c totmon  - total number of monomers
+c npt     - total number of particles
+c nb      - total number of bonds
+c nb_all  - total number of bonds (in all processors)
+c nmb     - total numberof morse bonds
+c nangl   - total number of angles
+c nangl_all   - total number of angles (in all processors)
+c ntors   - total number of torsion
+c nimp    - total number of improper torsions
+c lestyp  - total number of different types of LES monomers
+c totex   - number of exclusions of particle interactions
+c totexm  - number of exclusions of particle interactions for mutants
+c totspe  - number of special (1-4) interactions
+c NBULK   - number of "bulk" (molecular systems)
+c nchg    - the number of charged particles in the molecule(s
+c nbeta   - number of beta carbons, required for hydrophobicity calculations.
+c nwaters - number of TIP3 water molecules.
+c *** lesflag - if true, les particles are present
+c hydroflag - if true hydrophobic interactions are on
+c
+c set for DNA simulation and compatability with CHARMM force field
+c arith   - if true the combination rule for sigma(ij)
+c		is set sigma(ij) = 1/2(sigma(i)+ sigma(j))
+c		we write in the connectivity file sqrt(epsilon(ii))
+c		and 1/2 sigma(ii). A different cdie is called
+c		in energy calculations.
+c specl   - set a second (excited energy surface) on with crossing vai Landau
+c		Zener model.
+c prll_on_off - if "on" parallel computation is expected
+c
+	integer totmon,npt,nb,nmb,nangl,ntors,nimp,lestyp,NBULK
+        integer nb_all, nangl_all, bonds_start, bonds_end
+	integer nbeta,nwaters
+	integer totex,totexm,totspe,nchg
+	integer totex3,totspe3
+	logical lesflag,hydroflag,arith,specl
+
+C-----------------------------------------------------------------------
+c yael
+C the mononer division list
+c maxdiv is the maximum number of partes per monomer
+c poidmon - pointer to monomer part of particle
+c           poidmon(i) is the monomer part number of the i'th particle.
+c mdivyes sould be true if there are divided monomers in the .MONO file
+
+       integer mdivlist(0:maxdiv+1,maxmono),totdmon
+       integer realmono(maxdiv*maxmono)
+c       integer dpoipt(0:(maxdiv*maxmono+1))
+       integer dpoipt(0:(maxdiv+1)*maxmono)
+       integer poidmon(maxpt)
+       logical mdivyes
+
+C-----------------------------------------------------------------------
+c jarek
+C the virtual particles lists and flags
+c nvptmax - the maximum number of virtual particles - see LENGTH.BLOCK
+c vp_list - contains all the virt. part.
+c vp_ex - contains real particles related to virt. part. to avoid electrostatic
+c         interactions between them
+c vp_point - pointer to vp_ex
+c
+c vp_flag -  should be true if one wants to use virt. part.
+c com_flag - the only really working algorithm of positioning VP with
+c            respect to related particles
+c gcnt_flag - geom. center rather than cent. of mass - not finished
+
+       integer vp_list(nvptmax),nvpt
+       integer vp_ex(3*nvptmax)
+c note - if introducing new types of virt. part. this should be changed to
+c      integer vp_ex(max_no_of_related_prts*nvptmax)
+       integer vp_point(nvptmax)
+       logical vp_flag,com_flag,gcnt_flag
+
+c michele
+c
+c Hydrogen bond 
+c
+c 
+c poi_acc - pointer to hydrogen bond acceptors
+       integer poi_acc(maxpt)
+c poi_don - pointer to hydrogen bond donors
+       integer poi_don(maxpt)
+c n_acceptors - number of hydrogen bond acceptors
+       integer n_acceptors
+c n_donors - number of hydrogen bond donors
+       integer n_donors
+
+c-----------------------------------------------------------------------
+c Now gather everything into common blocks
+c
+	common /CONNLOG/lesflag,hydroflag,arith,flagchr,specl,
+     1		mdivyes
+	common /CONNINT/poimon,lesid,ptid,pbulk,poipt,betap,idxtip3,
+     1		indxwat,ib1,ib2,
+     2		iangl1,iangl2,iangl3,itor1,itor2,itor3,itor4,period,
+     3		iimp1,iimp2,iimp3,iimp4,exc1,exc2,spec1,spec2,
+     4          cplbl,ptsaid,exm1,exm2,
+     5		totmon,npt,nb,nangl,ntors,nimp,lestyp,NBULK,
+     6		totex,totexm,totspe,totex3,totspe3,imb1,imb2,nmb,nchg,nbeta,
+     7		nwaters,nb_all,nangl_all,
+     8		mdivlist,totdmon,realmono,dpoipt,poidmon,numtyp,
+ccccccc huhnkie start
+     9          num_pairs,mutaid,bonds_start, bonds_end
+ccccccc huhnkie end     
+	common /CONNDBL/ptms,invms,ptchg,epsgm6,epsgm12,p14,ptwei,
+     1		cbeta,
+     2		hydro_scale,avg_hydro,kbond,req,kangl,angleq,ktors1,
+     3          ktors2,ktors3,phase1,kimp,impeq,rmeq,D,alpha,Arep,
+     4		beta1,Brep,phase2,phase3,
+cccccccccc huhnkie start
+     5          A_arr,B_arr,Q_arr
+     6          ,sqinvms,denstyp
+ccccccccc huhnkie end
+	common /CONNCHR/ptnm,moname,BULK,chain
+        common /VIRTINT/nvpt,vp_list,vp_ex,vp_point
+        common /VIRTLOG/vp_flag,com_flag,gcnt_flag
+ccccccccc hydrogen bonds ccccccccc
+        common /HBINT/n_donors,n_acceptors,poi_don,poi_acc

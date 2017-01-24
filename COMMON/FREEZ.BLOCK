@@ -1,0 +1,7 @@
+c pointer to atoms which are not fixed
+c
+	integer inofrz
+	integer nofreez(maxpt),zerofrz(maxpt)
+	logical frzM(maxdiv*maxmono),slow_frz
+	common /nfrz/nofreez,zerofrz,inofrz
+	common /lfrz/frzM,slow_frz

@@ -1,0 +1,109 @@
+C for part in SCpredict which defines the properties of the isolated 
+c aminoacids, used to built the rotamer library.
+c based on CONNECT.BLOCK
+c
+c maxmonotype - maximal number of monomers types in the 
+c               rotational library
+c maxpttype   - maximal number of particles of all monomer types 
+c               together.
+c maxbondtype - maximal total number of bonds for all monomers together.
+c maxangltype - maximal total number of angles for all monomers together
+c maxextype   - maximal total number of exclusions for all monomers 
+c               together.
+c
+      integer maxmonotype,maxpttype,maxbondtype,maxangltype,
+     &        maxextype
+      parameter (maxmonotype=22,maxpttype=300,maxbondtype=300,
+     &           maxangltype=300,maxextype=1000)
+c
+c-----------------------------------------------------------------------
+c *** vector of length totmono (number of monomers in the molecule)
+c               totmonos4< maxmonotype
+c monames4  - character*4 vector with the name of monomers type
+c poipts4   - From monomers to particles poipt(i) is the last particle
+c               of monomer i
+c poinbs4   - poinb(i) points to last bond in monomer i
+c poinangls4 - poinangl(i) points to last angle in monomer i
+c poiexs4   - poiex(i) points to last exclusion in monomer i
+c
+      character*4 monames4(maxmonotype)
+      integer poipts4(0:maxmonotype),poinbs4(0:maxmonotype)
+      integer poinangls4(0:maxmonotype)
+      integer poiexs4(0:maxmonotype)
+c-----------------------------------------------------------------------
+c *** vectors of length npts4 = poipts4(totmons4) (number of particles 
+c     in the system)
+c             npts4 < maxpttype
+c poimons4  - integer vector with monomer pointer
+c             (poimons4(ipt) = the # of the monomer of the ipt particle)
+c ptids4    - integer vector with id of particle types
+c ptnumbers4- integer vector with number of the particle in the monomer.
+c ptnms4    - (char*4)name of the particle  (ipt)
+c ptmss4    - (double)mass of the particle  (ipt)  
+c ptchgs4   - (double)charge of particle    (ipt)  
+c epsgm6s4  - (double)square root of van der Waals energy times sigma^6
+c epsgm12s4 - (double)square root of van der Waals energy times sigma^12
+c flagchrs4 - is a flag charge. It is set to true of the particle is 
+c             charged
+c
+      integer poimons4(maxpttype),ptids4(maxpttype)
+      integer ptnumbers4(maxpttype)
+      logical flagchrs4(maxpttype)
+      character*4 ptnms4(maxpttype)
+      double precision ptmss4(maxpttype),ptchgs4(maxpttype)
+      double precision epsgm6s4(maxpttype),epsgm12s4(maxpttype)
+
+c-----------------------------------------------------------------------
+c *** vectors of length nbs4 (number of bonds) nbs4 < maxbondtype
+c ib1s4 ib2s4 - pointers to particles that are bonded
+c             ib1s4(i) is the pointer to particle k.
+c kbonds4   - (double) force constant for harmonic energy of bonds
+c reqs4     - (double) equilibrium position for harmonic energy of bonds
+c
+      integer ib1s4(maxbondtype),ib2s4(maxbondtype)
+      double precision reqs4(maxbondtype)
+c-----------------------------------------------------------------------
+c *** vectors of length nangls4 (number of angles)
+c               nangls4 < maxangltype
+c iangl1s4 iangl2s4 iangl3s4 - pointers to particles in angles
+c kangls4   - (double) force constant for harmonic energy of angles
+c angleqs4  - (double)equilibrium position for harmonic energy of angles
+c
+      integer iangl1s4(maxangltype),iangl2s4(maxangltype)
+      integer iangl3s4(maxangltype)
+      double precision angleqs4(maxangltype)
+c-----------------------------------------------------------------------
+c Exclusion lists between 1-2 1-3 
+c exc1s4 is a pointer to exc2s4, i.e. exc2s4(exc1s4(i)) is the last
+c particles to be excluded from interaction with i
+c 1-4 list:
+c
+      integer exc1s4(0:maxpttype),exc2s4(maxextype)
+c----------------------------------------------------------------------
+c *** integers define actual size of molecule, initially are set to 0
+c
+c totmons4  - total number of monomers
+c npts4     - total number of particles
+c nbs4      - total number of bonds
+c nangls4   - total number of angles
+c totexs4   - number of exclusions of particle interactions
+c totspes4  - number of special (1-4) interactions
+c
+      integer totmons4,npts4,nbs4,nangls4,totexs4
+c
+c-----------------------------------------------------------------------
+c Now gather everything into common blocks
+c
+      common /CONNLOGs4/flagchrs4
+      common /CONNINTs4/poimons4,ptids4,poipts4,ib1s4,ib2s4,
+     1     iangl1s4,iangl2s4,iangl3s4,exc1s4,exc2s4,
+     5     totmons4,poinbs4,poinangls4,
+     7     poiexs4,ptnumbers4,npts4,nbs4,nangls4,totexs4
+      common /CONDBLs4/ptmss4,ptchgs4,epsgm6s4,epsgm12s4,
+     1     reqs4,angleqs4
+      common /CONNCHRs4/ptnms4,monames4
+c
+
+
+
+

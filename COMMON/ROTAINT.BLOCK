@@ -1,0 +1,46 @@
+C DEFINITION OF THE ROTAMER INTERNAL COORDINATES
+c
+c-------------------------------------------------------------------
+c BASIC LENGTHS 
+c maxptrotint - maximal number of atoms in the rotamer internal 
+c               coordinate library. 
+c maxrotint   - maximal number of rotamers in the rotamer library. 
+c maxptmonrotint - maximal number of particles in a single monomer
+c
+      integer maxptrotint,maxrotint,maxptmonrotint
+      parameter (maxptrotint=10000,maxrotint=700,maxptmonrotint=30)
+c-------------------------------------------------------------------
+c
+c
+c nptsrotint - total number of particles in the rotamer internal 
+c              coordinate library. (nptsrotint<maxptrotint)
+c nrotint  - total number of rotamers in the rotamer library.
+c
+      integer nptsrotint,nrotint
+c-------------------------------------------------------------------
+c
+c poiptrotint(i)  - pointer to the last atom of rotamer(i).
+c poityrotint(j)  - pointer to the last rotamer index of type (j).
+c typerotint(i)   - type of rotamer i (monomer index as in 
+c                   connectivity file).
+c nrotinttype(i)  - number of rotamers of type (i)
+c glbindrotint(ipt)- rotamer global index  of atom ipt.
+c ptrotint[1-4](ipt)- atoms involved in the torsion (indeces in the 
+c                   monomer) associated with the atom ipt. 
+c chirotint(ipt)  - torsion angle associated with atom ipt.
+c 
+      integer poiptrotint(0:maxrotint),poityrotint(0:maxmonotype)
+      integer typerotint(maxrotint),nrotinttype(maxmonotype)
+      integer glbindrotint(maxptrotint)
+      integer ptrotint1(maxptrotint),ptrotint2(maxptrotint)
+      integer ptrotint3(maxptrotint),ptrotint4(maxptrotint)
+      double precision chirotint(maxptrotint)
+c
+c-------------------------------------------------------------------
+c
+      COMMON /ROTINT/nptsrotint,nrotint,
+     1               poiptrotint,poityrotint,typerotint,glbindrotint,
+     2               nrotinttype,
+     2               ptrotint1,ptrotint2,ptrotint3,ptrotint4
+      COMMON /ROTDBL/chirotint
+c      

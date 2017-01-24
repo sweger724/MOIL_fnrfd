@@ -1,0 +1,63 @@
+c Similarly to the regular cdie, we are generating here
+c three of everything: list of joined vdw and electrostatic and separate
+c list of vdw and a seprate list of electrostatic
+c
+c A common block for simulating periodic boundary condition
+c It is assumed that the number of symmetry atoms will not exceed
+c three times maxpt.
+c ipermax - maximum number of symmetry related atoms
+c maxpwat - maximum number of periodic waters
+c isym    - number of symmetry related transformations
+c iblock  - iblock(i) pointer to the last atom of the i-th symmetry
+c           operation
+c symreal    -  pointer to the "real" atom, psym(i) is the index of the
+c            real atom
+c psym(1-3)    - a pointer of a symmetry atom to the nonbonded listS(1-3)
+c indxsym - the index of symmetry related atoms
+c symnum - the number of symmetry operations
+c arot,brot,crot - gets value of 1 or -1 and determines the rotation
+c      operation for x,y and z. when there is arotation, the default is
+c      arot = 1 ,brot = -1 ,crot = -1(rotation in 180 deg. around the x-axis)
+c srot(isym) for each symmetry operation i isym(i) is true if there is
+c a rotation in this direction.
+c
+
+c### added for squeeze selection
+c nsqz    - number of monomers to be squeezed
+c mono_sqz - please squeeze is a list of monomers that will be squeezed into a box
+c
+
+
+c
+c### added for TIP3 waters
+c ipwat(1 or 2)        - number of periodic waters
+c iblckwt(1 or 2) - pointer to the last water of the i-th symmetry operation.
+c symmwat(1 or 2) - pointer to the monomer num. of the "real" water
+c psymwt(1 or 2)  - pointer to the monomer lists of waters.
+c
+	integer iblock1(isym),iblock2(isym),iblock3(isym)
+	integer symreal1(ipermax),symreal2(ipermax),symreal3(ipermax)
+	integer psym1(ipermax),psym2(ipermax),psym3(ipermax)
+	integer symop(3,isym)
+	integer indxsym1,indxsym2,indxsym3,nlist1,nlist2,nlist3
+	integer symnum
+
+	integer nsqz,mono_sqz(maxmono)
+
+	integer arot,brot,crot
+	logical rotop(isym)
+
+	integer ipwat1, ipwat2, nwlist1, nwlist2
+	integer iblckwt1(0:isym),iblckwt2(0:isym)
+	integer symmwat1(maxpwat),symmwat2(maxpwat)
+	integer psymwt1(0:maxpwat),psymwt2(0:maxpwat)
+
+	double precision a,b,c
+
+	COMMON /SYMML/rotop
+	COMMON /SYMMD/a,b,c
+	COMMON /SYMMI/iblock1,iblock2,iblock3,symreal1,symreal2
+     1		,symreal3,psym1,psym2,psym3,symop,indxsym1,indxsym2
+     2		,indxsym3,nlist1,nlist2,nlist3,symnum,arot,brot,crot
+     3		,ipwat1,ipwat2,iblckwt1,iblckwt2,psymwt1,psymwt2
+     4          ,symmwat1,symmwat2,nwlist1,nwlist2,mono_sqz,nsqz

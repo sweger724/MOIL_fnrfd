@@ -1,0 +1,8 @@
+c
+c use in reading dynamics file. If (norew) - no rewind -  the dynamics file
+c is not rewind toread next structure. If this is the first structure,
+c i.e. ncoor=lpstr then rewind will be used regardless..
+c
+	logical norew
+	integer lpstr
+	common /norw/ norew,lpstr

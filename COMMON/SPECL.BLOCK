@@ -1,0 +1,35 @@
+c  some variables used in the special programs
+c  f - a factor between 0 and 1
+c  total energy = f*(unbind energy) + (1-f)*(bind energy)
+c  f = 1 / (1 + EXP(-lamda*(r-rcut)))
+c  sdx(maxpt),sdy(maxpt),sdz(maxpt) -- forces for particles which is in the
+c  special connectivity file
+c dist -  distance between Fe and NO
+c Rswi -  distance between Fe and NO at which switch from repulsion to Morse
+c Force -  force use in Landau-Zener formula  Force = | F1 - F2 |
+c delt -  electronic coupling at the crossing point
+c newpoit - pointer to the actual index of a particle according
+c		to its id in the special list.
+c pt_to_spcl - a pointer from the usual particle list to the list of
+c		"special" particles (those with two electronic curves)
+         double precision f(maxmorsb),lamda(maxmorsb)
+         double precision rcut(maxmorsb),dist(maxmorsb)
+         double precision Rswi,Force,delt
+         double precision sdx(maxspcl),sdy(maxspcl),sdz(maxspcl)
+         double precision se_bond1,se_bond2
+         double precision se_theta1,se_theta2
+         double precision se_el1,se_el2,se_vdw1,se_vdw2
+         double precision dx1(maxspcl),dy1(maxspcl),dz1(maxspcl)
+         double precision tempdfx(maxmorsb),tempdfy(maxmorsb)
+         double precision tempdfz(maxmorsb),tmpf(maxmorsb)           
+	 integer newpoit(maxspcl),ntyp(maxspcl),pt_to_spcl(maxpt)
+	 integer snb0,snang0,snb(maxmorsb),snang(maxmorsb)
+	 integer lz14(0:maxmorsb)
+         integer poitype(0:maxmorsb)
+         integer poitype1(0:maxmorsb),poitype2(0:maxmorsb)
+	 common /SPDBLE/f,lamda,rcut,sdx,sdy,sdz,se_theta1,
+     #   se_theta2,Rswi,
+     #   se_bond1,se_bond2,tempdfx,tempdfy,tempdfz,tmpf,dx1,dy1,dz1,
+     #   dist,Force,delt,se_el1,se_el2,se_vdw1,se_vdw2
+	 common /SPINT/ newpoit,ntyp,snb,snang,snb0,snang0,
+     # poitype, poitype1,poitype2,pt_to_spcl,lz14

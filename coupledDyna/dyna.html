@@ -1,0 +1,137 @@
+<HTML>
+<HEAD><TITLE>Source ./dynamics/dyna.f</TITLE></HEAD>
+<BODY>
+<a name="DYNAMICS"><h3>PROGRAM DYNAMICS ( )</h3></a>
+<blockquote>
+<table><tr><td align="left"><b>Description</b></td></tr>
+<tr><td><pre>program for burning CPU(s)</pre></td></tr></table>
+<table><tr><td><b>Source file:</b></td><td>dyna.f</td></tr>
+<tr><td></td></tr>
+</table>
+
+<table><tr><td><b>I/O Operations:</b></td></tr>
+<tr><td><pre>Unit ID  Unit No       Access  Form   Operation
+   STDO                   SEQ  FMTD           W  
+
+<small>Operation codes A=rewind,B=backspace,C=close,E=endfile
+                I=inquire,O=open,R=read,W=write</small></pre></td></tr></table>
+<table><tr><td align="left"><b>Intrinsic Functions Called</b><br></td></tr>
+<tr><td><pre>DOUBLE PRECISION   DABS,       DSQRT
+GENERIC            MIN,        MOD
+</pre></td></tr></table>
+<table><tr><td align="left"><b>External Functions and Subroutines Called</b><br></td></tr>
+<tr><td><pre>SUBROUTINE         ALERT,      BUILD_MATRIX
+SUBROUTINE         BUILD_MATRIX_FROM_IDX,  CONJUGATE_GRAD_SHAKEPT
+SUBROUTINE         CONJUGATE_GRAD_SHAKEVL,             DUMP_DYNA
+SUBROUTINE         DUMP_PARAM,             EFORCE,     FORCE_NORM
+SUBROUTINE         INFO,       INIT_DYNA,  LAN_ZEN,    MSHAKPT
+SUBROUTINE         MSHAKVL,    MULTEMP,    NBONDM,     NBONDM_SPCL
+SUBROUTINE         OVRLPCK,    PRBM,       SHAKEPT,    SHAKEVL
+SUBROUTINE         SQUEEZE,    STDC,       SYMINIT,    UP_RES
+SUBROUTINE         VELINIT,    WDYNCRD,    WDYNVEL,    WENER
+</pre></td></tr></table>
+<table><tr><td align="left"><b>Parameter Variables Used</b><br></td></tr>
+<tr><td><pre>INTEGER            ICHUNK             (ICHUNK = 96)
+INTEGER            IGENE              (IGENE = 400)
+INTEGER            IGENE1             (IGENE1 = 1100)
+INTEGER            MAXPT              (MAXPT = 450)
+INTEGER            MAXMONO            (MAXMONO = 600)
+INTEGER            MAXBOND            (MAXBOND = 600)
+INTEGER            MAXANGL            (MAXANGL = 900)
+INTEGER            MAXTORS            (MAXTORS = 700)
+INTEGER            MAXIMP             (MAXIMP = 300)
+INTEGER            MAXEX              (MAXEX = 5000)
+INTEGER            MAXSPEC            (MAXSPEC = 10000)
+INTEGER            MAXBULK            (MAXBULK = 2)
+INTEGER            MAXCNST            (MAXCNST = 2000)
+INTEGER            ICHGVDW            (ICHGVDW = 500000)
+INTEGER            IVDW               (IVDW = 80000)
+INTEGER            ICHG               (ICHG = 18000)
+INTEGER            WTRSHRT            (WTRSHRT = 500000)
+INTEGER            WTRLNG             (WTRLNG = 5000)
+INTEGER            MAXSHAK            (MAXSHAK = MAXBOND+MAXBOND/20)
+INTEGER            LGRID              (LGRID = 100)
+INTEGER            ISYM               (ISYM = 26)
+INTEGER            IPERMAX            (IPERMAX = 5*MAXPT)
+INTEGER            MAXPWAT            (MAXPWAT = 5*MAXMONO)
+INTEGER            MAXCOPY            (MAXCOPY = 200)
+INTEGER            MAXMORSB           (MAXMORSB = 4)
+INTEGER            SICHGVDW           (SICHGVDW = 100)
+INTEGER            MAXSPCL            (MAXSPCL = 50)
+INTEGER            GRID               (GRID = 12)
+INTEGER            PROC_MAX           (PROC_MAX = 4)
+INTEGER            MAXPE              (MAXPE = 16)
+INTEGER            MX_SHK_SHR         (MX_SHK_SHR = 5)
+INTEGER            MAXDIV             (MAXDIV = 5)
+INTEGER            MAXLINK            (MAXLINK = 6)
+INTEGER            NVPTMAX            (NVPTMAX = 10)
+INTEGER            MAXN               (MAXN = 1000)
+INTEGER            MAXORD             (MAXORD = 4)
+INTEGER            MAXT               (MAXT = 5000000)
+INTEGER            MAXS               (MAXS = MAXPT)
+INTEGER            PTH                (PTH = MAXORD*MAXS)
+INTEGER            MAXTAU             (MAXTAU = 200000)
+INTEGER            ITEMPG             (ITEMPG = 10)
+INTEGER            MAXLESPT           (MAXLESPT = 2*MAXCOPY)
+</pre></td></tr></table>
+<table><tr><td align="left"><b>Local Variables</b> <small>(+ indicates altered content)</small><b></b><br></td></tr>
+<tr><td><pre>CHARACTER*8       +NAME
+DOUBLE PRECISION   GRADF,      MAT_VAL(10*MAXSHAK),   +TMP
+INTEGER           +IAT1,      +IAT2,      +ISTEP,     +J
+INTEGER           +K,         +KK,        +L
+INTEGER            MAT_IDX(10*MAXSHAK),   +NAMEL
+LOGICAL            FAILURE
+</pre></td></tr></table>
+<table>
+<tr><td align="left"><b>Referenced Common Block Variables</b> <small>(+ indicates altered content)</small><b></b></td></tr>
+<tr><td><pre>BSSBP1             LOGICAL            QSSBP
+CONNDBL            DOUBLE PRECISION   PTMS(MAXPT)
+CONNINT            INTEGER            NPT
+CONNLOG            LOGICAL            SPECL
+CRD                DOUBLE PRECISION  +COOR(3,MAXPT)
+CRD2               DOUBLE PRECISION   COOR2(3,MAXPT)
+DYNDBL             DOUBLE PRECISION   CURTEMP(ITEMPG)
+DYNDBL             DOUBLE PRECISION   DT,        DT2
+DYNDBL             DOUBLE PRECISION   DTEMP(ITEMPG)
+DYNDBL             DOUBLE PRECISION   DXTRA,     DYTRA
+DYNDBL             DOUBLE PRECISION   DZTRA,     FACTOR1(MAXPT)
+DYNDBL             DOUBLE PRECISION   FACTOR2(MAXPT)
+DYNDBL             DOUBLE PRECISION   FMAX,      GRDLX(3,MAXPT)
+DYNDBL             DOUBLE PRECISION   GRDLY(3,MAXPT)
+DYNDBL             DOUBLE PRECISION   GRDLZ(3,MAXPT)
+DYNDBL             DOUBLE PRECISION   RMS,      +TEMPI(ITEMPG)
+DYNINT             INTEGER            IORIE,     IRAND
+DYNINT             INTEGER            JPICK(MAXPT)
+DYNINT             INTEGER            NCOOR,     NEQSTEP
+DYNINT             INTEGER            NEWV,      NINFO
+DYNINT             INTEGER            NLIST,     NRIGI
+DYNINT             INTEGER            NSCALV,    NSTEP
+DYNINT             INTEGER            NTEMP,     NVELO
+DYNINT             INTEGER            TGROUP(ITEMPG)
+DYNINT             INTEGER            TPO(MAXPT)
+DYNINT             INTEGER            UWCRD,     UWVEL
+DYNLOG             LOGICAL            FREEZE,    NORI
+DYNLOG             LOGICAL            NO_SCALING
+DYNLOG             LOGICAL            SDYES,     SHAKB
+DYNLOG             LOGICAL            SHAKL,     SHAKM
+DYNLOG             LOGICAL            SYMANNEAL
+ENERGY             DOUBLE PRECISION   DPOT(3,MAXPT)
+LENER              LOGICAL            ESYMYES,   ETETH_YES
+MSK1               LOGICAL            MATSHAK
+NFRZ               INTEGER            INOFRZ,    NOFREEZ(MAXPT)
+PRLL_I             INTEGER            MY_PE
+RESTART            INTEGER            START_DYNA
+SHK1               INTEGER            ISHAK1(MAXSHAK)
+SHK1               INTEGER            ISHAK2(MAXSHAK)
+SHK1               INTEGER            ITERSHAK,  NSHAK
+SHK2               DOUBLE PRECISION  +COOREF(3,MAXSHAK)
+SHK2               DOUBLE PRECISION   EPSHAKV
+SWITCHL            LOGICAL            SWITCH
+SYMMD              DOUBLE PRECISION  +A,        +B,             +C
+UNTS               INTEGER            STDO
+VEL                DOUBLE PRECISION  +VELO(3,MAXPT)
+</pre></td></tr></table>
+</blockquote>
+<BR>
+</BODY>
+</HTML>

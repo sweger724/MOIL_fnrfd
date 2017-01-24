@@ -1,0 +1,20 @@
+      DOUBLE PRECISION FUNCTION STEP1(FNEW,FM,GTP,SMAX)
+c      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      DOUBLE PRECISION FNEW,FM,GTP,SMAX
+C
+C ********************************************************
+C STEP1 RETURNS THE LENGTH OF THE INITIAL STEP TO BE TAKEN ALONG THE
+C VECTOR P IN THE NEXT LINEAR SEARCH.
+C ********************************************************
+C
+      DOUBLE PRECISION ALPHA,D,EPSMCH
+      DOUBLE PRECISION DABS,MCHPR1
+      EPSMCH = MCHPR1()
+      D = DABS(FNEW-FM)
+      ALPHA = 1.D0
+      IF (2.D0*D .LE. (-GTP) .AND. D .GE. EPSMCH)
+     *     ALPHA = -2.D0*D/GTP
+      IF (ALPHA .GE. SMAX) ALPHA = SMAX
+      STEP1 = ALPHA
+      RETURN
+      END

@@ -1,0 +1,26 @@
+c data for dihendral constraints is stored
+c pointers to 4 dihedral atoms:   - icnst[1-4](maxcnst)
+c constraint equilibrium position - cnseq(maxcnst)
+c constraint force constant       - kcns(maxcnst)
+c actual number of constraints    - ncnst
+c
+c Also relevant but in different BLOCKs
+c maxcnst - maximum number of constraints (LENGTH.BLOCK)
+c e_cnst  - energy of constraints (ENERGY.BLOCK)
+c ecnyes  - logical flag, if true constraint energy present
+c
+c e_cent constraint on center of mass of selected particles
+c variables 
+c center integer vector of length maxpt with particles to be constrained
+c icenter actual number of constrained particles
+
+	integer ncnst,icenter
+	integer icnst1(maxcnst),icnst2(maxcnst),icnst3(maxcnst)
+	integer icnst4(maxcnst),center(maxpt)
+	double precision cnseq(maxcnst),kcns(maxcnst)
+	double precision kcenter,xeq,yeq,zeq
+        logical xcenter,ycenter,zcenter
+
+	COMMON/INTCNST/ncnst,icnst1,icnst2,icnst3,icnst4,icenter,center
+	COMMON/DBLCNST/cnseq,kcns,kcenter,xeq,yeq,zeq
+        COMMON/LOGCNST/xcenter,ycenter,zcenter

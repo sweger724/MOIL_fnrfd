@@ -1,0 +1,49 @@
+c COMMON BLOCK for second derivatives calculations
+c Note that at present the storage of the covalent off diagonal derivatives
+c is quite wasteful. This will hopefully be modified in the not too far future.
+c The list are packed according to the index of the internal degree of freedom
+c rather than according to atom numbers. The same atom may (actually
+c does) appear more than once. This way we are sure however that we are not
+c storing zero elements and we know before hand what is the size of matrices
+c that is required (which is still much less that 9*maxpt^2). In the future
+c it will be probably better to set all of the above matrices to unsave local
+c variables in the relevant routines. In the main caller for 
+c individiual matrices a screening can be made in order to generate a packed
+c version of the total second derivative matrix.
+c
+	integer maxpt2d,ichvd2,ivdw2,ichg2,ispec2,mbond2,mangl2,mtors2
+	integer mimp2,ibeta2
+	parameter(maxpt2d=5500,ichvd2=80000,ivdw2=60000,ichg2=1)
+	parameter(ispec2=9972,mbond2=5648,mangl2=8220,mtors2=6078)
+	parameter(mimp2=2264)
+	parameter(ibeta2=1)
+	double precision diag(6*maxpt2d)
+
+c	<<******************* added by jing **************************
+c	
+c	For using two data files act as two big array d2nb_1() and
+c	d2nb_2() repectively. All stuff added by jing are included in 
+c	two "**********************" common lines, and old statement
+c	will be added a "c*" in each of them.
+
+c*	double precision d2nb_1(6*ichvd2)
+c*	double precision d2nb_2(6*ivdw2)
+
+c	************************************************************>>
+
+	double precision d2nb_3(6*ichg2)
+	double precision d2spec(6*ispec2)
+	double precision d2bond(6*mbond2)
+	double precision d2theta(27*mangl2)
+	double precision d2phi(54*mtors2)
+	double precision d2imp(54*mimp2)
+c	double precision d2v(3*maxpt2d,3*maxpt2d)
+	double precision d2hyd(6*ibeta2)
+
+c	<<***********************************************************
+
+c	common /scndrv/diag,d2nb_1,d2nb_2,d2nb_3,d2spec,
+c     1		d2bond,d2theta,d2phi,d2imp,d2hyd
+
+	common /scndrv/diag,d2nb_3,d2spec,
+     1		d2bond,d2theta,d2phi,d2imp,d2hyd

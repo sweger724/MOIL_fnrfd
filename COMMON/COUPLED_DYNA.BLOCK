@@ -1,0 +1,36 @@
+c ---------------------------------------------------
+c MPI parameters for homology dyna runs
+c ---------------------------------------------------
+
+
+c ---------------------------------------------------
+c MPIerr - auxiliary variable for running of PMI ruttines
+c
+c Hstep - each Hstep integration steps a penalty for 
+c         structural difference is added to energy
+c
+c-----------------------------------------------------
+
+	integer MPIerr,Hstep
+      
+        PARAMETER(Hstep=1)
+
+	integer align(maxmono), alignN
+	integer CAindex(maxmono)
+	double precision coorCA(3,maxmono)
+	integer DYNA_TAG
+
+	PARAMETER(DYNA_TAG=546)
+
+	double precision R_tresh
+	double precision E_homology_const
+
+	logical RUN_HOMOLOGY
+	PARAMETER( RUN_HOMOLOGY = .true. )
+	PARAMETER( R_tresh=1.0d0 )
+
+c
+c Put all variables to common block
+c
+        common /dyna_mpi/MPIerr,align,alignN,
+     &         CAindex,coorCA,E_homology_const

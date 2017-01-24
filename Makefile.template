@@ -1,0 +1,1191 @@
+# Moil make file as of 10/11/2007. Working procedures are listed below under all
+#
+# to compile all programs type "make all" to compile a specific module,
+# type "make module"
+#
+# list of people who contributed code (alphabetic order):
+# Ron Elber, Alfredo Cardenas, Avijit Ghosh, Robert Goldstein, Chen Keasar, 
+# Haiying Li, Jaroslaw Meller, Debasisa Mohanty, Roberto Olender, 
+# Adrian Roitberg, Amena Siddiqi, Carlos Simmerling, Konesh Siva, 
+# Ileana Stoica, Alex Ulitsky, Gennady Verkhivker, Yael Weinbach,
+# Anthony West, Veaceslav Zaloj
+#
+# People (in addition to the above) who suffer the testing,
+# designing parameters and writing documentation :
+# Chyung Choi, Danuta Rojewska, Karunesh Arora
+# GUI implementation: Baohua Wang.
+#
+# We made a use of
+# (1) The Housholder diagonalization routine written by Ryszard Czerminski.
+# (2) The truncated newton-raphson minimization by Stephen G. Nash
+# (3) The Particle Mesh Ewald of Darden and co-workers,
+#        J. Chem. Phys. 98,10089(1993)
+# (4) The Spherical Solvent Boundary Potential of Beglov and Roux
+#        K. Chem. Phys. 100,9050(1994)
+# (5) Generalized Born model from Tsui and Case 
+#        Biopolymers 56, 275(2000)
+#
+################################################################
+#
+# There are sections below to comment/uncomment depending on     
+# your system and compiler.  Systems common at UT/ICES/TACC
+# are at the top.  You may define FCMOIL and FFLAGSMOIL in
+# your environment to override the settings for the FORTRAN
+# compiler and flags used.
+#
+# Updated Mar 02, 2009. Thomas Blom
+#
+###############################################################
+
+# Ucomment for Windows:
+#MV = mv.bat 
+#CLEAN = clean.bat
+#
+# Uncomment for Unix/Linux/OSX
+MV = mv
+CLEAN = rm -f */*.o 
+
+
+################################################################
+
+.f.o:
+	$(FC) $(FFLAGS) -c $<
+	$(MV) $(*F).o $(<D)
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+	$(MV) $(*F).o $(<D)
+
+
+##################### gfortran notice ###############################
+# please ensure you are using the latest version of gfortran
+# as earlier versions may not respect the -frecord-marker=4 flag.
+# This flag is required to maintain compatibility with binary files
+# written by other fortran compilers.
+#
+# If you will only ever using binary files generated on your own
+# system, this issue will not affect you, but note that the 
+# tests in moil.test make use of binary files generated with intel
+# fortran on linux.
+# 
+####################################################################
+# default template: gfortran (osx etc)
+FC = gfortran 
+FFLAGS = -O3 -mcmodel=medium -m64 -static-libgfortran -frecord-marker=4 -fconvert=swap -I .
+
+# ices ubuntu desktops, using 64bit intel fortran:
+#IFCDIR=/opt/intel/Compiler/11.1/073/bin/intel64
+#FC=$(IFCDIR)/ifort					#intel 11
+#FFLAGS = -O2 -convert big_endian -I .                  # ifort at ices ubuntu desktops
+
+# intel fortran on stampede
+#IFCDIR=/share/apps/intel/Compiler/11.1/073
+#FC=$(IFCDIR)/bin/intel64/ifort 
+#FFLAGS = -C -g -convert big_endian -I .                # ifort on stampede (debug)
+#FFLAGS = -O3 -xT -convert big_endian -I .              # ifort on stampede (optimized)
+
+# the following may be necessary when compiling large programs for 64bit: see ifort manpage
+#FFLAGS = -mcmodel=medium -shared-intel                 #intel 10 on linux 64bit
+
+# intel fortran on junior
+#IFCDIR=/share/apps/intel/fce/10.1.021
+#FC=$(IFCDIR)/bin/ifort
+#FFLAGS = -O3 -xT -convert big_endian -I .              
+
+# intel fortran on ranger
+#IFCDIR=/share/apps/intel/10.1/fc
+#FC=$(IFCDIR)/bin/ifort 
+#FFLAGS = -O3 -xW -convert big_endian -I .              # ifort on ranger
+
+# Windows with g77 (minGW)
+#FC=g77
+#FFLAGS = -I .
+
+# Windows with intel fortran: make sure the $(FC) line below has exactly 1 tab
+# and not multiple spaces under the .f.o rule!
+# .f.o:
+#	$(FC) $(FFLAGS) -c $< -object:$*.o
+#
+# FC=ifort
+# FFLAGS = -I . /convert:big_endian /nowarn /nologo
+
+# If these are defined in the environment, they will override the settings in this file.
+ifdef FCMOIL
+FC = $(FCMOIL)
+FFLAGS = $(FFLAGSMOIL)
+endif	
+
+###############################################################################################
+
+
+# C compilers 
+CC = cc            					#SGI,terra
+#CC = xlc          					#RS6K
+#CC = gcc 	   					#linux
+#
+# C flags
+#
+#CFLAGS = -g -C -64 					#R10000
+#CFLAGS = -g -C    					#default
+#CFLAGS = -O      					#linux,RS6K
+#CFLAGS = -O2 -c  $(INCLUDE) -volatile -inline automatic  #terra
+#
+# Fortran compilers
+#
+#FC = xlf						#IBM
+#FC = f77						#SUN
+#FC = f77						#SGI
+#FC = f77 -p						#SGI profile
+#FC = fc						#stardent 3000
+#FC = f90						#Dec alpha
+#FC = fort77						#linux
+#FC = pgf77    						#linux : PG
+#FC = mpif77 						#linux for sdel
+#FC = /opt/mpich-pgi/bin/mpif77  			# mpif77 for biosim
+# FC=g77
+#FFLAGS =-I./  -I$(MPIDIR)/include -L$(MPIDIR)/lib #-O2
+#FC = ifc                                               #intel8
+#FC = mpxlf						#SP/2
+#LD=ld							#Terra loader
+#LDFLAGS= -O3 -r -d -N -EL
+#
+# Fortran flags
+#
+#FFLAGS = +O3 -v -u
+#FFLAGS = -O2 -u -mips2 -Olimit 5000 			#SGI R4000 
+#FFLAGS = -O2 -u -mips4					#SGI R10000
+#FFLAGS  = -n32 -O -I.					#SGI OS 6.5
+#FFLAGS = -c -u -O2 					#STARDENT 3000
+#FFLAGS = -O -u -qmaxmem=-1 				#IBM R/S 6000
+#FFLAGS = -O -u -convert big_endian   			#Dec alpha
+#FFLAGS = -O -m486                    			#linux
+#FFLAGS = -fpic -fast -byteswapio -I .                       	#linux
+#FFLAGS = -fpic -fast -I .                       	#linux
+# FFLAGS = -I .
+#
+#FFLAGS =                        	                #SUN
+#FFLAGS = -O3  -w -I .                                  #intel
+#
+#FFLAGS = -O -qstrict -qarch=pwr2 -qtune=pwr2 -u -qmaxmem=-1 -qnolist 	#SP/2
+#
+#
+# DEBUG
+# profiling
+#
+#FFLAGS = -u -p
+#FFLAGS = -C -g -u -qmaxmem=-1 -qflttrap -qextchk -qspnans -v  -qlist
+# for g77
+#FFLAGS = -C -g  -I.
+#FFLAGS = -C -d2
+#FFLAGS = -fpic -Mbounds  -g -byteswapio
+#FFLAGS = -ffortran-bounds-check -I . 
+
+everything: all 
+
+all: exe/boat exe/ccrd exe/con_specl exe/conn exe/contacts \
+exe/dyna exe/dxdl exe/energy exe/fluc exe/freee exe/mini_pwl \
+exe/mini_tn exe/ovrlp_trj exe/puth exe/pdb2puth exe/rgyr exe/addion \
+exe/rms_2path exe/rms_2crd exe/rms_p2p exe/rms_resd exe/rot \
+exe/solvatecrd exe/superback exe/superfluc exe/superrms exe/test_drv \
+exe/torstat exe/therm exe/umbr exe/fp exe/domains exe/superTMscore \
+exe/xcrd exe/xcrd2 exe/xangle exe/xtors exe/path_eqw exe/memeqns \
+exe/str_measures exe/eff_difdens exe/av_dif exe/align exe/reconstruct \
+exe/crd2pdb exe/LD exe/test_gbdrv exe/tmalign exe/muta exe/xtemp exe/t-grid \
+exe/t2-grid exe/tf-grid exe/watden exe/press exe/solvatecrd_gen exe/helen \
+exe/FFCorFun exe/DiffChargeNatMut exe/PMNCrdPoly exe/seq
+
+common_files = COMMON/ACTPARA1.BLOCK COMMON/ACTPARA.BLOCK COMMON/AVE.BLOCK \
+COMMON/AVEDS.BLOCK COMMON/BUFFER.BLOCK COMMON/CCRD.BLOCK \
+COMMON/CON_GRAD.BLOCK COMMON/CONNECT2.BLOCK \
+COMMON/CONNECT.BLOCK COMMON/CONSPECL1.BLOCK COMMON/CONSPECL2.BLOCK \
+COMMON/CONSPECL4.BLOCK COMMON/CONSTRAN.BLOCK COMMON/CONVERT.BLOCK \
+COMMON/COORD.BLOCK COMMON/CRBM.BLOCK COMMON/DEBUG.BLOCK \
+COMMON/DYNA.BLOCK COMMON/ENERGY.BLOCK COMMON/ENERGY_DEE.BLOCK \
+COMMON/EWALD.BLOCK COMMON/EXTERNAL.BLOCK COMMON/FREEZ.BLOCK COMMON/GETVEC.BLOCK \
+COMMON/LENGTH.BLOCK COMMON/LINE2.BLOCK COMMON/LINE.BLOCK COMMON/METAL.BLOCK \
+COMMON/MONOMERS.BLOCK COMMON/MSHAKE.BLOCK COMMON/NBLIST.BLOCK \
+COMMON/PARALLEL.BLOCK COMMON/PDQ.BLOCK COMMON/PROPERT.BLOCK COMMON/RESTART.BLOCK \
+COMMON/ROTAGEN.BLOCK COMMON/ROTAINT.BLOCK COMMON/SC2.BLOCK \
+COMMON/SCNDRV.BLOCK COMMON/SCNDRV_DSK.BLOCK COMMON/SDELAVE.BLOCK \
+COMMON/SGB.BLOCK COMMON/SHAKE.BLOCK COMMON/SPECL.BLOCK COMMON/SPW.BLOCK \
+COMMON/SSBP.BLOCK COMMON/SWITCH.BLOCK COMMON/SYMM.BLOCK COMMON/TETHER.BLOCK \
+COMMON/TMP_CONNECT.BLOCK COMMON/UNITS.BLOCK COMMON/VARBLE.BLOCK COMMON/VELOC.BLOCK \
+COMMON/EBALL.BLOCK COMMON/ELASTIC.BLOCK COMMON/FREADY.BLOCK COMMON/PATH.BLOCK \
+COMMON/SEARCH.BLOCK COMMON/LD.BLOCK COMMON/OVERLAP.BLOCK COMMON/PT.BLOCK \
+COMMON/PRESS.BLOCK COMMON/STEER.BLOCK
+
+COMM_DUMMY =    comm_dummy/tcliballgather.o     comm_dummy/tcliballgatherv.o \
+                comm_dummy/tcliballreduce.o     comm_dummy/tclibbroadcast.o \
+                comm_dummy/tcliberrormessage.o  comm_dummy/tclibshiftleft.o \
+                comm_dummy/tclibshiftright.o    comm_dummy/terra_open_scratch.o \
+                comm_dummy/load_balance.o \
+                comm_dummy/gather_vel.o         comm_dummy/eforce_reduce.o \
+                comm_dummy/gather_crd.o         comm_dummy/reduce_n.o \
+                comm_dummy/reduce_1.o           comm_dummy/gather_v.o \
+                comm_dummy/send_all.o \
+                comm_dummy/reduce_energies.o    comm_dummy/gather_nbmlists.o \
+                comm_dummy/gather_nblists.o     comm_dummy/reduce_int.o \
+                comm_dummy/gather_shake.o       comm_dummy/gather_mshake.o \
+                comm_dummy/vdble_reduce.o       comm_dummy/gather_force.o \
+                comm_dummy/recv_stru.o          comm_dummy/send_stru.o \
+                comm_dummy/Send_Double.o        comm_dummy/Recv_Double.o \
+                comm_dummy/Send_Integer.o       comm_dummy/Recv_Integer.o \
+                comm_dummy/init_path_paral.o    comm_dummy/Transmit.o \
+                comm_dummy/Send_First.o         comm_dummy/Receive_First.o \
+                comm_dummy/comm_exit.o          comm_dummy/init_paral.o \
+                comm_dummy/parallel_end.o       comm_dummy/broadcast_state.o
+
+$(COMM_DUMMY) : $(common_files)
+
+connect_files = connect/addbond.o connect/angtor.o \
+	connect/chsort.o \
+	connect/count_waters.o connect/dimer.o connect/edcon.o  \
+	connect/fillpt.o connect/getmoname.o connect/lego.o  \
+	connect/monomers.o connect/propert.o connect/set_hydro.o \
+	connect/rmute.o connect/add_muta.o
+
+generic_files = generic/close_open.o generic/dump_param.o generic/find_bond.o \
+        generic/getcrd.o generic/house.o generic/of.o \
+        generic/ovrlpck.o generic/pick.o \
+        generic/putcrd.o generic/rcon_specl1.o generic/rcon_specl2.o \
+        generic/rconn.o generic/rm_elem.o generic/rpath.o generic/rpxyz.o \
+        generic/search.o generic/unit.o generic/ranlux.o \
+        generic/wconn.o generic/wpath.o generic/zerov.o \
+        generic/rpath_seq.o generic/find_angle.o generic/draw_normal.o\
+        generic/dist2.o generic/normalize.o generic/com.o generic/rmsd_weight.o \
+        generic/rmsd_weight2.o generic/rpath_seqE.o
+
+$(generic_files) : $(common_files)
+
+vopt_files = vopt/vcomprs.o vopt/vecmin.o vopt/vcopy.o vopt/vscalar.o vopt/vinit.o vopt/vadd.o \
+	vopt/vsub_mul.o vopt/scalar_mu_vec1.o vopt/scalar_mu_vec2.o vopt/vec_mul_add.o \
+	vopt/normalize_vec.o vopt/vnorm2.o
+
+$(vopt_files) : $(common_files)
+
+
+
+intrprtr_files = intrprtr/alert.o intrprtr/brkpair.o intrprtr/echo.o \
+	intrprtr/find.o intrprtr/fopen.o intrprtr/get4c.o \
+	intrprtr/getc.o intrprtr/getd.o intrprtr/geti.o intrprtr/getL.o \
+	intrprtr/intgr.o intrprtr/next.o intrprtr/number.o \
+	intrprtr/rline.o intrprtr/testl.o
+$(intrprtr_files) : $(common_files)
+
+fready_force_files = fready/CGinit.o fready/eCG_bond.o fready/eCG_LJ.o \
+          fready/eCG_Torsion.o dynamics/getvel.o fready/nbfinitCG.o \
+          fready/eCG_WellBondPot.o fready/CG_nb_list.o \
+          fready/eCG_NB.o  fready/Read_CG_input.o fready/Read_CG_input2.o \
+          fready/initCGmass.o fready/eCG.o  fready/eCG_theta.o \
+          fready/eCG_tors.o fready/eCG_WellAnglePot.o  \
+          fready/getCGid.o fready/eCG_backboneNB.o \
+          fready/angle.o fready/CGtorsion.o fready/eCG_backboneHB.o \
+          fready/read_CG_parameters.o
+
+force_files = pot/amid.o pot/cdie.o pot/cdie_arith.o \
+	pot/cdie_ewald.o pot/cdie_spcl.o pot/cnstrn.o \
+	pot/ebond.o pot/ebond_specl.o pot/ecent.o pot/esteer.o \
+	pot/eforce.o pot/ehydro.o pot/eimphi.o \
+	pot/emorse.o pot/ener14.o pot/ephi.o pot/deriv_test.o \
+	pot/etether.o pot/etheta.o pot/etheta_specl.o \
+	pot/ewald_receip.o pot/exlist.o pot/force_norm.o \
+	pot/half_harm.o pot/init_ef.o pot/init_ssbp.o \
+	pot/init_var.o pot/init_wre.o pot/metal_wall.o \
+	pot/nbfinit.o pot/nbond.o pot/nbond_spcl.o \
+	pot/nbondm.o pot/nbondm_spcl.o pot/num_drv.o \
+	pot/rdie.o pot/repuls.o pot/set_ssbp.o \
+	pot/shft_cdie.o pot/special.o pot/ssbp.o \
+	pot/test_distances.o pot/virt_prtc.o \
+	pot/watwat.o pot/watwat_ewald.o pot/eball.o pot/wener.o \
+	pot/eenm.o pot/G_deriv.o pot/network.o  fready/enm_lists.o \
+        pot/interface_constraint.o  pot/angle_constraint.o dim/GetReducedCoors.o\
+        GB/mysff_f.o GB/make_rborn.o GB/init_gb_nonpol.o GB/egb_nonpol2.o \
+	fp/torsion.o fp/alabarrier.o fp/ctors.o fp/rgyrconst.o \
+	search/DistAngle.o pot/D_one_dihedral.o \
+	pot/e_field.o pot/repulsive_wall.o \
+	pot/urey_init.o pot/urey.o \
+	$(fready_force_files)
+
+$(force_files) : $(common_files)
+
+symm_files = symm/erfcfun.o symm/ewald_init.o symm/nbmsym.o \
+	symm/nbsym.o symm/nbsym_metal.o symm/squeeze.o \
+	symm/symcdie.o symm/symcdie_ewald.o symm/syminit.o \
+	symm/symwat.o symm/symwat_ewald.o
+$(symm_files) : $(common_files)
+
+Edynamics_files = dynamics/con_grad_shak.o dynamics/dump_dyna.o \
+        dynamics/frz_eval.o dynamics/rm_degf.o \
+        dynamics/info.o dynamics/init_con.o \
+        dynamics/invmat.o dynamics/lan_zen.o \
+        dynamics/mshakinit.o dynamics/mshakpt.o dynamics/mshakvl.o \
+        dynamics/multemp.o dynamics/ortho.o dynamics/picktemp.o \
+        dynamics/prbm.o dynamics/prob.o dynamics/rdyncrd.o \
+        dynamics/set_cutoffs.o dynamics/shakefr.o dynamics/shakept.o \
+        dynamics/shakevl.o dynamics/shakinit.o dynamics/up_res.o \
+        dynamics/velinit.o dynamics/wdyncrd.o dynamics/wdynvel.o \
+        generic/open_scratch.o dynamics/getRandomDisplacement.o \
+        steep/stdc.o puth/pos.o \
+        dynamics/Andersen_thermostat.o
+
+$(Edynamics_files) : $(common_files)
+
+dynamics_files = dynamics/con_grad_shak.o dynamics/dump_dyna.o \
+	dynamics/frz_eval.o dynamics/rm_degf.o \
+	dynamics/info.o dynamics/init_con.o dynamics/init_dyna.o \
+	dynamics/invmat.o dynamics/lan_zen.o dynamics/line_loop.o \
+	dynamics/mshakinit.o dynamics/mshakpt.o dynamics/mshakvl.o \
+	dynamics/multemp.o dynamics/ortho.o dynamics/picktemp.o \
+	dynamics/prbm.o dynamics/prob.o dynamics/rdyncrd.o \
+	dynamics/set_cutoffs.o dynamics/shakefr.o dynamics/shakept.o \
+	dynamics/shakevl.o dynamics/shakinit.o dynamics/up_res.o \
+	dynamics/velinit.o dynamics/wdyncrd.o dynamics/wdynvel.o \
+	generic/open_scratch.o dynamics/PT_dummy.o \
+        dynamics/dummy_init_io.o dynamics/press_dummy.o
+
+$(dynamics_files) : $(common_files)
+
+les_files = LES/add_les_new.o LES/angle_add_les.o LES/bond_add_les.o LES/copy_angles.o \
+	LES/copy_improper.o LES/copy_torsion.o LES/excl_add_les.o LES/fill_angle.o \
+	LES/fill_improper.o LES/fill_torsion.o LES/impr_add_les.o LES/init_add_les.o \
+	LES/list14_add_les.o LES/mdiv_add_les.o LES/molc_add_les.o LES/morse_add_les.o \
+	LES/prtc_add_les.o LES/read_add_les.o LES/test_many_ifs.o LES/tors_add_les.o
+$(les_files) : $(common_files)
+
+
+con_files = connect/connect.o $(connect_files) \
+	$(les_files) $(generic_files) $(vopt_files) $(intrprtr_files) \
+	pot/init_var.o $(COMM_DUMMY)
+
+$(con_files) : $(common_files)
+exe/conn : $(con_files)
+	$(FC) $(FFLAGS) -o exe/conn $(con_files)
+
+conspcl_files = connect/con_spcl.o $(connect_files) \
+	$(generic_files) $(vopt_files) $(intrprtr_files) \
+	pot/init_var.o $(COMM_DUMMY) 
+
+$(con_specl_files) : $(common_files)
+exe/con_specl : $(conspcl_files)
+	$(FC) $(FFLAGS) -o exe/con_specl $(conspcl_files)
+
+ener_files = pot/energy.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) $(force_files) \
+	$(symm_files) dynamics/rdyncrd.o $(COMM_DUMMY) 
+
+$(ener_files) : $(common_files)
+exe/energy : $(ener_files)
+	$(FC) $(FFLAGS) -o exe/energy $(ener_files)
+
+test_gbdrv_files = GB/test_gbdrv.o GB/testderi2nd.o GB/egb_np2nd.o \
+	GB/overlappair_idx.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) $(force_files) \
+	$(symm_files) dynamics/rdyncrd.o $(COMM_DUMMY)
+
+$(test_gbdrv_files) : $(common_files)
+exe/test_gbdrv : $(test_gbdrv_files)
+	$(FC) $(FFLAGS) -o exe/test_gbdrv $(test_gbdrv_files)
+
+dyna_files = puth/pos.o dynamics/dyna.o $(dynamics_files) \
+	$(generic_files) $(vopt_files) $(intrprtr_files) \
+	$(force_files) $(symm_files) steep/stdc.o \
+	$(COMM_DUMMY)
+
+$(dyna_files) : $(common_files)
+exe/dyna : $(dyna_files)
+	$(FC) $(FFLAGS) -o exe/dyna $(dyna_files)
+
+######################################################################################
+# Dyna with Pressure: files with _press appended to the base filename are those
+#                     that were modified to include pressure calculations.
+
+
+#tfb: I removed dyanamics/getvel.o from dynamics_press_files because it
+# is also included in fready_force_files and this causes a multiple-definition
+# error on gfortran under OSX
+dynamics_press_files = dynamics/con_grad_shak.o dynamics/dump_dyna.o \
+	dynamics/frz_eval.o dynamics/rm_degf.o \
+	dynamics/info.o dynamics/init_con.o dynamics/init_dyna.o \
+	dynamics/invmat.o dynamics/lan_zen.o dynamics/line_loop.o \
+	dynamics/mshakinit.o dynamics/mshakpt_press.o dynamics/mshakvl.o \
+	dynamics/multemp.o dynamics/ortho.o dynamics/picktemp.o \
+	dynamics/prbm.o dynamics/prob.o dynamics/rdyncrd.o \
+	dynamics/set_cutoffs.o dynamics/shakefr.o dynamics/shakept_press.o \
+	dynamics/shakevl.o dynamics/shakinit.o dynamics/up_res.o \
+	dynamics/velinit.o dynamics/wdyncrd.o dynamics/wdynvel.o \
+	dynamics/init_press.o dynamics/write_press.o  dynamics/PT_dummy.o \
+	generic/open_scratch.o dynamics/calculate_kinetic_energy.o \
+        dynamics/dummy_init_io.o
+$(dynamics_press_files) : $(common_files)
+
+force_press_files = pot/amid.o pot/cdie.o pot/cdie_arith.o \
+	pot/cdie_ewald_press.o pot/cdie_spcl.o pot/cnstrn.o \
+	pot/ebond.o pot/ebond_specl.o pot/ecent_press.o \
+	pot/eforce_press.o pot/ehydro.o pot/eimphi.o \
+	pot/emorse.o pot/ener14_press.o pot/ephi.o pot/deriv_test.o \
+	pot/etether.o pot/etheta.o pot/etheta_specl.o \
+	pot/ewald_receip.o pot/exlist.o pot/force_norm.o \
+	pot/half_harm.o pot/init_ef.o pot/init_ssbp.o \
+	pot/init_var.o pot/init_wre.o pot/metal_wall.o \
+	pot/nbfinit.o pot/nbond.o pot/nbond_spcl.o \
+	pot/nbondm.o pot/nbondm_spcl.o pot/num_drv.o \
+	pot/rdie.o pot/repuls.o pot/set_ssbp.o \
+	pot/shft_cdie.o pot/special.o pot/ssbp.o \
+	pot/test_distances.o pot/virt_prtc.o \
+	pot/watwat.o pot/watwat_ewald_press.o pot/eball.o pot/wener.o \
+	pot/eenm.o pot/G_deriv.o pot/network.o \
+        GB/mysff_f.o GB/make_rborn.o GB/init_gb_nonpol.o GB/egb_nonpol2.o \
+	fp/torsion.o fp/alabarrier.o fp/ctors.o fp/rgyrconst.o \
+	pot/urey.o pot/urey_init.o \
+	$(fready_force_files)
+
+symm_press_files = symm/erfcfun.o symm/ewald_init.o symm/nbmsym.o \
+	symm/nbsym.o symm/nbsym_metal.o symm/squeeze.o \
+	symm/symcdie.o symm/symcdie_ewald_press.o symm/syminit.o \
+	symm/symwat.o symm/symwat_ewald_press.o
+$(symm_press_files) : $(common_files)
+
+
+dynapress_files = puth/pos.o dynamics/dyna.o $(dynamics_press_files) \
+	$(generic_files) $(vopt_files) $(intrprtr_files) \
+	$(force_press_files) $(symm_press_files) steep/stdc.o \
+	$(COMM_DUMMY)
+
+$(dynapress_files) : $(common_files)
+exe/dynapress : $(dynapress_files)
+	$(FC) $(FFLAGS) -o exe/dynapress $(dynapress_files)
+
+#
+######################################################################################
+
+LD_files = puth/pos.o dynamics/LD.o $(dynamics_files) \
+         $(generic_files) $(vopt_files) $(intrprtr_files) \
+         $(force_files) $(symm_files) steep/stdc.o \
+         $(COMM_DUMMY) dynamics/getRandomDisplacement.o
+ 
+$(LD_files) : $(common_files)
+exe/LD : $(LD_files)
+	$(FC) $(FFLAGS) -o exe/LD $(LD_files)
+
+boat_files = 	boat/boat.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+	dynamics/rdyncrd.o pot/init_var.o $(COMM_DUMMY)
+
+$(boat_files) : $(common_files)
+exe/boat : $(boat_files)
+	$(FC) $(FFLAGS) -o exe/boat $(boat_files)
+
+trst_files = 	boat/torstat.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+	dynamics/rdyncrd.o pot/init_var.o $(COMM_DUMMY)
+
+$(trst_files) : $(common_files)
+exe/torstat : $(trst_files)
+	$(FC) $(FFLAGS) -o exe/torstat $(trst_files)
+
+xtemp_files = analysis/xtemp.o generic/rmsd_weight.o ccrd/wsubset.o \
+        $(intrprtr_files) dynamics/rdyncrd.o dynamics/wdyncrd.o \
+        generic/rpath_seq.o \
+        generic/rconn.o generic/pick.o generic/of.o \
+        generic/rpath.o generic/putcrd.o generic/getcrd.o \
+        generic/wpath.o generic/unit.o generic/rpxyz.o \
+        generic/house.o pot/init_var.o $(COMM_DUMMY)
+
+$(xtemp_files) : $(common_files)
+exe/xtemp : $(xtemp_files)
+	$(FC) $(FFLAGS) -o exe/xtemp $(xtemp_files)
+
+t-grid_files = analysis/t-grid.o generic/rmsd_weight.o ccrd/wsubset.o \
+        $(intrprtr_files) dynamics/rdyncrd.o dynamics/wdyncrd.o \
+        generic/rpath_seq.o \
+        generic/rconn.o generic/pick.o generic/of.o \
+        generic/rpath.o generic/putcrd.o generic/getcrd.o \
+        generic/wpath.o generic/unit.o generic/rpxyz.o \
+        generic/house.o pot/init_var.o vopt/vcopy.o $(COMM_DUMMY)
+
+$(t-grid_files) : $(common_files)
+exe/t-grid : $(t-grid_files)
+	$(FC) $(FFLAGS) -o exe/t-grid $(t-grid_files)
+
+tf-grid_files = analysis/tf-grid.o generic/rmsd_weight.o ccrd/wsubset.o \
+        $(intrprtr_files) dynamics/rdyncrd.o dynamics/wdyncrd.o \
+        generic/rpath_seq.o \
+        generic/rconn.o generic/pick.o generic/of.o \
+        generic/rpath.o generic/putcrd.o generic/getcrd.o \
+        generic/wpath.o generic/unit.o generic/rpxyz.o \
+        generic/house.o pot/init_var.o vopt/vcopy.o $(COMM_DUMMY)
+
+$(tf-grid_files) : $(common_files)
+exe/tf-grid : $(tf-grid_files)
+	$(FC) $(FFLAGS) -o exe/tf-grid $(tf-grid_files)
+
+t2-grid_files = analysis/t2-grid.o generic/rmsd_weight.o ccrd/wsubset.o \
+        $(intrprtr_files) dynamics/rdyncrd.o dynamics/wdyncrd.o \
+        generic/rpath_seq.o \
+        generic/rconn.o generic/pick.o generic/of.o \
+        generic/rpath.o generic/putcrd.o generic/getcrd.o \
+        generic/wpath.o generic/unit.o generic/rpxyz.o \
+        generic/house.o pot/init_var.o vopt/vcopy.o $(COMM_DUMMY)
+
+$(t2-grid_files) : $(common_files)
+exe/t2-grid : $(t2-grid_files)
+	$(FC) $(FFLAGS) -o exe/t2-grid $(t2-grid_files)
+
+ccrd_files = ccrd/ccrd.o generic/rmsd_weight.o ccrd/wsubset.o \
+	$(intrprtr_files) dynamics/rdyncrd.o dynamics/wdyncrd.o \
+	generic/rpath_seq.o generic/convertpath.o \
+	generic/rconn.o generic/pick.o generic/of.o \
+	generic/rpath.o generic/putcrd.o generic/getcrd.o \
+	generic/wpath.o generic/unit.o generic/rpxyz.o \
+	generic/house.o generic/wpath_select.o pot/init_var.o $(COMM_DUMMY)
+
+$(ccrd_files) : $(common_files)
+exe/ccrd : $(ccrd_files)
+	$(FC) $(FFLAGS) -o exe/ccrd $(ccrd_files)
+
+exe/crd2pdb: analysis/crd2pdb.o
+	$(FC) $(FFLAGS) -o exe/crd2pdb analysis/crd2pdb.o
+
+path_eqw_files = ccrd/path_eqw.o ccrd/wsubset.o \
+	$(intrprtr_files) dynamics/rdyncrd.o dynamics/wdyncrd.o \
+	generic/rconn.o generic/pick.o generic/of.o \
+	generic/rpath.o generic/putcrd.o generic/getcrd.o \
+	generic/wpath.o generic/unit.o generic/rpxyz.o \
+	generic/house.o pot/init_var.o $(COMM_DUMMY)
+
+$(path_eqw_files) : $(common_files)
+exe/path_eqw : $(path_eqw_files)
+	$(FC) $(FFLAGS) -o exe/path_eqw $(path_eqw_files)
+
+rms_files =	analysis/rms_resd.o	$(generic_files) $(vopt_files) $(intrprtr_files) \
+		pot/init_var.o dynamics/rdyncrd.o $(COMM_DUMMY)
+
+$(rms_files) : $(common_files)
+exe/rms_resd : $(rms_files)
+	$(FC) $(FFLAGS) -o exe/rms_resd $(rms_files)
+
+rms_2path_files = analysis/rms_2path.o
+
+$(rms_2path_files) : $(common_files)
+exe/rms_2path : $(rms_2path_files) $(generic_files) $(vopt_files) $(connect_files) $(intrprtr_files) pot/init_var.o
+	$(FC) $(FFLAGS) -o exe/rms_2path \
+	$(rms_2path_files) \
+	$(connect_files) $(generic_files) $(vopt_files) $(intrprtr_files) \
+	pot/init_var.o $(COMM_DUMMY) 
+
+rms_2dcd_files = analysis/rms_2dcd.o
+
+$(rms_2dcd_files) : $(common_files)
+exe/rms_2dcd : $(rms_2dcd_files) $(generic_files) $(vopt_files) $(connect_files) $(intrprtr_files) \
+        pot/init_var.o dynamics/rdyncrd.o $(COMM_DUMMY)
+	$(FC) $(FFLAGS) -o exe/rms_2dcd \
+	$(rms_2dcd_files) dynamics/rdyncrd.o \
+	$(connect_files) $(generic_files) $(vopt_files) $(intrprtr_files) \
+	pot/init_var.o $(COMM_DUMMY) 
+
+rms_2crd_files = analysis/rms_2crd.o 
+
+$(rms_2crd_files) : $(common_files)
+exe/rms_2crd : $(rms_2crd_files) $(generic_files) $(vopt_files) $(connect_files) $(intrprtr_files) pot/init_var.o $(COMM_DUMMY)
+	$(FC) $(FFLAGS) -o exe/rms_2crd \
+	$(rms_2crd_files) \
+	$(connect_files) $(generic_files) $(vopt_files) $(intrprtr_files) \
+	pot/init_var.o $(COMM_DUMMY) 
+
+rms_p2p_files = analysis/rms_p2p.o 
+
+$(rms_p2p_files) : $(common_files)
+exe/rms_p2p : $(rms_p2p_files) $(generic_files) $(vopt_files) $(connect_files) $(intrprtr_files) pot/init_var.o $(COMM_DUMMY)
+	$(FC) $(FFLAGS) -o exe/rms_p2p \
+	$(rms_p2p_files) \
+	$(connect_files) $(generic_files) $(vopt_files) $(intrprtr_files) \
+	pot/init_var.o $(COMM_DUMMY) 
+
+rms_select_files = analysis/rms_select.o generic/ovrl2str.o
+
+$(rms_select_files) : $(common_files)
+exe/rms_select : $(rms_select_files) $(generic_files) $(vopt_files) $(connect_files) $(intrprtr_files) pot/init_var.o
+	$(FC) $(FFLAGS) -o exe/rms_select \
+	$(rms_select_files) \
+	$(connect_files) $(generic_files) $(vopt_files) $(intrprtr_files) \
+	pot/init_var.o $(COMM_DUMMY) 
+
+bave_files = analysis/bave.o
+
+$(bave_files) : $(common_files)
+exe/bave : $(bave_files) $(generic_files) $(vopt_files) $(connect_files) $(intrprtr_files) $(COMM_DUMMY) pot/init_var.o
+	$(FC) $(FFLAGS) -o exe/bave $(bave_files) $(connect_files) $(generic_files) \
+	$(vopt_files) $(intrprtr_files) $(COMM_DUMMY) pot/init_var.o
+
+superrms_files = analysis/superrms.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+		 pot/init_var.o dynamics/rdyncrd.o $(COMM_DUMMY)
+
+$(superrms_files) : $(common_files)
+exe/superrms : $(superrms_files)
+	$(FC) $(FFLAGS) -o exe/superrms $(superrms_files)
+
+superTMscore_files = analysis/superTMscore.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+	pot/init_var.o dynamics/rdyncrd.o $(COMM_DUMMY) analysis/TMscore.o
+
+$(superTMscore_files) : $(common_files)
+
+exe/superTMscore : $(superTMscore_files)
+	$(FC) $(FFLAGS) -o exe/superTMscore $(superTMscore_files)
+
+align_files = analysis/align.o $(generic_files) $(intrprtr_files) \
+                pot/init_var.o dynamics/rdyncrd.o \
+                $(COMM_DUMMY) analysis/Find_Center.o 
+
+$(align_files) : $(common_files)
+exe/align : $(align_files)
+	$(FC) $(FFLAGS) -o exe/align $(align_files)
+
+superback_files = analysis/superback.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+		pot/init_var.o dynamics/rdyncrd.o dynamics/wdyncrd.o $(COMM_DUMMY)
+
+$(superback_files) : $(common_files)
+exe/superback : $(superback_files)
+	$(FC) $(FFLAGS) -o exe/superback $(superback_files)
+
+superfluc_files = analysis/superfluc.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+		  pot/init_var.o dynamics/rdyncrd.o $(COMM_DUMMY)
+
+$(superfluc_files) : $(common_files)
+exe/superfluc : $(superfluc_files)
+	$(FC) $(FFLAGS) -o exe/superfluc $(superfluc_files)
+
+fluc_files = analysis/fluc.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+	pot/init_var.o dynamics/rdyncrd.o $(COMM_DUMMY)
+
+$(fluc_files) : $(common_files)
+exe/fluc : $(fluc_files)
+	$(FC) $(FFLAGS) -o exe/fluc $(fluc_files)
+
+str_measures_files = analysis/str_measures.o analysis/shape.o \
+        $(connect_files) $(generic_files) $(vopt_files) $(intrprtr_files) \
+        pot/init_var.o dynamics/rdyncrd.o $(COMM_DUMMY)
+
+$(str_measures_files) : $(common_files)
+exe/str_measures : $(str_measures_files)
+	$(FC) $(FFLAGS) -o exe/str_measures $(str_measures_files)
+
+contacts_files = analysis/contacts.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) pot/init_var.o dynamics/rdyncrd.o $(COMM_DUMMY)
+
+$(contacts_files) : $(common_files)
+exe/contacts : $(contacts_files)
+	$(FC) $(FFLAGS) -o exe/contacts $(contacts_files)
+
+addion_files = analysis/addion.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o pot/init_var.o $(COMM_DUMMY)
+
+$(addion_files) : $(common_files)
+exe/addion : $(addion_files)
+	$(FC) $(FFLAGS) -o exe/addion $(addion_files)
+
+watden_files = analysis/watden.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o pot/init_var.o $(COMM_DUMMY)
+
+$(watden_files) : $(common_files)
+exe/watden : $(watden_files)
+	$(FC) $(FFLAGS) -o exe/watden $(watden_files)
+
+DiffChargeNatMut_files = muta/DiffChargeNatMut.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o pot/init_var.o $(COMM_DUMMY)
+
+$(DiffChargeNatMut_files) : $(common_files)
+exe/DiffChargeNatMut : $(DiffChargeNatMut_files)
+	$(FC) $(FFLAGS) -o exe/DiffChargeNatMut $(DiffChargeNatMut_files)
+
+PMNCrdPoly_files = muta/PMNCrdPoly.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o pot/init_var.o $(COMM_DUMMY)
+
+$(PMNCrdPoly_files) : $(common_files)
+exe/PMNCrdPoly : $(PMNCrdPoly_files)
+	$(FC) $(FFLAGS) -o exe/PMNCrdPoly $(PMNCrdPoly_files)
+
+rgyr_files = analysis/rgyr.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o pot/init_var.o $(COMM_DUMMY)
+
+$(rgyr_files) : $(common_files)
+exe/rgyr : $(rgyr_files)
+	$(FC) $(FFLAGS) -o exe/rgyr $(rgyr_files)
+
+shift_files = analysis/shift.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o pot/init_var.o $(COMM_DUMMY)
+
+$(shift_files) : $(common_files)
+exe/shift : $(shift_files)
+	$(FC) $(FFLAGS) -o exe/shift $(shift_files)
+
+dxdl_files = analysis/dxdl.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) $(symm_files) dynamics/rdyncrd.o \
+	$(force_files) $(COMM_DUMMY)
+
+$(dxdl_files) : $(common_files)
+exe/dxdl : $(dxdl_files)
+	$(FC) $(FFLAGS) -o exe/dxdl $(dxdl_files) $(LFLAGS)
+
+umbr_files = umbrella/umbr.o umbrella/dyna_umbr.o \
+	umbrella/comc_umbr.o umbrella/crbm_umbr.o \
+	$(generic_files) $(vopt_files) $(intrprtr_files) $(symm_files)  \
+	$(force_files) dynamics/velinit.o \
+	dynamics/rdyncrd.o umbrella/hot_umbr.o \
+	umbrella/orthg.o umbrella/getpd_umbr.o \
+	$(COMM_DUMMY) 
+
+$(umbr_files) : $(common_files)
+exe/umbr : $(umbr_files)
+	$(FC) $(FFLAGS) -o exe/umbr $(umbr_files)
+
+freee_files = free_e/freee.o free_e/dyna_free.o \
+	umbrella/comc_umbr.o	free_e/crbm_free.o \
+	$(generic_files) $(vopt_files) $(intrprtr_files) $(force_files) \
+	dynamics/velinit.o dynamics/rdyncrd.o puth/pos.o \
+	dynamics/mshakinit.o	dynamics/mshakpt.o \
+	dynamics/mshakvl.o dynamics/invmat.o \
+	umbrella/hot_umbr.o	free_e/orthg.o \
+	umbrella/getpd_umbr.o $(symm_files) \
+	$(COMM_DUMMY)
+
+$(freee_files) : $(common_files)
+exe/freee : $(freee_files)
+	$(FC) $(FFLAGS) -o exe/freee $(freee_files)
+
+fp_files = fp/fp.o fp/bd.o fp/dyna_fp.o \
+        fp/vecmin_fp.o fp/dist2_fp.o fp/com_fp.o \
+        fp/mdbd_func.o \
+        fp/crbm.o fp/comc.o fp/wmlst.o \
+        $(generic_files) $(vopt_files) $(intrprtr_files) $(force_files) \
+        $(dynamics_files) puth/pos.o fp/deselect.o fp/projf.o \
+        umbrella/hot_umbr.o fp/orthg.o \
+        fp/getmlst.o fp/getpdn.o fp/getpd.o $(symm_files) $(COMM_DUMMY)
+
+
+exe/fp: $(fp_files)
+	$(FC) $(FFLAGS) -o exe/fp $(fp_files)
+
+$(fp_files) : $(common_files)
+        
+
+memeqns_files = memeqns/memeqns.f
+
+exe/memeqns: $(memeqns_files)
+	$(FC) $(FFLAGS) -o exe/memeqns $(memeqns_files)
+
+
+minitn_files = 	mini_tn/blas.o		mini_tn/chkucp.o \
+	mini_tn/getptc.o	mini_tn/gtims.o \
+	mini_tn/initp3.o	mini_tn/initpc.o \
+	mini_tn/linder.o	mini_tn/lmqn.o \
+	mini_tn/lsout.o		mini_tn/mchpr1.o \
+	mini_tn/mini_tn.o	mini_tn/modlnp.o \
+	mini_tn/mslv.o		mini_tn/msolve.o \
+	mini_tn/ndia3.o		mini_tn/negvec.o \
+	mini_tn/setpar.o	mini_tn/setucr.o \
+	mini_tn/ssbfgs.o	mini_tn/step1.o \
+	mini_tn/tn.o		mini_tn/ztime.o \
+	$(generic_files) $(vopt_files) $(intrprtr_files) \
+	$(force_files) $(symm_files) mini_tn/eforce0.o \
+	dynamics/rdyncrd.o $(COMM_DUMMY)
+
+$(minitn_files) : $(common_files)
+exe/mini_tn : $(minitn_files)
+	$(FC) $(FFLAGS) -o exe/mini_tn $(minitn_files)
+
+minipwl_files = mini_pwl/mini_pwl.o	$(generic_files) $(vopt_files) \
+	$(intrprtr_files) $(force_files) $(symm_files) \
+	mini_pwl/pwl.o dynamics/rdyncrd.o \
+	dynamics/wdyncrd.o $(COMM_DUMMY)
+
+$(minipwl_files) : $(common_files)
+exe/mini_pwl : $(minipwl_files)
+	$(FC) $(FFLAGS) -o exe/mini_pwl $(minipwl_files)
+
+puth_files =   	puth/puth.o puth/case1.o puth/case2.o \
+	puth/put_mis1.o puth/put_mis2.o puth/puth1.o \
+	puth/pos.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+	dynamics/wdyncrd.o dynamics/rdyncrd.o \
+	dynamics/velinit.o pot/init_var.o $(COMM_DUMMY)
+
+$(puth_files) : $(common_files)
+exe/puth :$(puth_files)
+	$(FC) $(FFLAGS) -o exe/puth $(puth_files)
+
+therm_files = 	therm/therm.o		therm/dyna_therm.o \
+	therm/shakecons.o $(dynamics_files) $(generic_files) $(vopt_files) \
+	$(intrprtr_files) $(force_files) $(symm_files) \
+	umbrella/hot_umbr.o chain/orthg.o steep/stdc.o puth/pos.o \
+	umbrella/getpd_umbr.o $(COMM_DUMMY)
+
+$(therm_files) : $(common_files)
+exe/therm : $(therm_files)
+	$(FC) $(FFLAGS) -o exe/therm $(therm_files)
+
+numer_files = 	s2d/numerical.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) $(force_files) $(symm_files) \
+	$(COMM_DUMMY)
+
+$(numer_files) : $(common_files)
+exe/numerical : $(numer_files)
+	$(FC) $(FFLAGS) -o exe/numerical $(numer_files)
+
+scndrv_files = 	s2d/scndrv.o $(generic_files) $(vopt_files) \
+	s2d/cdie2.o $(intrprtr_files) \
+	s2d/bond2.o		s2d/theta2.o \
+	s2d/ephi2.o		s2d/eimphi2.o \
+	s2d/dhyd2.o		$(force_files) \
+	$(symm_files) $(COMM_DUMMY)
+
+$(scndrv_files) : $(common_files)
+exe/scndrv : $(scndrv_files)
+	$(FC) $(FFLAGS) -o exe/scndrv $(scndrv_files)
+
+scn_files = 	s2d/test.o		$(generic_files) $(vopt_files) \
+	s2d/cdie2.o \
+	s2d/bond2.o		s2d/theta2.o \
+	s2d/ephi2.o		s2d/eimphi2.o \
+	s2d/dhyd2.o		$(intrprtr_files) \
+	s2d/matvec.o $(force_files) \
+	$(symm_files) $(COMM_DUMMY)
+
+$(scn_files) : $(common_files)
+exe/scn : $(scn_files)
+	$(FC) $(FFLAGS) -o exe/scn $(scn_files)
+
+# Added the matvec routine to s2d (for chain)
+
+s2d_files  =  s2d/matvec_14.o    s2d/matvec_die.o  s2d/matvec_theta.o \
+    s2d/matvec_bond.o     s2d/matvec_tors.o    s2d/matvec_diag.o \
+    s2d/matvec_impto.o    s2d/cdie2_wat.o      s2d/getvec.o \
+    s2d/bond2_pcs.o       s2d/cdie2_pcs2.o     s2d/eimphi2_pcs.o \
+    s2d/theta2_pcs.o      s2d/cdie2_pcs1.o     s2d/cdie2_pcs3.o \
+    s2d/etors2_pcs.o      s2d/cdie2_14.o \
+    s2d/d2vanlyt.o        s2d/convnotpair.o    s2d/convpair.o
+
+reconstr_files = analysis/reconstruct.o $(generic_files) \
+                 $(intrprtr_files) pot/init_var.o \
+                 analysis/Find_Rotation.o analysis/Find_Center.o \
+                 analysis/RotateVector.o $(COMM_DUMMY)
+
+exe/reconstruct : $(reconstr_files)
+	$(FC) $(FFLAGS) -o exe/reconstruct $(reconstr_files)
+
+nativeContacts_files = analysis/nativeContacts.o $(generic_files) \
+                $(intrprtr_files) pot/init_var.o \
+                analysis/Find_Rotation.o analysis/Find_Center.o \
+                analysis/RotateVector.o $(COMM_DUMMY)
+
+exe/nativeContacts : $(nativeContacts_files)
+	$(FC) $(FFLAGS) -o exe/nativeContacts $(nativeContacts_files)
+
+Bfactors_files = analysis/Bfactors.o $(generic_files) \
+                $(intrprtr_files) pot/init_var.o \
+                analysis/Find_Rotation.o analysis/Find_Center.o \
+                analysis/RotateVector.o $(COMM_DUMMY)
+
+exe/Bfactors : $(Bfactors_files)
+	$(FC) $(FFLAGS) -o exe/Bfactors $(Bfactors_files)
+
+rot_files =	analysis/rotate.o	$(generic_files) $(vopt_files) \
+	pot/init_var.o $(intrprtr_files) dynamics/rdyncrd.o $(COMM_DUMMY)
+
+$(rot_files) : $(common_files)
+exe/rot : $(rot_files)
+	$(FC) $(FFLAGS) -o exe/rot $(rot_files)
+
+
+xcrd_files = analysis/xcrd.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o \
+	pot/init_var.o $(COMM_DUMMY)
+
+$(xcrd_files) : $(common_files)
+exe/xcrd : $(xcrd_files)
+	$(FC) $(FFLAGS) -o exe/xcrd $(xcrd_files)
+
+xcrd2_files = analysis/xcrd2.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o \
+	pot/init_var.o $(COMM_DUMMY)
+
+$(xcrd2_files) : $(common_files)
+exe/xcrd2 : $(xcrd2_files)
+	$(FC) $(FFLAGS) -o exe/xcrd2 $(xcrd2_files)
+
+xcrdXE_files = analysis/xcrdXE.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o \
+	pot/init_var.o $(COMM_DUMMY)
+
+$(xcrdXE_files) : $(common_files)
+exe/xcrdXE : $(xcrdXE_files)
+	$(FC) $(FFLAGS) -o exe/xcrdXE $(xcrdXE_files)
+
+xangle_files = 	analysis/xangle.o	$(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o \
+	pot/init_var.o		$(COMM_DUMMY)
+
+$(xangle_files) : $(common_files)
+exe/xangle : $(xangle_files)
+	$(FC) $(FFLAGS) -o exe/xangle $(xangle_files)
+
+average_files = 	analysis/average.o	$(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o \
+	pot/init_var.o		$(COMM_DUMMY)
+
+$(average_files) : $(common_files)
+exe/average : $(average_files)
+	$(FC) $(FFLAGS) -o exe/average $(average_files)
+
+xdist_files = 	analysis/xdist.o	$(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o \
+	pot/init_var.o		$(COMM_DUMMY)
+
+$(xdist_files) : $(common_files)
+exe/xdist : $(xdist_files)
+	$(FC) $(FFLAGS) -o exe/xdist $(xdist_files)
+
+xtors_files = 	analysis/xtors.o	$(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o \
+	pot/init_var.o		$(COMM_DUMMY)
+
+$(xtors_files) : $(common_files)
+exe/xtors : $(xtors_files)
+	$(FC) $(FFLAGS) -o exe/xtors $(xtors_files)
+
+test_drv_files = pot/test_drv.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+	$(force_files) $(symm_files) dynamics/rdyncrd.o \
+	$(COMM_DUMMY)
+
+$(test_drv_files) : $(common_files)
+exe/test_drv : $(test_drv_files)
+	$(FC) $(FFLAGS) -o exe/test_drv $(test_drv_files)
+
+effmass_files = analysis/eff_mass.o	$(generic_files) $(vopt_files) \
+	$(intrprtr_files) $(force_files) \
+	analysis/makmat.o	analysis/offdm.o \
+	analysis/invmat.o	analysis/effmass.o \
+	analysis/shftmat.o	analysis/orthmat.o \
+	dynamics/ortho.o	analysis/wmat.o 
+
+$(effmass_files) : $(common_files)
+exe/effmass : $(effmass_files)
+	$(FC) $(FFLAGS) -o exe/effmass $(effmass_files)
+
+ovrltrj_files = analysis/ovrlp_trj.o	$(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o dynamics/wdyncrd.o \
+	pot/init_var.o		$(COMM_DUMMY)
+
+$(ovrltrj_files) : $(common_files)
+exe/ovrlp_trj : $(ovrltrj_files)
+	$(FC) $(FFLAGS) -o exe/ovrlp_trj $(ovrltrj_files)
+
+domains_files = analysis/domains.o $(generic_files) $(vopt_files) \
+        $(intrprtr_files) pot/init_var.o dynamics/rdyncrd.o $(COMM_DUMMY)
+
+exe/domains : $(domains_files)
+	$(FC) $(FFLAGS) -o exe/domains $(domains_files)
+
+$(domains_files) : $(common_files)
+
+
+
+difdens_files = analysis/eff_difdens.o $(generic_files) $(vopt_files) \
+        $(intrprtr_files) dynamics/rdyncrd.o pot/init_var.o $(COMM_DUMMY)
+
+exe/eff_difdens : $(difdens_files)
+	$(FC) $(FFLAGS) -o exe/eff_difdens $(difdens_files)
+
+$(difdens_files) : $(common_files)
+
+
+
+avdif_files = analysis/av_dif.o $(generic_files) $(vopt_files) \
+        $(intrprtr_files) dynamics/rdyncrd.o pot/init_var.o $(COMM_DUMMY)
+
+exe/av_dif : $(avdif_files)
+	$(FC) $(FFLAGS) -o exe/av_dif $(avdif_files)
+
+$(avdif_files) : $(common_files)
+
+
+##################################################################
+
+##################################################################
+muta_files = muta/mutpot.o\
+	muta/print_l.o\
+	muta/LD_l.o\
+	muta/norm_test.o\
+	dynamics/getRandomDisplacement.o \
+	dynamics/PT_dummy.o \
+	dynamics/con_grad_shak.o dynamics/dump_dyna.o \
+	dynamics/frz_eval.o dynamics/rm_degf.o \
+	dynamics/info.o dynamics/init_con.o dynamics/init_dyna.o \
+	dynamics/invmat.o dynamics/lan_zen.o dynamics/line_loop.o \
+	dynamics/mshakinit.o dynamics/mshakpt.o dynamics/mshakvl.o \
+	dynamics/multemp.o dynamics/ortho.o dynamics/picktemp.o \
+	dynamics/prbm.o dynamics/prob.o dynamics/rdyncrd.o \
+	dynamics/set_cutoffs.o dynamics/shakefr.o dynamics/shakept.o \
+	dynamics/shakevl.o dynamics/shakinit.o dynamics/up_res.o \
+	dynamics/velinit.o dynamics/wdyncrd.o dynamics/wdynvel.o \
+	generic/open_scratch.o puth/pos.o steep/stdc.o \
+	$(les_files) $(generic_files) $(vopt_files) $(intrprtr_files) \
+	$(force_files) $(symm_files)\
+	$(COMM_DUMMY)
+
+$(muta_files) : $(common_files)
+
+exe/muta : $(muta_files)
+	$(FC) $(FFLAGS) -o exe/muta $(muta_files)
+
+press_files = analysis/pressure.o $(generic_files) $(vopt_files) \
+	$(dynamics_files) puth/pos.o $(intrprtr_files) $(force_files) \
+	$(symm_files) $(COMM_DUMMY) analysis/init_pressure.o
+
+$(press_files) : $(common_files)
+exe/press : $(press_files)
+	$(FC) $(FFLAGS) -o exe/press $(press_files)
+
+
+FFCorFun_files = analysis/FFCorFun.o $(generic_files) $(vopt_files) \
+	$(dynamics_files) puth/pos.o $(intrprtr_files) $(force_files) \
+	$(symm_files) $(COMM_DUMMY) analysis/CORFUN.o
+
+$(FFCorFun_files) : $(common_files)
+exe/FFCorFun : $(FFCorFun_files)
+	$(FC) $(FFLAGS) -o exe/FFCorFun $(FFCorFun_files)
+
+###################################################################
+
+
+##################################################################
+
+
+####################################################################
+#
+solv_files =  prepcrd/solvatecrd.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+	dynamics/wdyncrd.o dynamics/rdyncrd.o \
+	dynamics/velinit.o pot/init_var.o $(COMM_DUMMY)
+
+$(solvatecrd_files) : $(common_files)
+exe/solvatecrd :  $(solv_files)
+	$(FC) $(FFLAGS) -o exe/solvatecrd  $(solv_files)
+#
+#
+solv_gen_files =  prepcrd/solvatecrd_gen.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+	dynamics/wdyncrd.o dynamics/rdyncrd.o \
+	dynamics/velinit.o pot/init_var.o $(COMM_DUMMY)
+
+$(solvatecrd_gen_files) : $(common_files)
+exe/solvatecrd_gen :  $(solv_gen_files)
+	$(FC) $(FFLAGS) -o exe/solvatecrd_gen  $(solv_gen_files)
+
+BinarySolution_files =  prepcrd/BinarySolution.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+        dynamics/wdyncrd.o dynamics/rdyncrd.o \
+        dynamics/velinit.o pot/init_var.o $(COMM_DUMMY)
+
+$(BinarySolution_files) : $(common_files)
+exe/BinarySolution :  $(BinarySolution_files)
+	$(FC) $(FFLAGS) -o exe/BinarySolution  $(BinarySolution_files)
+
+#
+#
+#
+helen_files = analysis/helen.o $(generic_files) $(vopt_files) \
+	$(intrprtr_files) dynamics/rdyncrd.o \
+	pot/init_var.o $(COMM_DUMMY)
+
+$(helen_files) : $(common_files)
+exe/helen : $(helen_files)
+	$(FC) $(FFLAGS) -o exe/helen $(helen_files)
+#
+#
+pdb_files =  prepcrd/pdb2puth.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+	dynamics/wdyncrd.o dynamics/rdyncrd.o \
+	dynamics/velinit.o pot/init_var.o $(COMM_DUMMY)
+
+$(pdb2puth_files) : $(common_files)
+exe/pdb2puth  : $(pdb_files)
+	$(FC) $(FFLAGS) -o exe/pdb2puth $(pdb_files)
+
+seq_files =  prepcrd/seq.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+	dynamics/wdyncrd.o dynamics/rdyncrd.o \
+	dynamics/velinit.o pot/init_var.o $(COMM_DUMMY)
+
+$(seq_files) : $(common_files)
+exe/seq  : $(seq_files)
+	$(FC) $(FFLAGS) -o exe/seq $(seq_files)
+
+#
+#####################################################################
+
+tmalign_files = tmalign/tmalign_new.o
+exe/tmalign : $(tmalign_files)
+	$(FC) $(FFLAGS) -o exe/tmalign $(tmalign_files) 
+
+path_files =   path/path.o \
+        path/comc.o  path/crbm.o   path/UpdateLists.o \
+        path/path_2.o  path/GetDave.o  path/path_anneal.o \
+        path/Communicate_Positions.o path/sds_constraint.o \
+        $(generic_files) $(intrprtr_files) $(symm_files) \
+        $(force_files) dynamics/rdyncrd.o path/Write2Path.o \
+        path/mass_weight_coordinates.o path/Write2File.o \
+        path/orthg.o path/rchainparal.o path/path_test.o \
+        path/open_inout.o $(vopt_files) \
+        path/GatherAction.o path/Get_Dls.o path/Fast_2nd_deriv.o \
+
+$(path_files) : $(common_files)
+
+
+sdel_files =  sdel/initPath.o sdel/line_loop.o \
+            sdel/sds.o sdel/Communicate_Momenta.o
+
+$(sdel_files) : $(common_files)
+
+exe/sdelS : $(sdel_files) $(path_files) $(COMM_DUMMY)
+	$(FC) $(FFLAGS) -o exe/sdelS $(sdel_files) $(path_files) $(COMM_DUMMY)
+
+dim_prepare_files = dim/dim_prepare.o dim/dim_prepare_MD.o \
+        search/Distance.o dim/init_dyna.o \
+        $(generic_files) $(intrprtr_files) $(symm_files) \
+        $(force_files) $(Edynamics_files) $(vopt_files) path/open_inout.o \
+        path/mass_weight_coordinates.o search/rchainparal.o \
+        path/comc.o path/orthg.o dim/line_loop.o path/Write2File.o 
+
+$(dim_prepare_files) : $(common_files)
+
+exe/dim_prepare : $(dim_prepare_files) $(COMM_DUMMY)
+	$(FC) $(FFLAGS) -o exe/dim_prepare $(dim_prepare_files) $(COMM_DUMMY)
+
+dim_run_files = dim/dim_run.o dim/dim_run_MD.o \
+        dim/init_dyna.o \
+        $(generic_files) $(intrprtr_files) $(symm_files) \
+        $(force_files) $(Edynamics_files) $(vopt_files) path/open_inout.o \
+        path/mass_weight_coordinates.o search/rchainparal.o \
+        path/comc.o path/orthg.o dim/line_loop.o path/Write2File.o \
+        search/Distance.o
+
+$(dim_run_files) : $(common_files)
+
+exe/dim_run : $(dim_run_files) $(COMM_DUMMY)
+	$(FC) $(FFLAGS) -o exe/dim_run $(dim_run_files) $(COMM_DUMMY)
+
+dim_sample_files = dim/dim_sample.o dim/dim_sample_MD.o \
+        dim/init_dyna.o \
+        $(generic_files) $(intrprtr_files) $(symm_files) \
+        $(force_files) $(Edynamics_files) $(vopt_files) path/open_inout.o \
+        path/mass_weight_coordinates.o search/rchainparal.o \
+        path/comc.o path/orthg.o dim/line_loop.o path/Write2File.o \
+        search/Distance.o
+
+$(dim_sample_files) : $(common_files)
+
+exe/dim_sampleS : $(dim_sample_files) $(COMM_DUMMY)
+	$(FC) $(FFLAGS) -o exe/dim_sampleS $(dim_sample_files) $(COMM_DUMMY)
+
+clusters_files = analysis/clusters.o $(generic_files) $(vopt_files) $(intrprtr_files) \
+		 pot/init_var.o dynamics/rdyncrd.o $(COMM_DUMMY)
+
+$(clusters_files) : $(common_files)
+exe/clusters : $(clusters_files)
+	$(FC) $(FFLAGS) -o exe/clusters $(clusters_files)
+
+clean:
+	$(CLEAN)	
+

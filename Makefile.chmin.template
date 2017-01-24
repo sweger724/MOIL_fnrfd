@@ -1,0 +1,335 @@
+# Moil make file as of 4/16/2003. Working procedures are listed below under all
+#
+# to compile all programs type "make all" to compile a specific module,
+# type "make module"
+#
+# list of people who contributed code (alphabetic order):
+# Ron Elber, Alfredo Cardenas, Avijit Ghosh, Robert Goldstein, Chen Keasar, 
+# Haiying Li, Jaroslaw Meller, Debasisa Mohanty, Roberto Olender, 
+# Adrian Roitberg, Amena Siddiqi, Carlos Simmerling, Konesh Siva, 
+# Ileana Stoica, Alex Ulitsky, Gennady Verkhivker, Yael Weinbach, Veaceslav 
+# Zaloj 
+# People (in addition to the above) who suffer the testing,
+# designing parameters and writing documentation :
+# Chyung Choi, Danuta Rojewska, Karunesh Arora
+# GUI implementation: Baohua Wang.
+#
+# We made a use of
+# (1) The Housholder diagonalization routine written by Ryszard Czerminski.
+# (2) The truncated newton-raphson minimization by Stephen G. Nash
+# (3) The Particle Mesh Ewald of Darden and co-workers,
+#        J. Chem. Phys. 98,10089(1993)
+# (4) The Spherical Solvent Boundary Potential of Beglov and Roux
+#        K. Chem. Phys. 100,9050(1994)
+# (5) Generalized Born model from Tsui and Case 
+#        Biopolymers 56, 275(2000)
+#
+################################################################
+#
+# There are sections below to comment/uncomment depending on     
+# your system and compiler.  Systems common at UT/ICES/TACC
+# are at the top.  You may define FCMOIL and FFLAGSMOIL in
+# your environment to override the settings for the FORTRAN
+# compiler and flags used.
+#
+# Updated Mar 02, 2009. Thomas Blom
+#
+###############################################################
+
+# Ucomment for Windows:
+#MV = mv.bat 
+#CLEAN = clean.bat
+#
+# Uncomment for Unix/Linux/OSX
+MV = mv
+CLEAN = rm -f */*.o 
+
+
+################################################################
+
+.f.o:
+	$(FC) $(FFLAGS) -c $<
+	$(MV) $(*F).o $(<D)
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+	$(MV) $(*F).o $(<D)
+
+##################### gfortran notice ###############################
+# please ensure you are using the latest version of gfortran
+# as earlier versions may not respect the -frecord-marker=4 flag.
+# This flag is required to maintain compatibility with binary files
+# written by other fortran compilers.
+#
+# If you will only ever using binary files generated on your own
+# system, this issue will not affect you, but note that the 
+# tests in moil.test make use of binary files generated with intel
+# fortran on linux.
+# 
+####################################################################
+# default template: gfortran (osx etc)
+FC = gfortran 
+FFLAGS = -m64 -O3 -static-libgfortran -frecord-marker=4 -fconvert=swap -I . 
+
+# ices ubuntu desktops, using 64bit intel fortran:
+#IFCDIR=/opt/intel/Compiler/11.1/073/bin/intel64
+#FC=$(IFCDIR)/ifort					#intel 11
+#FFLAGS = -O2 -convert big_endian -I .                  # ifort at ices ubuntu desktops
+
+# intel fortran on stampede
+#IFCDIR=/share/apps/intel/Compiler/11.1/073
+#FC=$(IFCDIR)/bin/intel64/ifort 
+#FFLAGS = -O3 -xT -convert big_endian -I .              # ifort on stampede
+
+# intel fortran on junior
+#IFCDIR=/share/apps/intel/fce/10.1.021/bin
+#IFCDIR=/share/apps/intel/Compiler/11.1/bin/intel64
+#IFCDIR=/share/apps/intel/Compiler/12.1/bin
+#FC=$(IFCDIR)/ifort
+#FFLAGS = -O3 -xT -convert big_endian -I .              
+
+# intel fortran on ranger
+#IFCDIR=/share/apps/intel/10.1/fc
+#FC=$(IFCDIR)/bin/ifort 
+#FFLAGS = -O3 -xW -convert big_endian -I .              # ifort on ranger
+
+# the following may be necessary when compiling large programs for 64bit: see ifort manpage
+#FFLAGS = -mcmodel=medium -shared-intel                 #intel 10 on linux 64bit
+
+# Windows with g77 (minGW)
+#FC=g77
+#FFLAGS = -I .
+
+# Windows with intel fortran: make sure the $(FC) line under the .f.o rule is indented
+# with exactly 1 tab and not spaces for mingw32-make under win32!
+#.f.o:
+#	$(FC) $(FFLAGS) -c $< -object:$*.o
+#
+#FC=ifort
+#FFLAGS = -I . /convert:big_endian /nowarn /nologo
+
+# If these are defined in the environment, they will override the settings above.
+ifdef FCMOIL
+FC = $(FCMOIL)
+FFLAGS = $(FFLAGSMOIL)
+endif	
+
+###############################################################################################
+
+# C compilers 
+CC = cc            					#SGI,terra
+#CC = xlc          					#RS6K
+#CC = gcc 	   					#linux
+#
+# C flags
+#
+#CFLAGS = -g -C -64 					#R10000
+#CFLAGS = -g -C    					#default
+#CFLAGS = -O      					#linux,RS6K
+#CFLAGS = -O2 -c  $(INCLUDE) -volatile -inline automatic  #terra
+#
+# Fortran compilers
+#
+#FC = xlf						#IBM
+#FC = f77						#SUN
+#FC = f77						#SGI
+#FC = f77 -p						#SGI profile
+#FC = fc						#stardent 3000
+#FC = f90						#Dec alpha
+#FC = fort77						#linux
+#FC = pgf77    						#linux : PG
+#FC = mpif77 						#linux for sdel
+#FC = /opt/mpich-pgi/bin/mpif77  			# mpif77 for biosim
+#FC=g77
+#FFLAGS =-I./  -I$(MPIDIR)/include -L$(MPIDIR)/lib #-O2
+#FC = ifc                                               #intel
+#FC=$(IFCDIR)/bin/ifort					#intel 9/10
+#FC = mpxlf						#SP/2
+#FC = gfortran
+#LD=ld							#Terra loader
+#LDFLAGS= -O3 -r -d -N -EL
+#
+# Fortran flags
+#
+#FFLAGS = +O3 -v -u
+#FFLAGS = -O2 -u -mips2 -Olimit 5000 			#SGI R4000 
+#FFLAGS = -O2 -u -mips4					#SGI R10000
+#FFLAGS  = -n32 -O -I.					#SGI OS 6.5
+#FFLAGS = -c -u -O2 					#STARDENT 3000
+#FFLAGS = -O -u -qmaxmem=-1 				#IBM R/S 6000
+#FFLAGS = -O -u -convert big_endian   			#Dec alpha
+#FFLAGS = -O -m486                    			#linux
+#FFLAGS =  -fpic -fast -byteswapio -I .                       	#linux
+#FFLAGS =  -fpic -fast -I .                       	#linux
+#0FFLAGS =   -I .                       	#linux
+#FFLAGS = -fconvert=swap -I .
+
+#FFLAGS =                        	                #SUN
+#FFLAGS = -O3  -w -I .                                  #intel
+#
+#FFLAGS = -O -qstrict -qarch=pwr2 -qtune=pwr2 -u -qmaxmem=-1 -qnolist 	#SP/2
+#
+#
+# DEBUG
+# profiling
+#
+#FFLAGS = -u -p
+#FFLAGS = -C -g -u -qmaxmem=-1 -qflttrap -qextchk -qspnans -v  -qlist
+#FFLAGS = -C -g -u  -I.
+#FFLAGS = -C -d2
+#FFLAGS = -Mbounds  -g -C -u -byteswapio
+#FFLAGS = -ffortran-bounds-check -I .
+
+
+everything: exe/chmin exe/sdpS
+
+common_files = COMMON/ACTPARA1.BLOCK COMMON/ACTPARA.BLOCK COMMON/AVE.BLOCK \
+COMMON/AVEDS.BLOCK COMMON/BUFFER.BLOCK COMMON/CCRD.BLOCK \
+COMMON/CON_GRAD.BLOCK COMMON/CONNECT2.BLOCK \
+COMMON/CONNECT.BLOCK COMMON/CONSPECL1.BLOCK COMMON/CONSPECL2.BLOCK \
+COMMON/CONSPECL4.BLOCK COMMON/CONSTRAN.BLOCK COMMON/CONVERT.BLOCK \
+COMMON/COORD.BLOCK COMMON/CRBM.BLOCK COMMON/DEBUG.BLOCK \
+COMMON/DYNA.BLOCK COMMON/ENERGY.BLOCK COMMON/ENERGY_DEE.BLOCK \
+COMMON/EWALD.BLOCK COMMON/EXTERNAL.BLOCK COMMON/FREEZ.BLOCK COMMON/GETVEC.BLOCK \
+COMMON/LENGTH-CHMIN.BLOCK COMMON/LINE2.BLOCK COMMON/LINE.BLOCK COMMON/METAL.BLOCK \
+COMMON/MONOMERS.BLOCK COMMON/MSHAKE.BLOCK COMMON/NBLIST.BLOCK \
+COMMON/PARALLEL.BLOCK COMMON/PDQ.BLOCK COMMON/PROPERT.BLOCK COMMON/RESTART.BLOCK \
+COMMON/ROTAGEN.BLOCK COMMON/ROTAINT.BLOCK COMMON/SC2.BLOCK \
+COMMON/SCNDRV.BLOCK COMMON/SCNDRV_DSK.BLOCK COMMON/SDELAVE.BLOCK \
+COMMON/SGB.BLOCK COMMON/SHAKE.BLOCK COMMON/SPECL.BLOCK COMMON/SPW.BLOCK \
+COMMON/SSBP.BLOCK COMMON/SWITCH.BLOCK COMMON/SYMM.BLOCK COMMON/TETHER.BLOCK \
+COMMON/TMP_CONNECT.BLOCK COMMON/UNITS.BLOCK COMMON/VARBLE.BLOCK COMMON/VELOC.BLOCK \
+COMMON/EBALL.BLOCK COMMON/ELASTIC.BLOCK COMMON/FREADY.BLOCK COMMON/STEER.BLOCK
+
+COMM_DUMMY = 	comm_dummy/tcliballgather.o	comm_dummy/tcliballgatherv.o \
+		comm_dummy/tcliballreduce.o	comm_dummy/tclibbroadcast.o \
+		comm_dummy/tcliberrormessage.o	comm_dummy/tclibshiftleft.o \
+		comm_dummy/tclibshiftright.o	comm_dummy/terra_open_scratch.o \
+		comm_dummy/load_balance.o \
+		comm_dummy/gather_vel.o		comm_dummy/eforce_reduce.o \
+		comm_dummy/gather_crd.o		comm_dummy/reduce_n.o \
+		comm_dummy/reduce_1.o		comm_dummy/gather_v.o \
+		comm_dummy/send_all.o \
+		comm_dummy/reduce_energies.o	comm_dummy/gather_nbmlists.o \
+		comm_dummy/gather_nblists.o	comm_dummy/reduce_int.o \
+		comm_dummy/gather_shake.o	comm_dummy/gather_mshake.o \
+		comm_dummy/vdble_reduce.o	comm_dummy/gather_force.o \
+                comm_dummy/broadcast_state.o
+
+$(COMM_DUMMY) : $(common_files)
+
+connect_files = connect/addbond.o connect/angtor.o \
+	connect/chsort.o \
+	connect/count_waters.o connect/dimer.o connect/edcon.o  \
+	connect/fillpt.o connect/getmoname.o connect/lego.o  \
+	connect/monomers.o connect/propert.o connect/set_hydro.o
+
+generic_files = generic/close_open.o generic/dump_param.o generic/find_bond.o \
+        generic/getcrd.o generic/house.o generic/of.o \
+        generic/ovrlpck.o generic/pick.o \
+        generic/putcrd.o generic/rcon_specl1.o generic/rcon_specl2.o \
+        generic/rconn.o generic/rm_elem.o generic/rpath.o generic/rpxyz.o \
+        generic/search.o generic/unit.o generic/ranlux.o \
+        generic/wconn.o generic/wpath.o generic/zerov.o \
+        generic/rpath_seq.o generic/find_angle.o generic/draw_normal.o\
+        generic/dist2.o generic/normalize.o generic/com.o generic/rmsd_weight.o
+
+$(generic_files) : $(common_files)
+
+vopt_files = vopt/scalar_mu_vec1.o vopt/scalar_mu_vec2.o vopt/vcomprs.o vopt/vcopy.o \
+	vopt/vecmin.o vopt/vec_mul_add.o vopt/vinit.o vopt/vnorm.o vopt/vscalar.o \
+	vopt/v_sub_mul_add.o vopt/vsub_mul.o vopt/vnorm2.o
+
+$(vopt_files) : $(common_files)
+
+intrprtr_files = intrprtr/alert.o intrprtr/brkpair.o intrprtr/echo.o \
+	intrprtr/find.o intrprtr/fopen.o intrprtr/get4c.o \
+	intrprtr/getc.o intrprtr/getd.o intrprtr/geti.o intrprtr/getL.o \
+	intrprtr/intgr.o intrprtr/next.o intrprtr/number.o \
+	intrprtr/rline.o intrprtr/testl.o
+$(intrprtr_files) : $(common_files)
+
+fready_force_files = fready/CGinit.o fready/eCG_bond.o fready/eCG_LJ.o \
+          fready/eCG_Torsion.o dynamics/getvel.o fready/nbfinitCG.o \
+          fready/eCG_WellBondPot.o fready/CG_nb_list.o \
+          fready/eCG_NB.o  fready/Read_CG_input.o fready/Read_CG_input2.o \
+          fready/initCGmass.o fready/eCG.o  fready/eCG_theta.o \
+          fready/eCG_tors.o fready/eCG_WellAnglePot.o  \
+          fready/getCGid.o fready/eCG_backboneNB.o \
+          fready/angle.o fready/CGtorsion.o fready/eCG_backboneHB.o \
+          fready/read_CG_parameters.o
+
+force_files = pot/amid.o pot/cdie.o pot/cdie_arith.o \
+	pot/cdie_ewald.o pot/cdie_spcl.o pot/cnstrn.o \
+	pot/ebond.o pot/ebond_specl.o pot/ecent.o \
+	pot/eforce.o pot/ehydro.o pot/eimphi.o \
+	pot/emorse.o pot/ener14.o pot/ephi.o pot/deriv_test.o \
+	pot/etether.o pot/etheta.o pot/etheta_specl.o \
+	pot/ewald_receip.o pot/exlist.o pot/force_norm.o \
+	pot/half_harm.o pot/init_ef.o pot/init_ssbp.o \
+	pot/init_var.o pot/init_wre.o pot/metal_wall.o \
+	pot/nbfinit.o pot/nbond.o pot/nbond_spcl.o \
+	pot/nbondm.o pot/nbondm_spcl.o pot/num_drv.o \
+	pot/rdie.o pot/repuls.o pot/set_ssbp.o \
+	pot/shft_cdie.o pot/special.o pot/ssbp.o \
+	pot/test_distances.o pot/virt_prtc.o pot/D_one_dihedral.o \
+	pot/watwat.o pot/watwat_ewald.o pot/eball.o pot/wener.o \
+	GB/mysff_f.o GB/make_rborn.o GB/egb_nonpol2.o \
+	pot/eenm.o pot/G_deriv.o pot/network.o fready/enm_lists.o \
+        pot/interface_constraint.o pot/angle_constraint.o dim/GetReducedCoors.o \
+	fp/torsion.o fp/alabarrier.o fp/ctors.o fp/rgyrconst.o search/DistAngle.o \
+	pot/e_field.o pot/repulsive_wall.o \
+	pot/urey.o pot/urey_init.o \
+	$(fready_force_files)
+
+$(force_files) : $(common_files)
+
+symm_files = symm/erfcfun.o symm/ewald_init.o symm/nbmsym.o \
+	symm/nbsym.o symm/nbsym_metal.o symm/squeeze.o \
+	symm/symcdie.o symm/symcdie_ewald.o symm/syminit.o \
+	symm/symwat.o symm/symwat_ewald.o
+$(symm_files) : $(common_files)
+
+dynamics_files = dynamics/con_grad_shak.o dynamics/dump_dyna.o \
+	dynamics/frz_eval.o dynamics/rm_degf.o \
+	dynamics/info.o dynamics/init_con.o dynamics/init_dyna.o \
+	dynamics/invmat.o dynamics/lan_zen.o dynamics/line_loop.o \
+	dynamics/mshakinit.o dynamics/mshakpt.o dynamics/mshakvl.o \
+	dynamics/multemp.o dynamics/ortho.o dynamics/picktemp.o \
+	dynamics/prbm.o dynamics/prob.o dynamics/rdyncrd.o \
+	dynamics/set_cutoffs.o dynamics/shakefr.o dynamics/shakept.o \
+	dynamics/shakevl.o dynamics/shakinit.o dynamics/up_res.o \
+	dynamics/velinit.o dynamics/wdyncrd.o dynamics/wdynvel.o \
+	generic/open_scratch.o
+$(dynamics_files) : $(common_files)
+
+les_files = LES/add_les_new.o LES/angle_add_les.o LES/bond_add_les.o LES/copy_angles.o \
+	LES/copy_improper.o LES/copy_torsion.o LES/excl_add_les.o LES/fill_angle.o \
+	LES/fill_improper.o LES/fill_torsion.o LES/impr_add_les.o LES/init_add_les.o \
+	LES/list14_add_les.o LES/mdiv_add_les.o LES/molc_add_les.o LES/morse_add_les.o \
+	LES/prtc_add_les.o LES/read_add_les.o LES/test_many_ifs.o LES/tors_add_les.o
+$(les_files) : $(common_files)
+
+
+chmin_files = chain/chmin.o  chain/chmin1.o chain/orthg.o \
+  	      chain/comc.o   chain/chnneal.o  chain/rchain.o \
+	      chain/crbm.o   chain/pwl_chn.o \
+	      chain/sds.o    chain/hotchain.o\
+	$(generic_files) $(vopt_files) $(intrprtr_files) $(symm_files) \
+	$(force_files) dynamics/rdyncrd.o $(COMM_DUMMY)
+
+$(chmin_files) : $(common_files)
+exe/chmin : $(chmin_files)
+	$(FC) $(FFLAGS) -o exe/chmin $(chmin_files)
+
+sdp_files =  sdpS/chmin.o             sdpS/chmin1.o \
+             chain/comc.o             chain/chnneal.o  \
+             chain/crbm.o              chain/pwl_chn.o \
+             sdpS/sds.o chain/hotchain.o chain/orthg.o chain/rchain.o \
+             $(generic_files) $(vopt_files) $(intrprtr_files) $(symm_files) \
+             $(force_files) dynamics/rdyncrd.o $(COMM_DUMMY)
+     
+$(sdp_files) : $(common_files)
+
+exe/sdpS : $(sdp_files)
+	$(FC) $(FFLAGS) -o exe/sdpS $(sdp_files)

@@ -1,0 +1,96 @@
+C DEFINITION OF THE MOLECULE TOPOLOGY AND POTENTIAL ENERGY TERMS
+C *** SPECIAL PART (SWITCHING BETWEEN BONDED AND NON-BONDED PARTS)
+
+
+c-----------------------------------------------------------------------
+c spoimon  - integer vector with monomer pointer
+c		(spoimon2(ipt) = the # of the monomer of the ipt particle)
+c sptid2    - integer vector with id of particle types
+c sptnm2    - (char*4) name of the particle as a function of the 
+c particle number
+c sptms2    - (double) mass of the particle                "
+c sptchg2   - (double) charge of particle                  "
+c sepsgm26  - (double) square root of van der Waals energy times sigma^6
+c sepsgm212 - (double) square root of van der Waals energy times sigma^12
+c sptwei2   - (double) particle special weight used in LES calculations
+c slesid2   - integer id of LES residue. If normal residue set to 0 if les
+c		residue all the copies under a single MULT are set to the
+c		same number
+c smutaid2  - integer id for mutation. If atom is not mutant is set to 0
+c               if it is mutant to 1 and 2.
+c styp2     - integer id of unit of special particles
+c 
+	integer spoimon2(maxspcl),sptid2(maxspcl),slesid2(maxspcl)
+        integer smutaid2(maxspcl)
+	integer styp2(maxspcl),stotex2,stotspe2 
+	character*4 sptnm2(maxspcl)
+	double precision sptms2(maxspcl),sptchg2(maxspcl)
+	double precision sepsgm26(maxspcl)
+	double precision sepsgm212(maxspcl),sptwei2(maxspcl)
+c-----------------------------------------------------------------------
+
+
+c-----------------------------------------------------------------------
+c *** vector of length imono (number of monomers in the molecule)
+c		simono2 < maxsmon
+c smoname2  - character*4 vector with the name of monomers type
+c spoipt2   - From monomers to particles poipt(i) is the last particle
+c		of monomer i
+c
+	character*4 smoname2(maxsmon)
+	integer spoipt2(maxsmon)
+c-----------------------------------------------------------------------
+
+c-----------------------------------------------------------------------
+c *** vectors of length nb (number of bonds) nb < maxbond
+c sib21 sib22 - pointers to particles that are bonded
+c           sib21(k) is the pointer to particle k.
+c skbond2   - (double) force constant for harmonic energy of bonds
+c sreq2     - (double) equilibrium position for harmonic energy of bonds
+c
+	integer sib21(maxspcl),sib22(maxspcl)
+	double precision skbond2(maxspcl),sreq2(maxspcl)
+c-----------------------------------------------------------------------
+
+c *** vectors of length nangl (number of angles)
+c		snangl2 < maxangl
+c siangl21 siangl22 siangl23 - pointers to particles in angles
+c skangl2   - (double) force constant for harmonic energy of angles
+c sangleq2  - (double) equilibrium position for harmonic energy of angles
+c
+	integer siangl21(maxspcl),siangl22(maxspcl),siangl23(maxspcl)
+	double precision skangl2(maxspcl),sangleq2(maxspcl)
+c stmon2  - total number of monomers
+c snb2      - total number of bonds
+c snangl2   - total number of angles
+c
+         integer stmon2,snpt2,snb2(0:maxmorsb),snang2(0:maxmorsb)
+	 integer lz14_2(0:maxmorsb)
+c
+c NOTE THAT NO TORSION OR IMPROPER TORSION ARE TAKEN CARE OF
+c
+c----------------------------------------------------------------------
+c Exclusion lists between 1-2 1-3
+c sexc21 is a pointer to sexc22, i.e. sexc22(sexc21(i)) is the last
+c particles to be excluded from interaction with i
+
+        integer sexc21(0:maxspcl),sexc22(maxsx)
+c
+c sspec21 & sspec22 are pointers for particles that interact
+c via 1-4 interactions on the second energy surface.
+c
+        integer sspec21(0:maxs14),sspec22(maxs14)
+
+	double precision s2p14(3,maxs14)
+
+c-------------------------------
+c-----------------------------------------------------------------------
+c Now gather everything into common blocks
+c
+	common /SCONINT2/spoimon2,slesid2,sptid2,spoipt2,sib21,sib22,
+     1	siangl21,siangl22,siangl23,stotex2,stotspe2,sspec21,sspec22,
+     2		stmon2,snb2,snang2,styp2,sexc21,sexc22,snpt2,
+     3		lz14_2,smutaid2
+	common /SCONDBL2/sptms2,sptchg2,sepsgm26,sepsgm212,sptwei2,
+     1		skbond2,sreq2,skangl2,sangleq2,s2p14
+	common /SCONCHR2/sptnm2,smoname2

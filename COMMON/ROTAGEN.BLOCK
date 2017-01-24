@@ -1,0 +1,69 @@
+C DEFINITION OF THE ROTAMERS
+c
+c-------------------------------------------------------------------
+c maxmono    - (LENGTH>BLOCK) maximal number of monomers
+c maxnposenh - maximum number of positions enhanced with rotamer 
+c              library.
+c maxnmonenh - maximum total amount of rotamers 
+c              (considering all rotamers at all positions).
+c              (DEFINES THE MATRIX OF PAIRS - THE LARGEST ONE !!)
+c maxnmontyp - maximum number of rotamer types, counting one for each
+c              different types at each position. 
+
+      integer  maxnposenh,maxnmonenh,maxnmontyp,maxnmonenhppos
+      parameter (maxnposenh=20,maxnmonenh=2500,maxnmontyp=100)
+      parameter (maxnmonenhppos=500)
+c  
+c-------------------------------------------------------------------
+C 
+c nposenh - number of positions enhanced (nposenh<maxnposenh)
+c nmonenh - total number of monomers used (including all 
+c           positions and rotamers) (nmonenh<maxnmonenh)
+c
+      integer  nposenh,nmonenh
+c
+c-------------------------------------------------------------------
+C indexposenh(i) - backbone monomer index of the ith enhanced position 
+c poirotenh(i)   - pointer to the last rotamer index used at enhanced 
+c                  position i (considering all rotamers).
+c typerotenh(i)  - type of monomer i (considering all rotamers). 
+c poiatrotenh(i) - pointer to the last atom of rotamer i 
+c                  (considering all rotamers). 
+c posrotenh(i)   - enhanced position index of rotamer i. 
+c intindrotenh   - internal index for the different rotamers of a given 
+c                  type. 
+c
+      integer indexposenh(maxnposenh),poirotenh(0:maxnposenh),
+     &        poiatrotenh(0:maxnmonenh),posrotenh(maxnmonenh),
+     &        typerotenh(maxnmonenh),intindrotenh(maxnmonenh)
+c
+c-----------------------------------------------------------------------
+c ipickm - assigns to monomer i of the backbone 0 if it is conserved,or 
+c          1 if it is changed by a rotomer library. 
+c standardAA - false if N-alquilated
+c
+      integer ipickm(maxmono)
+      logical standardAA(maxmono)
+
+c
+c-------------------------------------------------------------------
+c
+c exc1s5 and exc2s5 - pointers to the backbone atoms that interact with
+c                     the CB via bonded interactions.
+      integer totexs5,exc1s5(0:maxnposenh),exc2s5(20*maxnposenh)
+c  
+c-----------------------------------------------------------------------
+c coorcb - coordinates of the CB atoms of the residues enhanced.
+c nbback - number of bonds in the backbone
+      double precision coorcb(3,maxnposenh)
+      integer nbback
+c  
+c-----------------------------------------------------------------------
+c Now gather everything into common blocks
+c
+      common /RGENINT/nposenh,nmonenh,indexposenh,poirotenh,
+     &               poiatrotenh,posrotenh,typerotenh,ipickm,
+     &               intindrotenh,nbback,totexs5,exc1s5,exc2s5
+      common /RGENLOG/standardAA
+      common /RGENDBL/coorcb
+c

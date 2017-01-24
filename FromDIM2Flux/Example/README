@@ -1,0 +1,9 @@
+To run this example, first run program FromDIM2Kmatrix:
+
+../FromDIM2Kmatrix.exe
+(we asume that the executable is above the directory that contains the example data)
+
+Then run stationary-vector to get the flux vector (q.dat in this example)
+../build/stationary-vector Kij_nonzero_for_q.dat milestone_lifetime_for_q.dat q.dat
+(assuming you build and compile that program in directory build as instructed in README file
+

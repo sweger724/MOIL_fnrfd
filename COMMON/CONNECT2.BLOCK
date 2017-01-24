@@ -1,0 +1,41 @@
+c---------------------------------------------------------------------
+c variables for TPM (Thermodynamic Perturbation Method(s))
+c design for linear mutation
+c---------------------------------------------------------------------
+	integer periodA(maxtors),periodB(maxtors)
+
+
+	double precision ptmsA(maxpt),ptchgA(maxpt),epsgm6A(maxpt)
+	double precision epsgm12A(maxpt),ptweiA(maxpt)
+	double precision kbondA(maxbond),reqA(maxbond)
+
+	double precision kanglA(maxangl),angleqA(maxangl)
+	double precision ktors1A(maxtors),ktors2A(maxtors)
+	double precision ktors3A(maxtors),phase1A(maxtors)
+        double precision phase2A(maxtors),phase3A(maxtors)
+	double precision kimpA(maximp)
+	double precision impeqA(maximp)
+
+	double precision ptmsB(maxpt),ptchgB(maxpt),epsgm6B(maxpt)
+	double precision epsgm12B(maxpt),ptweiB(maxpt)
+	double precision kbondB(maxbond),reqB(maxbond)
+
+
+	double precision kanglB(maxangl),angleqB(maxangl)
+	double precision ktors1B(maxtors),ktors2B(maxtors)
+	double precision ktors3B(maxtors),phase1B(maxtors)
+        double precision phase2B(maxtors),phase3B(maxtors)
+	double precision kimpB(maximp)
+	double precision impeqB(maximp)
+
+c------------------------------------------------------------------
+c special addition for TPM
+c------------------------------------------------------------------
+	common /CONNINTA/periodA
+	common /CONNINTB/periodB
+	common /CONNDBLA/ptmsA,ptchgA,epsgm6A,epsgm12A,ptweiA,
+     1		kbondA,reqA,kanglA,angleqA,ktors1A,ktors2A,ktors3A,
+     2		phase1A,phase2A,phase3A,kimpA,impeqA
+	common /CONNDBLB/ptmsB,ptchgB,epsgm6B,epsgm12B,ptweiB,
+     1		kbondB,reqB,kanglB,angleqB,ktors1B,ktors2B,ktors3B,
+     2		phase1B,phase2B,phase3B,kimpB,impeqB

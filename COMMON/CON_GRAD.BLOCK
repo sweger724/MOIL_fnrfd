@@ -1,0 +1,26 @@
+c Adina Milston
+c This common block initially meant for parameters in the con_grad_shak
+c which must be shared, but have no BIG significance.
+c it can really be memuzag into shakeblock if wanted.
+c another approach could be made- look at the conjugate grad again for 
+c memory and see if there is any better way of parallelizing.
+c p1,p2 paramters for the conjugate grad algorithm.
+c p - vector for multipling
+
+c	integer maxshak_tmp
+c	parameter (maxshak_tmp=12800)
+
+
+	double precision p1,p2,w
+	double precision p(maxshak)
+
+c conv for con_grad_shak  - I decided to make it local,and defined it in 
+c the shakept etc.
+c all_conv if they all converged
+
+	integer all_conv
+
+	
+	common /help_shk_int/ all_conv
+	common /help_shk_dbl/ p1,p2,w
+	common /help_shk_dbl_2/ p

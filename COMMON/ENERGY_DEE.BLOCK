@@ -1,0 +1,59 @@
+
+c variables used for the DEE calculation 
+c
+c kept   - true if the rotamer remains after DEE.
+c rotaux - matrix that convert from the auxiliary matrix that keeps the
+c          temporary index of a rotamer and its actual index
+c poirotenhaux - pointer to the auxiliary index of the last rotamer
+c          used at enhanced position i (considering all rotamers).
+c
+      logical kept(maxnmonenh)
+      integer poirotenhaux(0:maxnposenh),rotaux(maxnmonenh)
+      integer nmonenhleft 
+c
+c
+c variables used for non-bonding interactions
+c
+c rmax    - a single cutoff distance. Kept for compatability with
+c           old output
+c cutvdw2 - square of the cutoff for van der Waals interactions
+c cutvbig2- square of the second (buffer) cutoff for vdw (not used here)
+c cutele2 - cutoff for electrostatic interaction
+c cutebig2- second cutoff for electrostatic interactions
+C
+        double precision cutvdw2,cutvbig2,cutele2,cutebig2,rmax
+c  
+c-------------------------------------------------------------------
+c DEFINITION OF THE ENERGY MATRICES
+c 
+c maxnpairs - maximal number of pairs in the matrix lower diagonal.
+c
+c
+      integer  maxnpairs
+      parameter (maxnpairs=maxnmonenh*(maxnmonenh-1)/2)
+      integer  maxnpairslocal
+      parameter (maxnpairslocal=maxnmonenhppos*(maxnmonenhppos-1)/2)
+c  
+c-------------------------------------------------------------------
+c Eiback - interaction between the rotamer i (considering all rotamers)
+c          and the backbone
+c Eij    - interaction between the pair ij of rotamers. Only the lower 
+c          diagonal part of the matrix is defined. The only 
+c          interactions considered are the ones between different 
+c          enhanced monomers. 
+c DEPij  - flag if a given pair is a DEAD END PAIR or not. Uses the 
+c          same indeces as in the Eij matrix. 
+c pointEij(i) - pointer to the last interaction of rotamer i. 
+c 
+      double precision Eiback(maxnmonenh), Eij(maxnpairs)
+      double precision Eibackmax,Eijmax,hugeE
+      integer pointEij(0:maxnmonenh)
+      logical DEPij(maxnpairs)
+c  
+c-----------------------------------------------------------------------
+c Now gather everything into common blocks
+c
+      common /NB/cutvdw2,cutvbig2,cutele2,cutebig2,rmax
+      common /DEEINT/pointEij,poirotenhaux,rotaux,nmonenhleft
+      common /DEEDBL/Eiback,Eij,Eibackmax,Eijmax,hugeE
+      common /DEELOG/kept,DEPij

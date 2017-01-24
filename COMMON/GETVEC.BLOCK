@@ -1,0 +1,43 @@
+c COMMON BLOCK for second derivatives calculations
+c Note that at present the storage of the covalent off diagonal 
+c derivatives is quite wasteful. This will hopefully be modified in the
+c not too far future. The list are packed according to the index of the
+c internal degree of freedom rather than according to atom numbers. The
+c same atom may (actually does) appear more than once. This way we are 
+c sure however that we are not storing zero elements and we know before
+c hand what is the size of matrices  that is required (which is still 
+c much less that 9*maxpt^2). In the future it will be probably better 
+c to set all of the above matrices to unsave local variables in the 
+c relevant routines. In the main caller for individiual matrices a 
+c screening can be made in order to generate a packed version of the 
+c total second derivative matrix.
+c
+c
+      logical usesym	
+      integer maxptoffd
+      parameter(maxptoffd=maxpt2d/9+1)
+      double precision diag(6*maxpt2d)
+      double precision offdiag(54*maxptoffd)
+      integer ifirst,ilast,pairs1(9*maxptoffd),pairs2(9*maxptoffd)
+      integer pairs1s(9*maxptoffd)		
+      double precision q_pair(9*maxptoffd),a_pair(9*maxptoffd),
+     1                 b_pair(9*maxptoffd),tmp_pair(9*maxptoffd)
+c
+      double precision d2pt_ave(9,maxpt2d)
+c
+      common /getvec0/diag,offdiag
+      common /getvec1/q_pair,a_pair,b_pair,tmp_pair
+      common /getvec2/pairs1,pairs2,pairs1s
+      common /getvec3/ifirst,ilast
+      common /getvec4/usesym
+      common /getvec5/ d2pt_ave
+	
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,4 @@
+c set to initiate printing of debugging info
+c
+	logical debug,debug0,echoNO
+	common /dbg/debug,debug0,echoNO

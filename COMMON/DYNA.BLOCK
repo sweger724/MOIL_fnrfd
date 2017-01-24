@@ -1,0 +1,185 @@
+C ***DYNAMICS COMMON BLOCK
+
+
+c itempg  - maximum number of different temperatures
+	integer itempg
+	parameter (itempg=10)
+
+c nstep   - number of integration steps
+	integer*8 nstep
+
+c neqstep - number of equilibration steps
+	integer neqstep
+
+c ninfo   - number of steps between information dump
+	integer ninfo
+
+c ncoor   - number of steps between writing coordinates
+	integer ncoor
+
+c nvelo   - number of steps between writing velocities
+	integer nvelo
+
+c nlist   - number of steps between recalculating the non-bonded list
+	integer nlist
+
+c nscalv  - temperature window width that specifies when rescaling happens
+	double precision  nscalv
+
+c tempi   - vector of intial temperatures
+	double precision tempi(itempg)
+
+c tempf   - vector of final temperatures
+	double precision tempf(itempg)
+
+c	If tempi is different from tempf, linear scaling is assumed
+c	between tempi to tempf using neqstep. I.e. each integration
+c	step the temperature is increased by the step
+c	(tempf-tempi)/neqstep = tempnew and the velocities are
+c	scaled by the ratio sqrt(tempnew/tempold) where tempold
+c	is the previous velocity. This can be used for annealing
+c	too. 
+
+c dtemp   - the step of changing the temperature.
+	double precision dtemp(itempg)
+
+c curtemp - the current temperature
+	double precision curtemp(itempg)
+
+c ntemp   - actual number of different temperatures
+	integer ntemp
+
+c tpo     - temperatureof different particles (used in case of multiple
+c		temperatures. Length of npt, point to tempi/f
+	integer tpo(maxpt)
+
+c tgroup  - the number of degrees of freedom in different temperature groups
+	integer tgroup(itempg)
+
+c dt      - time step. Total time is therefore nstep*step
+c	Funny units are used internally (angstrom, kcal/mol, molar
+c	masses - AKM). External step is expected in picoseconds.
+	double precision dt
+
+c dt2     - square of the time step divided by two
+	double precision dt2
+
+c twodt   - half the time step
+	double precision twodt
+
+c boltz   - If true, velcoities are sampled according to Boltzmann 
+c		distribution, if false, velocities are read from
+c		unit urvel
+	logical boltz
+
+c shakm   - If true, shake is activated in matrix for for TIP3 only
+	logical shakm
+
+c shakl   - If true, shake is activated for particles m <= 1.1
+	logical shakl
+
+c shakb   - If true all bonds are shaked
+	logical shakb
+
+c nori    - if true no orientation (exclusion of rigidi body rotation
+c		and translation is done.
+	logical nori
+
+c symanneal - if true a variable water box sized is used
+	logical symanneal
+
+c freeze  - If true, there are frozn atoms
+	logical freeze
+
+c eqms    - if true, all masses are set to the same and equal 10.
+	logical eqms
+
+c sdyes    - if true, use steepest descent minimization to re-initiate
+c	the dynamics
+	logical sdyes
+
+c e_csnt - if true the energy is assumed constant (no velocity scaling)
+c
+c   wfly - if true check if waters fly away
+	logical no_scaling, wfly
+
+c iorie    - number of particles used in reorientation
+	integer iorie
+
+c irand	  - integer to initialize the randomizer
+	integer irand
+
+c nrigi   - force removal of rigid body motion each nrigi steps
+	integer nrigi
+
+c newv    - period for reassignment (randomly) of velocities
+	integer newv
+
+c uwcrd    - a unit number to write coordinates
+	integer uwcrd
+
+c uwvel    - a unit number to write velocities
+	integer uwvel
+
+c ipick & jpick - pointers to particles
+c tpick - 0/1 to select a subset of atoms
+c 	for which temperature will be computed
+c tsele - number of toms for selected temp calculations
+c tpoint - pointer to atoms selected for temp calc
+	integer ipick(maxpt),jpick(maxpt),tpick(maxpt)
+        integer tsele,tpoint(maxpt)
+
+c Temperature pick is on
+	logical Ltpick
+
+c factor1 & factor2 - dble precision vectors in which some of the 
+c		constants for the integrator are computed and stored
+c		in advance
+	double precision factor1(maxpt),factor2(maxpt)
+
+c grdlx,grdly,grdlz - dble precision vectors with the gradient of
+c		rotational constraints. Rotations along the axes x y z
+c		are considered.
+	double precision grdlx(3,maxpt),grdly(3,maxpt),grdlz(3,maxpt)
+
+c syma2,symb2,symc2 - the dimension of a new periodic box to be 
+c		approached from the initial size of the box
+	double precision syma2,symb2,symc2
+
+c dxtra,dytra,dztra - the step to be used in changing the dimension of the box
+	double precision dxtra,dytra,dztra
+
+c rms - root mean square between two structures
+	double precision rms
+
+c fmax - maximum force allowed before calling steepest descent minimizer.
+	double precision fmax
+
+c checkpoint & restart
+	logical resume
+	integer uchx, uchv, nchkpt
+
+c bdcf0,bdcf1,bdcf2 - Coefficients of Verlet Alg. in BD sim.
+c	double precision bdcf0,bdcf1,bdcf2
+
+c volbx -- sim box volume = a*b*c  (luca, moil with pressure)
+        double precision volbx
+
+        double precision coupling
+        logical andersen
+
+c
+c Put all variables to common block
+c
+	common /dynint/neqstep,ninfo,ncoor,nvelo,nlist,
+     1		ntemp,tpo,tgroup,iorie,nrigi,newv,irand,
+     2		uwcrd,uwvel,ipick,jpick,uchx,uchv,nchkpt,
+     3          tpick,tpoint,tsele
+        common /dynlong/ nstep
+	common /dynlog/boltz,shakm,shakl,shakb,freeze,resume,
+     1		eqms,nori,symanneal,sdyes,no_scaling,wfly,
+     2          andersen,Ltpick
+	common /dyndbl/tempi,tempf,dtemp,curtemp,dt,dt2,twodt,
+     1		factor1,factor2,grdlx,grdly,grdlz,nscalv,
+     2		syma2,symb2,symc2,dxtra,dytra,dztra,rms,fmax,
+     3          volbx,coupling

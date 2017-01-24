@@ -1,0 +1,11 @@
+c Common Block for Coordinate and something more
+c LENGTH.BLOCK defines maxpt (maximum number of particles)
+c
+c vircon was added for dynapress (moil with pressure) as coded by Luca and
+c ported to moil by thomas 07 may 2008
+
+	double precision coor(3,maxpt),more(maxpt)
+	double precision coor2(3,maxpt)
+        double precision vircon
+	common /CRD/coor,more,vircon
+	common /CRD2/coor2

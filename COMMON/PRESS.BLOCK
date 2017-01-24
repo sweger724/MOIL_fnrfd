@@ -1,0 +1,63 @@
+c      nmol         - number of covalently distinct molecules in the system
+c      patom(i)     - pointer to the last particle of molecule i
+c      ordLISTatm(i)- list to order the atom belonging to a molecule
+c      pmol(i)      - pointer to the molecule to which particle i belongs
+c      xmol(i)      - x coordinate of the center of mass of molecule i
+c      ymol(i)      - y coordinate of the center of mass of molecule i
+c      zmol(i)      - z coordinate of the center of mass of molecule i
+c      xrel(i)      - x coordinate of particle i relative to the center of mass of the molecule it belongs to
+c      yrel(i)      - y coordinate of particle i relative to the center of mass of the molecule it belongs to
+c      zrel(i)      - z coordinate of particle i relative to the center of mass of the molecule it belongs to
+c      vxmol(i)     - x coordinate of the velocity of the center of mass of molecule i
+c      vymol(i)     - y coordinate of the velocity of the center of mass of molecule i
+c      vzmol(i)     - z coordinate of the velocity of the center of mass of molecule i
+c      massmol(i)   - mass of molecule i
+c      virial       - istantaneus value of the virial
+c      virXX        - contribution of the virial to the XX component of the stress tensor
+c      virYY        - contribution of the virial to the YY component of the stress tensor
+c      virZZ        - contribution of the virial to the ZZ component of the stress tensor
+c      press        - istantanues value of the pressure
+c      ave_press    - time average value of the pressure
+c      pressON      - flag to indicate that the pressure calculation is ON
+c      V_PIdir      - variable used in direct Ewald term
+c      V_PIdirXX    - XX component of the Ewald direct term in the stress tensor times the volume
+c      V_PIdirYY    - YY component of the Ewald direct term in the stress tensor times the volume
+c      V_PIdirZZ    - ZZ component of the Ewald direct term in the stress tensor times the volume
+c      V_PIrec      - variable used in reciprocal Ewald term
+c      V_PIrecXX    - XX component of the Ewald reciprocal term in the stress tensor times the volume
+c      V_PIrecYY    - YY component of the Ewald reciprocal term in the stress tensor times the volume
+c      V_PIrecZZ    - ZZ component of the Ewald reciprocal term in the stress tensor times the volume
+c      V_PIrelXX    - XX component of the Ewald reciprocal term due to relative coordinates times the volume
+c      V_PIrelYY    - YY component of the Ewald reciprocal term due to relative coordinates times the volume
+c      V_PIrelZZ    - ZZ component of the Ewald reciprocal term due to relative coordinates times the volume
+c      V_PIcor      - variable used in correction Ewald term
+c      V_PIcorXX    - XX component of the Ewald correction term in the stress tensor times the volume
+c      V_PIcorYY    - YY component of the Ewald correction term in the stress tensor times the volume
+c      V_PIcorZZ    - ZZ component of the Ewald correction term in the stress tensor times the volume 
+
+       integer nmol
+       integer patom(maxpt),pmol(maxpt),ordLISTatm(maxpt)
+
+       double precision xmol(maxpt),ymol(maxpt),zmol(maxpt)
+       double precision vxmol(maxpt),vymol(maxpt),vzmol(maxpt)
+       double precision xrel(maxpt),yrel(maxpt),zrel(maxpt)
+       double precision massmol(maxpt)
+       double precision virial,virXX,virYY,virZZ 
+       double precision V_PIdirXX,V_PIdirYY,V_PIdirZZ,V_PIdir
+       double precision V_PIrecXX,V_PIrecYY,V_PIrecZZ,V_PIrec
+       double precision V_PIrelXX,V_PIrelYY,V_PIrelZZ
+       double precision V_PIcorXX,V_PIcorYY,V_PIcorZZ,V_PIcor
+       double precision press,ave_press
+
+       logical pressON
+
+       common /pressint/ nmol,patom,pmol,ordLISTatm
+
+       common /pressdble/ xmol,ymol,zmol,vxmol,vymol,vzmol,massmol,
+     1                    xrel,yrel,zrel,
+     2                    virial,virXX,virYY,virZZ,press,ave_press,
+     3                    V_PIdirXX,V_PIdirYY,V_PIdirZZ,
+     4                    V_PIrecXX,V_PIrecYY,V_PIrecZZ,
+     5                    V_PIrelXX,V_PIrelYY,V_PIrelZZ,
+     6                    V_PIcorXX,V_PIcorYY,V_PIcorZZ
+       common /presslog/ pressON

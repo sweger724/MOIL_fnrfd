@@ -1,0 +1,36 @@
+C	Parameters 
+        double precision ENERGYC
+
+C	S is our action Sum_i  P_i (Del_(i-1) + Del_i)
+C       where P_i is our momentum and del_i is the dist. btwn two structures
+
+c	"action","target fn","total time","integral of potential over path"
+
+	double precision pdqS,pdqA
+	integer PRINTNUM,skpno
+
+        parameter(PRINTNUM=1)		
+        double precision maxenergy
+	double precision dA(3,MAXPT*LGRID)
+	double precision temp_dS(3,maxpt*2)
+	integer temprun,cycleno
+	logical debugpdq, Random_velocities
+
+c	runmode = 0 run chmin
+c       runmode = 1 run pdq
+	integer runmode,intp
+	double precision dave
+
+C	Momenta and positions of first and last structure
+	double precision p0_initial,p0_final, FORCE_ENERGY
+	double precision r_initial(3,MAXPT),r_final(3,MAXPT)
+
+c        parameter(MASSWEIGHT=1)	
+	double precision velocities(3,MAXPT*LGRID)
+        integer MASSWEIGHT
+	common /PDQ_D/pdqS,pdqA,dA,ENERGYC,velocities,
+     $       p0_initial,p0_final,maxenergy,
+     $       r_initial,r_final,dave,temp_dS,FORCE_ENERGY
+        common /PDQ_L/debugpdq,Random_velocities
+        common /PDQ_I/temprun,skpno,runmode,intp,cycleno,
+     $   MASSWEIGHT
